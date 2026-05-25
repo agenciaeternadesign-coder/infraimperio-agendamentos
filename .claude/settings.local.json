@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /Users/alayanesouza/Downloads/Claude -maxdepth 3 -name \"*.env\" -o -name \"*.env.local\" -o -name \"tokens*\" -o -name \"credentials*\" -o -name \"secrets*\" 2>/dev/null | head -20)",
+      "Bash(find /Users/alayanesouza -maxdepth 5 \\\\\\( -name \".netrc\" -o -name \"gh_token*\" -o -name \"github_token*\" \\\\\\) 2>/dev/null | head -10)",
+      "Bash(gh auth *)",
+      "Bash(git config *)",
+      "Bash(security find-internet-password *)",
+      "Bash(git init *)",
+      "Bash(git add *)",
+      "Bash(git commit *)"
+    ]
+  }
+}
