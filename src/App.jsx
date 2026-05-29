@@ -8,6 +8,7 @@ import Clientes from './pages/Clientes'
 import ClienteDetalhe from './pages/ClienteDetalhe'
 import NovaVisita from './pages/NovaVisita'
 import Configuracoes from './pages/Configuracoes'
+import Pagamentos from './pages/Pagamentos'
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
             <Route path="/clientes" element={<Clientes />} />
             <Route path="/clientes/:id" element={<ClienteDetalhe />} />
             <Route path="/nova-visita" element={<NovaVisita />} />
+            <Route path="/pagamentos" element={<Pagamentos />} />
             <Route path="/configuracoes" element={<Configuracoes />} />
           </Route>
         </Routes>
