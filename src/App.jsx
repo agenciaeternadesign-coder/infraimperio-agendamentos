@@ -12,6 +12,8 @@ import Configuracoes from './pages/Configuracoes'
 import Pagamentos from './pages/Pagamentos'
 import Login from './pages/Login'
 import Registo from './pages/Registo'
+import RecuperarPassword from './pages/RecuperarPassword'
+import RedefinirPassword from './pages/RedefinirPassword'
 
 function PrivateRoute({ children }) {
   const { user, loadingAuth } = useAuth()
@@ -35,6 +37,8 @@ export default function App() {
             {/* Public routes */}
             <Route path="/login" element={<Login />} />
             <Route path="/registo" element={<Registo />} />
+            <Route path="/recuperar-password" element={<RecuperarPassword />} />
+            <Route path="/redefinir-password" element={<RedefinirPassword />} />
 
             {/* Protected routes */}
             <Route

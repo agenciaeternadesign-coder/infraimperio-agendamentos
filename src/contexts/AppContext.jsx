@@ -36,8 +36,8 @@ export function AppProvider({ children }) {
     const savedClients  = storage.getClients()
     const savedSettings = storage.getSettings()
 
-    setVisits(savedVisits.length   ? savedVisits   : sampleVisits)
-    setClients(savedClients.length ? savedClients  : sampleClients)
+    setVisits(savedVisits)
+    setClients(savedClients)
     setSettings(mergeSettings(defaultSettings, savedSettings))
     setInitialized(true)
   }, [])

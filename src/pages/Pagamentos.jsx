@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { LOGO_BASE64 } from '../data/logo_base64'
+import { supabase } from '../lib/supabase'
+import { useAuth } from '../contexts/AuthContext'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const LS_KEY = 'infraimperio_recibos_v1'
@@ -1003,7 +1005,7 @@ function TabHistorico({ estado, setEstado, onAbrirMes }){
 }
 
 // ─── Tab: Definições ──────────────────────────────────────────────────────────
-function TabDefinicoes({ estado, setEstado }){
+function TabDefinicoes({ estado, setEstado, onApagarTudo }){
   const [empresa, setEmpresa]=useState({...estado.empresa})
   const [config, setConfig]=useState({...estado.config})
   const [msg, setMsg]=useState('')
@@ -1050,8 +1052,7 @@ function TabDefinicoes({ estado, setEstado }){
   function apagarTudo(){
     if(confirmApagar===0){ setConfirmApagar(1); return }
     if(confirmApagar===1){ setConfirmApagar(2); return }
-    localStorage.removeItem(LS_KEY)
-    window.location.reload()
+    onApagarTudo ? onApagarTudo() : (localStorage.removeItem(LS_KEY), window.location.reload())
   }
 
   return (
@@ -1138,17 +1139,113 @@ function TabDefinicoes({ estado, setEstado }){
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function Pagamentos(){
+  const { empresa: empresaAuth } = useAuth()
+  const empresaId = empresaAuth?.id ?? null
+
   const estadoRef=useRef(estadoInicial())
   const [, forceRender]=useState(0)
+  const [loading, setLoading]=useState(true)
   const [tab, setTab]=useState('folha')
-  const [folhaMes, setFolhaMes]=useState(null) // {mes,ano} when jumping from histórico
+  const [folhaMes, setFolhaMes]=useState(null)
+
+  // Load from Supabase on mount, overriding localStorage cache
+  useEffect(()=>{
+    if(!empresaId){ setLoading(false); return }
+    async function load(){
+      try{
+        const [{ data: funcs }, { data: folhasData }] = await Promise.all([
+          supabase.from('colaboradores').select('*').eq('empresa_id', empresaId),
+          supabase.from('folhas_ponto').select('*').eq('empresa_id', empresaId),
+        ])
+        const updates={}
+        if(funcs) updates.funcionarios=funcs
+        if(folhasData){
+          const folhasObj={}
+          folhasData.forEach(f=>{ folhasObj[chaveMes(f.mes,f.ano)]={registos:f.registos||[],data_guardado:f.data_guardado} })
+          updates.folhas=folhasObj
+        }
+        // Merge empresa info from auth
+        if(empresaAuth){
+          updates.empresa={
+            ...estadoRef.current.empresa,
+            nome: empresaAuth.nome || estadoRef.current.empresa.nome,
+            email: empresaAuth.email || estadoRef.current.empresa.email,
+          }
+        }
+        if(Object.keys(updates).length){
+          estadoRef.current={...estadoRef.current,...updates}
+          forceRender(n=>n+1)
+        }
+      } catch(e){ console.error('Supabase load error:',e) }
+      setLoading(false)
+    }
+    load()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[empresaId])
 
   function setEstado(updater){
     const prev=estadoRef.current
     const next=typeof updater==='function'?updater(prev):updater
     estadoRef.current=next
-    salvarEstado(next)
+    salvarEstado(next) // keep localStorage as offline cache
     forceRender(n=>n+1)
+
+    if(!empresaId) return
+
+    // Sync colaboradores when funcionarios array changes
+    if(next.funcionarios!==prev.funcionarios){
+      const prevById=Object.fromEntries((prev.funcionarios||[]).map(f=>[f.id,f]))
+      next.funcionarios.forEach(f=>{
+        const p=prevById[f.id]
+        if(!p||JSON.stringify(p)!==JSON.stringify(f)){
+          const {id,...rest}=f
+          supabase.from('colaboradores').upsert({id,empresa_id:empresaId,...rest}).then()
+        }
+      })
+    }
+
+    // Sync folha to Supabase when explicitly saved (data_guardado changes)
+    if(next.folhas!==prev.folhas){
+      Object.entries(next.folhas).forEach(([chave,folha])=>{
+        const prevFolha=prev.folhas[chave]
+        if(folha.data_guardado && folha.data_guardado!==prevFolha?.data_guardado){
+          const parts=chave.split('-')
+          const ano=parseInt(parts[0]), mes=parseInt(parts[1])
+          supabase.from('folhas_ponto').upsert(
+            {empresa_id:empresaId,mes,ano,registos:folha.registos,data_guardado:folha.data_guardado},
+            {onConflict:'empresa_id,mes,ano'}
+          ).then()
+        }
+        // Detect deleted folhas
+        if(!next.folhas[chave] && prev.folhas[chave]){
+          const parts=chave.split('-')
+          const ano=parseInt(parts[0]), mes=parseInt(parts[1])
+          supabase.from('folhas_ponto').delete()
+            .eq('empresa_id',empresaId).eq('mes',mes).eq('ano',ano).then()
+        }
+      })
+      // Detect deletions (keys in prev but not in next)
+      Object.keys(prev.folhas).forEach(chave=>{
+        if(!next.folhas[chave]){
+          const parts=chave.split('-')
+          const ano=parseInt(parts[0]), mes=parseInt(parts[1])
+          supabase.from('folhas_ponto').delete()
+            .eq('empresa_id',empresaId).eq('mes',mes).eq('ano',ano).then()
+        }
+      })
+    }
+  }
+
+  async function handleApagarTudo(){
+    if(!window.confirm('ÚLTIMA CONFIRMAÇÃO: Apagar todos os dados da nuvem e locais?')) return
+    if(empresaId){
+      await Promise.all([
+        supabase.from('colaboradores').delete().eq('empresa_id',empresaId),
+        supabase.from('folhas_ponto').delete().eq('empresa_id',empresaId),
+      ])
+    }
+    localStorage.removeItem(LS_KEY)
+    window.location.reload()
   }
 
   const estado=estadoRef.current
@@ -1165,6 +1262,19 @@ export default function Pagamentos(){
     {id:'historico',label:'🗂️ Histórico'},
     {id:'definicoes',label:'⚙️ Definições'},
   ]
+
+  if(loading){
+    return (
+      <div className="max-w-[1600px] mx-auto">
+        <div className="flex gap-1 bg-white border-b px-2 pt-2 overflow-x-auto">
+          {tabs.map(t=>(
+            <button key={t.id} className="px-4 py-2 text-sm font-medium whitespace-nowrap border-b-2 border-transparent text-gray-400">{t.label}</button>
+          ))}
+        </div>
+        <div className="p-8 text-center text-gray-500 text-sm">A carregar dados...</div>
+      </div>
+    )
+  }
 
   return (
     <div className="max-w-[1600px] mx-auto">
@@ -1183,7 +1293,7 @@ export default function Pagamentos(){
         {tab==='funcionarios'&&<TabFuncionarios estado={estado} setEstado={setEstado} />}
         {tab==='recibos'&&<TabRecibos estado={estado} />}
         {tab==='historico'&&<TabHistorico estado={estado} setEstado={setEstado} onAbrirMes={abrirMesHistorico} />}
-        {tab==='definicoes'&&<TabDefinicoes estado={estado} setEstado={setEstado} />}
+        {tab==='definicoes'&&<TabDefinicoes estado={estado} setEstado={setEstado} onApagarTudo={handleApagarTudo} />}
       </div>
     </div>
   )

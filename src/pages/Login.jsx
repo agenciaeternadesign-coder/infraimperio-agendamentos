@@ -71,6 +71,11 @@ export default function Login() {
                 placeholder="••••••••"
               />
             </div>
+            <div className="text-right -mt-2">
+              <Link to="/recuperar-password" className="text-xs text-brand-600 hover:underline">
+                Esqueceu a password?
+              </Link>
+            </div>
             <button
               type="submit"
               disabled={loading}

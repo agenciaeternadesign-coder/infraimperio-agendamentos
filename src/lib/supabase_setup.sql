@@ -85,3 +85,47 @@ create policy "empresa members can manage folhas"
       select id from public.empresas where owner_id = auth.uid()
     )
   );
+
+-- ── colaboradores (payroll workers) ──────────────────────────
+create table if not exists public.colaboradores (
+  id              text primary key,
+  empresa_id      uuid references public.empresas(id) on delete cascade not null,
+  nome            text not null,
+  tipo            text default 'diarista',
+  diaria          numeric(10,2) default 0,
+  valor_fixo      numeric(10,2) default 0,
+  nif             text,
+  niss            text,
+  funcao          text,
+  morada          text,
+  cp              text,
+  forma_pagamento text default 'transferencia',
+  iban            text,
+  ativo           boolean default true,
+  created_at      timestamptz default now()
+);
+
+alter table public.colaboradores enable row level security;
+
+create policy "empresa owner can manage colaboradores"
+  on public.colaboradores for all
+  using (empresa_id in (select id from public.empresas where owner_id = auth.uid()))
+  with check (empresa_id in (select id from public.empresas where owner_id = auth.uid()));
+
+-- ── folhas_ponto (monthly payroll sheets) ────────────────────
+create table if not exists public.folhas_ponto (
+  id            uuid primary key default uuid_generate_v4(),
+  empresa_id    uuid references public.empresas(id) on delete cascade not null,
+  mes           int not null,
+  ano           int not null,
+  registos      jsonb default '[]',
+  data_guardado timestamptz,
+  unique (empresa_id, mes, ano)
+);
+
+alter table public.folhas_ponto enable row level security;
+
+create policy "empresa owner can manage folhas_ponto"
+  on public.folhas_ponto for all
+  using (empresa_id in (select id from public.empresas where owner_id = auth.uid()))
+  with check (empresa_id in (select id from public.empresas where owner_id = auth.uid()));
