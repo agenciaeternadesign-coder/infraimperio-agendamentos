@@ -36,6 +36,9 @@ export const WORK_TYPE_LABELS = {
   serralharia: 'Serralharia',
   vidros: 'Vidros e Janelas',
   pladur: 'Obras em Pladur',
+  fachada_frontal: 'Fachada Frontal',
+  fachada_tardoz: 'Fachada Tardoz',
+  fachada_empena: 'Fachada Empena',
   outro: 'Outro',
 }
 
