@@ -7,44 +7,19 @@ import { useAuth } from '../contexts/AuthContext'
 const LS_KEY = 'infraimperio_recibos_v1'
 const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
 
-const FUNCIONARIOS_INICIAIS = [
-  {nome:"Wanderson",tipo:"diarista",diaria:77.27},
-  {nome:"Rildomar",tipo:"diarista",diaria:63.63},
-  {nome:"Alexandre",tipo:"diarista",diaria:50.0},
-  {nome:"Mateus",tipo:"diarista",diaria:81.81},
-  {nome:"Paulo",tipo:"diarista",diaria:80.0},
-  {nome:"Milton",tipo:"diarista",diaria:50.0},
-  {nome:"Domingos",tipo:"diarista",diaria:50.0},
-  {nome:"Ronei",tipo:"diarista",diaria:70.0},
-  {nome:"André",tipo:"diarista",diaria:79.09},
-  {nome:"Valdo",tipo:"diarista",diaria:60.0},
-  {nome:"Reginaldo",tipo:"diarista",diaria:68.18},
-  {nome:"João",tipo:"diarista",diaria:0},
-  {nome:"Fábio",tipo:"diarista",diaria:0},
-  {nome:"César",tipo:"diarista",diaria:60.0},
-  {nome:"Roberto",tipo:"diarista",diaria:80.0},
-  {nome:"Manuel",tipo:"mensalista",diaria:0},
-  {nome:"Sofia",tipo:"mensalista",diaria:0},
-  {nome:"Vanessa",tipo:"mensalista",diaria:0},
-  {nome:"Alayane",tipo:"mensalista",diaria:0},
-  {nome:"Jaqueline",tipo:"mensalista",diaria:0},
-  {nome:"Jardel",tipo:"prestador",diaria:80.0},
-  {nome:"Elvis",tipo:"prestador",diaria:80.0},
-  {nome:"Rapel Blanqui",tipo:"prestador",diaria:0},
-  {nome:"José Eletricista",tipo:"prestador",diaria:0},
-]
+const FUNCIONARIOS_INICIAIS = []
 
 const EMPRESA_DEFAULT = {
-  nome:"INFRAIMPÉRIO - OBRAS REMODELAÇÕES",
-  morada:"Rua Miguel Bombarda n78",
-  cp:"2830-345 Barreiro",
+  nome:"",
+  morada:"",
+  cp:"",
   pais:"Portugal",
-  email:"infraimperio.obras@gmail.com",
+  email:"",
   tel:"",
-  nipc:"513674233",
-  capital:"10.000,00",
-  crc:"513674233",
-  matricula:"513674233",
+  nipc:"",
+  capital:"",
+  crc:"",
+  matricula:"",
 }
 
 const CONFIG_DEFAULT = {
