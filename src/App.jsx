@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { AppProvider } from './contexts/AppContext'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import Layout from './components/Layout'
@@ -32,7 +32,7 @@ export default function App() {
   return (
     <AuthProvider>
       <AppProvider>
-        <BrowserRouter>
+        <Router>
           <Routes>
             {/* Public routes */}
             <Route path="/login" element={<Login />} />
@@ -58,7 +58,7 @@ export default function App() {
               <Route path="/configuracoes" element={<Configuracoes />} />
             </Route>
           </Routes>
-        </BrowserRouter>
+        </Router>
       </AppProvider>
     </AuthProvider>
   )
