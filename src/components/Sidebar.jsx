@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { useAuth } from '../contexts/AuthContext'
+import { useApp } from '../contexts/AppContext'
 
 const NAV = [
   { to: '/',             label: 'Dashboard',    icon: HomeIcon },
@@ -12,7 +12,9 @@ const NAV = [
 ]
 
 export default function Sidebar({ open, onClose }) {
-  const { empresa, logout } = useAuth()
+  const { settings } = useApp()
+  const nomeEmpresa = settings?.company?.name || 'GestãoPro'
+  const cidadeEmpresa = settings?.company?.city || ''
   return (
     <>
       {/* Overlay mobile */}
@@ -33,8 +35,8 @@ export default function Sidebar({ open, onClose }) {
               <BuildingIcon />
             </div>
             <div>
-              <p className="text-white font-bold text-base leading-tight">{empresa?.nome || 'A carregar...'}</p>
-              <p className="text-brand-300 text-xs">{empresa?.email || ''}</p>
+              <p className="text-white font-bold text-base leading-tight">{nomeEmpresa}</p>
+              <p className="text-brand-300 text-xs">{cidadeEmpresa}</p>
             </div>
           </div>
         </div>
@@ -67,17 +69,11 @@ export default function Sidebar({ open, onClose }) {
 
         {/* Logout */}
         <div className="px-3 pb-2">
-          <button
-            onClick={logout}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-brand-300 hover:bg-brand-800 hover:text-white transition-colors"
-          >
-            <LogoutIcon /> Sair
-          </button>
         </div>
 
         {/* Footer */}
         <div className="px-4 py-4 border-t border-brand-800">
-          <p className="text-brand-400 text-xs text-center">{empresa?.city || ''}</p>
+          <p className="text-brand-400 text-xs text-center">GestãoPro Suite v1.0</p>
         </div>
       </aside>
     </>
