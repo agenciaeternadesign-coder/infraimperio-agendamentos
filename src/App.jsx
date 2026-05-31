@@ -1,6 +1,6 @@
-import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { HashRouter as Router, Routes, Route } from 'react-router-dom'
 import { AppProvider } from './contexts/AppContext'
-import { AuthProvider, useAuth } from './contexts/AuthContext'
+import { AuthProvider } from './contexts/AuthContext'
 import Layout from './components/Layout'
 import Dashboard from './pages/Dashboard'
 import Agenda from './pages/Agenda'
@@ -10,23 +10,6 @@ import ClienteDetalhe from './pages/ClienteDetalhe'
 import NovaVisita from './pages/NovaVisita'
 import Configuracoes from './pages/Configuracoes'
 import Pagamentos from './pages/Pagamentos'
-import Login from './pages/Login'
-import Registo from './pages/Registo'
-import RecuperarPassword from './pages/RecuperarPassword'
-import RedefinirPassword from './pages/RedefinirPassword'
-
-function PrivateRoute({ children }) {
-  const { user, loadingAuth } = useAuth()
-  if (loadingAuth) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-brand-900">
-        <div className="text-brand-300 text-sm">A carregar...</div>
-      </div>
-    )
-  }
-  if (!user) return <Navigate to="/login" replace />
-  return children
-}
 
 export default function App() {
   return (
@@ -34,20 +17,7 @@ export default function App() {
       <AppProvider>
         <Router>
           <Routes>
-            {/* Public routes */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/registo" element={<Registo />} />
-            <Route path="/recuperar-password" element={<RecuperarPassword />} />
-            <Route path="/redefinir-password" element={<RedefinirPassword />} />
-
-            {/* Protected routes */}
-            <Route
-              element={
-                <PrivateRoute>
-                  <Layout />
-                </PrivateRoute>
-              }
-            >
+            <Route element={<Layout />}>
               <Route path="/" element={<Dashboard />} />
               <Route path="/agenda" element={<Agenda />} />
               <Route path="/rota" element={<RotaDia />} />
