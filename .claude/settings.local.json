@@ -78,7 +78,9 @@
       "Bash(python3 /tmp/orc_client_search.py)",
       "Bash(python3 -c \"import fitz; print\\('PyMuPDF OK'\\)\")",
       "Bash(python3 -c \"import pdf2image; print\\('pdf2image OK'\\)\")",
-      "Bash(python3 -c \"import fitz; print\\('OK'\\)\")"
+      "Bash(python3 -c \"import fitz; print\\('OK'\\)\")",
+      "Bash(git tag *)",
+      "Bash(git push *)"
     ]
   }
 }
