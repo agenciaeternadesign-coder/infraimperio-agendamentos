@@ -106,13 +106,13 @@ export const sampleVisits = [
 
 export const defaultSettings = {
   company: {
-    name: 'Infraimpério',
-    street: 'Rua Miguel Bombarda',
-    number: '78',
-    city: 'Barreiro',
-    postalCode: '2830-000',
-    phone: '+351 212 345 678',
-    email: 'geral@infraimperio.pt',
+    name: '',
+    street: '',
+    number: '',
+    city: '',
+    postalCode: '',
+    phone: '',
+    email: '',
   },
   emailjs: {
     serviceId: '',
@@ -125,7 +125,7 @@ export const defaultSettings = {
     end: '18:00',
   },
   googleMaps: {
-    apiKey: 'AIzaSyDZ0xj8-8447oTtyZyD-SGoctxUObplCnA',
+    apiKey: '',
   },
   whatsapp: {
     twilio: {

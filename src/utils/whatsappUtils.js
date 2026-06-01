@@ -83,31 +83,18 @@ export async function sendTwilioWhatsApp(phone, body, twilio) {
   const toNumber = cleanPhone(phone)
   const fromClean = cleanPhone(fromNumber)
 
-  const form = new URLSearchParams({
-    From: `whatsapp:+${fromClean}`,
-    To:   `whatsapp:+${toNumber}`,
-    Body: body,
-  })
-
   try {
-    const res = await fetch(
-      `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Basic ${btoa(`${accountSid}:${authToken}`)}`,
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: form.toString(),
-      }
-    )
-    if (res.ok) return { success: true }
-    const err = await res.json().catch(() => ({}))
-    return { success: false, error: err.message ?? `Erro HTTP ${res.status}` }
+    // Use local proxy in dev, Vercel serverless function in production
+    const proxyUrl = '/api/twilio-proxy'
+    const res = await fetch(proxyUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ accountSid, authToken, fromNumber: fromClean, toNumber, body }),
+    })
+    const data = await res.json().catch(() => ({}))
+    if (res.ok && data.success) return { success: true }
+    return { success: false, error: data.error ?? `Erro HTTP ${res.status}` }
   } catch {
-    return {
-      success: false,
-      error: 'Falha de rede. Em produção o Twilio requer um backend proxy (CORS). Em localhost pode funcionar com extensão CORS.',
-    }
+    return { success: false, error: 'Falha de rede ao contactar o proxy Twilio.' }
   }
 }

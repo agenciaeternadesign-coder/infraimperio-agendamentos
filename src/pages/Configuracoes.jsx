@@ -1,5 +1,7 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useApp } from '../contexts/AppContext'
+import { useAuth } from '../contexts/AuthContext'
+import { supabase } from '../lib/supabase'
 import { toExportFormat, downloadJson, readJsonFile, fromExportFormat, requestAutoSyncFile, hasAutoSync } from '../utils/exportUtils'
 import { applyBrandColors } from '../utils/brandColors'
 
@@ -14,7 +16,24 @@ const PRESET_THEMES = [
 
 export default function Configuracoes() {
   const { settings, updateSettings, visits, clients, addVisit } = useApp()
+  const { empresa, setEmpresa } = useAuth()
   const [company,  setCompany]  = useState(settings.company)
+
+  // Pre-fill company data from Supabase empresa context
+  useEffect(() => {
+    if (empresa) {
+      setCompany((prev) => ({
+        ...prev,
+        name:       empresa.nome        ?? prev.name,
+        email:      empresa.email       ?? prev.email,
+        phone:      empresa.telefone    ?? prev.phone,
+        street:     empresa.street      ?? prev.street,
+        number:     empresa.number      ?? prev.number,
+        city:       empresa.city        ?? prev.city,
+        postalCode: empresa.postal_code ?? prev.postalCode,
+      }))
+    }
+  }, [empresa])
   const [emailjs,  setEmailjs]  = useState(settings.emailjs)
   const [hours,    setHours]    = useState(settings.workingHours)
   const [mapsKey,  setMapsKey]  = useState(settings.googleMaps?.apiKey ?? '')
@@ -63,7 +82,7 @@ export default function Configuracoes() {
     updateSettings({ branding: { ...branding, logoUrl: '' } })
   }
 
-  function handleSave(e) {
+  async function handleSave(e) {
     e.preventDefault()
     updateSettings({
       company,
@@ -73,6 +92,24 @@ export default function Configuracoes() {
       whatsapp: { twilio },
       branding,
     })
+
+    // Upsert to Supabase if empresa exists
+    if (empresa?.id) {
+      const updates = {
+        id:          empresa.id,
+        owner_id:    empresa.owner_id,
+        nome:        company.name,
+        email:       company.email,
+        telefone:    company.phone,
+        street:      company.street,
+        number:      company.number,
+        city:        company.city,
+        postal_code: company.postalCode,
+      }
+      const { data } = await supabase.from('empresas').upsert(updates).select().single()
+      if (data) setEmpresa(data)
+    }
+
     setSaved(true)
     setTimeout(() => setSaved(false), 2500)
   }

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { GoogleMap, DirectionsRenderer, useJsApiLoader } from '@react-google-maps/api'
 
 const LIBRARIES = []
-const HQ = { lat: 38.6637, lng: -9.0722 }
+const HQ_DEFAULT = { lat: 38.7167, lng: -9.1333 } // Lisboa, Portugal
 const MAP_OPTIONS = {
   zoomControl: true,
   streetViewControl: false,
@@ -15,7 +15,7 @@ const MAP_OPTIONS = {
 }
 
 // Inner component — only rendered when apiKey is present
-function MapContent({ visits, onLegsUpdate }) {
+function MapContent({ visits, onLegsUpdate, hqAddress }) {
   const [directions, setDirections]     = useState(null)
   const [dirError, setDirError]         = useState(null)
   const reqSeq = useRef(0)
@@ -33,11 +33,12 @@ function MapContent({ visits, onLegsUpdate }) {
     reqSeq.current += 1
     const seq = reqSeq.current
 
+    const origin = hqAddress || 'Portugal'
     const ds = new window.google.maps.DirectionsService()
     ds.route(
       {
-        origin:      HQ,
-        destination: HQ,
+        origin:      origin,
+        destination: origin,
         waypoints: visits.map((v) => ({
           location: `${v.address.street} ${v.address.number}, ${v.address.city}, Portugal`,
           stopover: true,
@@ -89,7 +90,7 @@ function MapContent({ visits, onLegsUpdate }) {
       )}
       <GoogleMap
         mapContainerStyle={{ width: '100%', height: '420px', borderRadius: '12px' }}
-        center={HQ}
+        center={HQ_DEFAULT}
         zoom={visits.length === 0 ? 12 : 11}
         options={MAP_OPTIONS}
       >
@@ -108,7 +109,7 @@ function MapContent({ visits, onLegsUpdate }) {
 }
 
 // Loader wrapper — must call hooks unconditionally
-function MapLoader({ apiKey, visits, onLegsUpdate }) {
+function MapLoader({ apiKey, visits, onLegsUpdate, hqAddress }) {
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: apiKey,
     libraries: LIBRARIES,
@@ -133,16 +134,15 @@ function MapLoader({ apiKey, visits, onLegsUpdate }) {
     )
   }
 
-  return <MapContent visits={visits} onLegsUpdate={onLegsUpdate} />
+  return <MapContent visits={visits} onLegsUpdate={onLegsUpdate} hqAddress={hqAddress} />
 }
 
 // Public component — shows NoKey banner if no apiKey
-export default function MapaRota({ apiKey, visits, onLegsUpdate }) {
+export default function MapaRota({ apiKey, visits, onLegsUpdate, hqAddress }) {
   if (!apiKey) {
     return <NoApiKeyBanner />
   }
-  // key prop forces remount when apiKey changes (reloads script)
-  return <MapLoader key={apiKey} apiKey={apiKey} visits={visits} onLegsUpdate={onLegsUpdate} />
+  return <MapLoader key={apiKey} apiKey={apiKey} visits={visits} onLegsUpdate={onLegsUpdate} hqAddress={hqAddress} />
 }
 
 function NoApiKeyBanner() {
