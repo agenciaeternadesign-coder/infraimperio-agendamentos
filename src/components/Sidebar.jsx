@@ -3,10 +3,6 @@ import { useApp } from '../contexts/AppContext'
 
 const NAV = [
   { to: '/',             label: 'Dashboard',    icon: HomeIcon },
-  { to: '/agenda',       label: 'Agenda',       icon: CalendarIcon },
-  { to: '/rota',         label: 'Rota do Dia',  icon: MapIcon },
-  { to: '/clientes',     label: 'Clientes',     icon: UsersIcon },
-  { to: '/nova-visita',  label: 'Nova Visita',  icon: PlusIcon, accent: true },
   { to: '/pagamentos',   label: 'Pagamentos',   icon: MoneyIcon },
   { to: '/entregas',     label: 'Entregas',     icon: HandCashIcon },
   { to: '/configuracoes',label: 'Configurações', icon: CogIcon },
