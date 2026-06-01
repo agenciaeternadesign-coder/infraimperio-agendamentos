@@ -23,11 +23,8 @@ export default function RotaDia() {
   const [showMap, setShowMap]           = useState(true)
   const [gapMinutes, setGapMinutes]     = useState(30)
 
-  const apiKey      = settings.googleMaps?.apiKey ?? ''
+  const apiKey    = settings.googleMaps?.apiKey ?? ''
   const companyAddr = settings.company
-  const hqAddress   = companyAddr
-    ? `${companyAddr.street} ${companyAddr.number}, ${companyAddr.city}`.trim()
-    : ''
 
   useEffect(() => {
     const dayVisits = getVisitsByDate(date).filter((v) => v.status !== 'cancelado')
@@ -143,7 +140,6 @@ export default function RotaDia() {
           apiKey={apiKey}
           visits={orderedVisits}
           onLegsUpdate={setLegInfo}
-          hqAddress={hqAddress}
         />
       )}
 
@@ -154,7 +150,7 @@ export default function RotaDia() {
         </div>
       ) : (
         <div className="space-y-1">
-          <HQStop label="Ponto de partida" sub={hqAddress || 'Sede da empresa'} />
+          <HQStop label="Ponto de partida" sub="Rua Miguel Bombarda 78, Barreiro" />
 
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext items={orderedVisits.map((v) => v.id)} strategy={verticalListSortingStrategy}>
@@ -177,7 +173,7 @@ export default function RotaDia() {
               <span className="text-xs text-green-600 font-medium">{returnLeg.duration} · {returnLeg.distance}</span>
             </div>
           )}
-          <HQStop label="Regresso à sede" sub={hqAddress || 'Sede da empresa'} />
+          <HQStop label="Regresso à sede" sub="Rua Miguel Bombarda 78, Barreiro" />
         </div>
       )}
 
