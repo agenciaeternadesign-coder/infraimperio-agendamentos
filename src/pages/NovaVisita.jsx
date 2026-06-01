@@ -5,10 +5,10 @@ import { WORK_TYPE_LABELS } from '../components/StatusBadge'
 import { todayString } from '../utils/dateUtils'
 import { formatDateShort } from '../utils/dateUtils'
 
-const WORK_TYPES = Object.entries(WORK_TYPE_LABELS)
+const WORK_TYPES = Object.entries(WORK_TYPE_LABELS).filter(([v]) => !['remodelacao','construcao','instalacoes','outro'].includes(v))
 
-const EMPTY_CLIENT = { name: '', phone: '', email: '', address: { street: '', number: '', city: '', postalCode: '' }, workType: 'remodelacao', notes: '' }
-const EMPTY_VISIT  = { date: todayString(), time: '09:00', address: { street: '', number: '', city: '', postalCode: '' }, workType: 'remodelacao', observations: '', status: 'agendado' }
+const EMPTY_CLIENT = { salutation: '', name: '', phone: '', email: '', address: { street: '', number: '', floor: '', city: '', postalCode: '' }, workType: 'telhados', notes: '' }
+const EMPTY_VISIT  = { date: todayString(), time: '09:00', address: { street: '', number: '', floor: '', city: '', postalCode: '' }, workType: 'telhados', observations: '', status: 'agendado' }
 
 export default function NovaVisita() {
   const { clients, addVisit, addClient, findDuplicateClient, getClientVisits } = useApp()
@@ -35,12 +35,15 @@ export default function NovaVisita() {
     }
   }, [searchParams, clients])
 
-  // When client is selected, pre-fill visit address
+  // Pre-fill visit address from client address when toggled on
   useEffect(() => {
-    if (selectedClient && sameAddressAsClient) {
+    if (!sameAddressAsClient) return
+    if (selectedClient) {
       setVisitForm((f) => ({ ...f, address: { ...selectedClient.address }, workType: selectedClient.workType ?? f.workType }))
+    } else if (clientMode === 'new' && newClientForm.address.street) {
+      setVisitForm((f) => ({ ...f, address: { ...newClientForm.address } }))
     }
-  }, [selectedClient, sameAddressAsClient])
+  }, [selectedClient, sameAddressAsClient, clientMode, newClientForm.address])
 
   const filteredClients = clients.filter((c) => {
     const q = search.toLowerCase()
@@ -85,14 +88,15 @@ export default function NovaVisita() {
 
     let client = selectedClient
     if (!client && clientMode === 'new') {
-      client = addClient(newClientForm)
+      client = await addClient(newClientForm)
     }
 
     if (!client) { setSaving(false); return }
 
+    const displayName = client.salutation ? `${client.salutation} ${client.name}` : client.name
     await addVisit({
       clientId: client.id,
-      clientName: client.name,
+      clientName: displayName,
       clientPhone: client.phone,
       clientEmail: client.email,
       ...visitForm,
@@ -100,7 +104,7 @@ export default function NovaVisita() {
 
     setSaving(false)
     setSuccess(true)
-    setTimeout(() => navigate('/agenda'), 1800)
+    setTimeout(() => navigate('/agenda'), 1200)
   }
 
   if (success) {
@@ -179,7 +183,15 @@ export default function NovaVisita() {
                 <DuplicateAlert alert={duplicateAlert} onUseExisting={() => handleSelectClient(duplicateAlert.client)} />
               )}
 
-              <div className="sm:col-span-2">
+              <div>
+                <label className="label">Tratamento</label>
+                <select className="input" value={newClientForm.salutation} onChange={(e) => handleNewClientChange('salutation', e.target.value)}>
+                  <option value="">—</option>
+                  <option value="Sr.">Sr.</option>
+                  <option value="Sra.">Sra.</option>
+                </select>
+              </div>
+              <div>
                 <label className="label">Nome completo *</label>
                 <input className="input" value={newClientForm.name} onChange={(e) => handleNewClientChange('name', e.target.value)} required />
               </div>
@@ -197,7 +209,7 @@ export default function NovaVisita() {
                   {WORK_TYPES.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
                 </select>
               </div>
-              <div className="sm:col-span-2 grid grid-cols-3 gap-2">
+              <div className="sm:col-span-2 grid grid-cols-4 gap-2">
                 <div className="col-span-2">
                   <label className="label">Rua</label>
                   <input className="input" value={newClientForm.address.street} onChange={(e) => handleNewClientChange('address', e.target.value, 'street')} />
@@ -205,6 +217,10 @@ export default function NovaVisita() {
                 <div>
                   <label className="label">Nº</label>
                   <input className="input" value={newClientForm.address.number} onChange={(e) => handleNewClientChange('address', e.target.value, 'number')} />
+                </div>
+                <div>
+                  <label className="label">Andar</label>
+                  <input className="input" placeholder="3º Esq." value={newClientForm.address.floor} onChange={(e) => handleNewClientChange('address', e.target.value, 'floor')} />
                 </div>
               </div>
               <div>
@@ -283,27 +299,28 @@ export default function NovaVisita() {
             <div className="sm:col-span-2">
               <div className="flex items-center justify-between mb-2">
                 <label className="label mb-0">Morada da Visita</label>
-                {selectedClient && (
-                  <label className="flex items-center gap-2 text-xs text-slate-600 cursor-pointer">
+                {(selectedClient || (clientMode === 'new' && newClientForm.address.street)) && (
+                  <label className="flex items-center gap-2 text-xs text-brand-700 font-medium cursor-pointer select-none bg-brand-50 border border-brand-200 rounded-lg px-2.5 py-1">
                     <input
                       type="checkbox"
                       checked={sameAddressAsClient}
                       onChange={(e) => setSameAddressAsClient(e.target.checked)}
-                      className="rounded"
+                      className="rounded accent-brand-700"
                     />
-                    Mesma do cliente
+                    Usar morada do cliente
                   </label>
                 )}
               </div>
-              <div className="grid grid-cols-3 gap-2">
+              <div className={`grid grid-cols-4 gap-2 ${sameAddressAsClient ? 'opacity-60' : ''}`}>
                 <div className="col-span-2">
-                  <input className="input" placeholder="Rua" value={visitForm.address.street} onChange={(e) => handleVisitChange('address', e.target.value, 'street')} />
+                  <input className="input" placeholder="Rua" value={visitForm.address.street} readOnly={sameAddressAsClient} onChange={(e) => handleVisitChange('address', e.target.value, 'street')} />
                 </div>
-                <input className="input" placeholder="Nº" value={visitForm.address.number} onChange={(e) => handleVisitChange('address', e.target.value, 'number')} />
+                <input className="input" placeholder="Nº" value={visitForm.address.number} readOnly={sameAddressAsClient} onChange={(e) => handleVisitChange('address', e.target.value, 'number')} />
+                <input className="input" placeholder="Andar" value={visitForm.address.floor ?? ''} readOnly={sameAddressAsClient} onChange={(e) => handleVisitChange('address', e.target.value, 'floor')} />
               </div>
-              <div className="grid grid-cols-2 gap-2 mt-2">
-                <input className="input" placeholder="Cidade" value={visitForm.address.city} onChange={(e) => handleVisitChange('address', e.target.value, 'city')} required />
-                <input className="input" placeholder="Código Postal" value={visitForm.address.postalCode} onChange={(e) => handleVisitChange('address', e.target.value, 'postalCode')} />
+              <div className={`grid grid-cols-2 gap-2 mt-2 ${sameAddressAsClient ? 'opacity-60' : ''}`}>
+                <input className="input" placeholder="Cidade" value={visitForm.address.city} readOnly={sameAddressAsClient} onChange={(e) => handleVisitChange('address', e.target.value, 'city')} required />
+                <input className="input" placeholder="Código Postal" value={visitForm.address.postalCode} readOnly={sameAddressAsClient} onChange={(e) => handleVisitChange('address', e.target.value, 'postalCode')} />
               </div>
             </div>
 

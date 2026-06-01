@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import {
   startOfMonth, endOfMonth, startOfWeek, endOfWeek,
   eachDayOfInterval, isSameMonth, isSameDay, addMonths,
@@ -23,10 +23,24 @@ export default function Agenda() {
   const [selectedVisit, setSelectedVisit] = useState(null)
   const [selectedDay, setSelectedDay] = useState(null)
 
-  const visitsForDay = (date) => {
+  // Mapa date→visitas calculado uma só vez por mudança no array de visitas
+  const visitsByDate = useMemo(() => {
+    const map = {}
+    for (const v of visits) {
+      if (!map[v.date]) map[v.date] = []
+      map[v.date].push(v)
+    }
+    // ordenar cada dia por hora
+    for (const key of Object.keys(map)) {
+      map[key].sort((a, b) => a.time.localeCompare(b.time))
+    }
+    return map
+  }, [visits])
+
+  const visitsForDay = useCallback((date) => {
     const str = format(date, 'yyyy-MM-dd')
-    return visits.filter((v) => v.date === str).sort((a, b) => a.time.localeCompare(b.time))
-  }
+    return visitsByDate[str] ?? []
+  }, [visitsByDate])
 
   return (
     <div className="max-w-5xl space-y-4">

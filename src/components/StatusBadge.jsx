@@ -16,9 +16,28 @@ export default function StatusBadge({ status, size = 'sm' }) {
 }
 
 export const WORK_TYPE_LABELS = {
-  remodelacao: 'Remodelação',
-  construcao: 'Construção Nova',
+  telhados: 'Telhados e Coberturas',
+  claraboias: 'Claraboias',
+  canalizacao: 'Canalização',
+  carpintaria: 'Carpintaria',
+  eletricidade: 'Eletricidade',
+  estores: 'Estores e Persianas',
+  isolamento: 'Isolamento',
+  manutencao: 'Manutenção',
+  montagens: 'Montagens',
+  coluna_agua: 'Coluna de Água de Prédios',
+  obras_construcao: 'Obras e Construção',
+  pavimentos: 'Pavimentos',
   pintura: 'Pintura',
+  piscinas: 'Piscinas',
+  reabilitacao: 'Reabilitação',
+  remodelacoes: 'Remodelações',
+  serralharia: 'Serralharia',
+  vidros: 'Vidros e Janelas',
+  pladur: 'Obras em Pladur',
+  // backward compat
+  remodelacao: 'Remodelações',
+  construcao: 'Obras e Construção',
   instalacoes: 'Instalações',
   outro: 'Outro',
 }

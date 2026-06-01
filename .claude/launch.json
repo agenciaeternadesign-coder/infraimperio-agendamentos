@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "suite",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "-p", "3001", "/Users/alayanesouza/Downloads/Claude"],
+      "port": 3001
+    }
+  ]
+}

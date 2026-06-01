@@ -69,8 +69,22 @@ function MapContent({ visits, onLegsUpdate }) {
   return (
     <div className="space-y-2">
       {dirError && (
-        <div className="text-xs bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-amber-700">
-          {dirError}
+        <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 space-y-1">
+          <p className="text-xs font-semibold text-amber-800">{dirError}</p>
+          {dirError.includes('Directions API') && (
+            <p className="text-xs text-amber-700">
+              Active a <strong>Directions API</strong> em{' '}
+              <a
+                href="https://console.cloud.google.com/apis/library/directions-backend.googleapis.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline font-medium"
+              >
+                Google Cloud Console → APIs → Directions API → Ativar
+              </a>
+              . Certifique-se de que a API Key usada tem esta API autorizada.
+            </p>
+          )}
         </div>
       )}
       <GoogleMap
@@ -83,7 +97,7 @@ function MapContent({ visits, onLegsUpdate }) {
           <DirectionsRenderer
             directions={directions}
             options={{
-              polylineOptions: { strokeColor: '#1d4ed8', strokeWeight: 5, strokeOpacity: 0.85 },
+              polylineOptions: { strokeColor: '#b91c1c', strokeWeight: 5, strokeOpacity: 0.85 },
               markerOptions: { zIndex: 10 },
             }}
           />

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useApp } from '../contexts/AppContext'
 import StatusBadge, { WORK_TYPE_LABELS } from '../components/StatusBadge'
@@ -10,31 +10,52 @@ export default function Dashboard() {
   const navigate = useNavigate()
   const [selectedVisit, setSelectedVisit] = useState(null)
 
-  const today = todayString()
+  const today = useMemo(() => todayString(), [])
   const todayVisits = getTodayVisits()
-  const nextVisit = todayVisits.find((v) => v.status !== 'cancelado' && v.status !== 'realizado')
+  const nextVisit = useMemo(
+    () => todayVisits.find((v) => v.status !== 'cancelado' && v.status !== 'realizado'),
+    [todayVisits]
+  )
 
-  const upcomingVisits = visits
-    .filter((v) => v.date > today && v.status !== 'cancelado')
-    .sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time))
-    .slice(0, 5)
+  const upcomingVisits = useMemo(() =>
+    visits
+      .filter((v) => v.date > today && v.status !== 'cancelado')
+      .sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time))
+      .slice(0, 5),
+    [visits, today]
+  )
 
-  const alertClients = visits
-    .filter((v) => v.date >= today && v.status !== 'cancelado')
-    .reduce((acc, v) => {
-      const prevVisits = visits.filter((pv) => pv.clientId === v.clientId && pv.date < today)
-      if (prevVisits.length > 0 && !acc.find((a) => a.visitId === v.id)) {
-        acc.push({ visitId: v.id, visit: v, prevCount: prevVisits.length })
+  // Pré-calcula visitas passadas por cliente para evitar O(n²)
+  const pastVisitCountByClient = useMemo(() => {
+    const map = {}
+    for (const v of visits) {
+      if (v.date < today) {
+        map[v.clientId] = (map[v.clientId] ?? 0) + 1
       }
-      return acc
-    }, [])
+    }
+    return map
+  }, [visits, today])
 
-  const stats = [
-    { label: 'Visitas hoje', value: todayVisits.filter(v => v.status !== 'cancelado').length, color: 'bg-blue-600', icon: CalIcon },
+  const alertClients = useMemo(() => {
+    const seen = new Set()
+    return visits
+      .filter((v) => v.date >= today && v.status !== 'cancelado')
+      .reduce((acc, v) => {
+        const prevCount = pastVisitCountByClient[v.clientId] ?? 0
+        if (prevCount > 0 && !seen.has(v.id)) {
+          seen.add(v.id)
+          acc.push({ visitId: v.id, visit: v, prevCount })
+        }
+        return acc
+      }, [])
+  }, [visits, today, pastVisitCountByClient])
+
+  const stats = useMemo(() => [
+    { label: 'Visitas hoje', value: todayVisits.filter(v => v.status !== 'cancelado').length, color: 'bg-brand-700', icon: CalIcon },
     { label: 'Esta semana', value: visits.filter(v => { const d = daysUntilVisit(v.date); return d >= 0 && d <= 7 && v.status !== 'cancelado' }).length, color: 'bg-emerald-600', icon: WeekIcon },
     { label: 'Total clientes', value: clients.length, color: 'bg-violet-600', icon: UsersIcon },
     { label: 'Pendentes', value: visits.filter(v => v.status === 'agendado').length, color: 'bg-amber-500', icon: ClockIcon },
-  ]
+  ], [todayVisits, visits, clients])
 
   return (
     <div className="space-y-6 max-w-5xl">
@@ -97,16 +118,18 @@ export default function Dashboard() {
         <div className="space-y-5">
           {/* Next visit highlight */}
           {nextVisit && (
-            <div className="bg-brand-700 rounded-xl p-5 text-white">
-              <p className="text-brand-200 text-xs font-medium mb-2">Próxima visita</p>
-              <p className="font-bold text-lg">{nextVisit.time}</p>
-              <p className="font-medium">{nextVisit.clientName}</p>
-              <p className="text-brand-200 text-sm mt-1 truncate">
+            <div className="bg-white border border-slate-100 rounded-xl p-5 shadow-sm">
+              <p className="text-brand-600 text-xs font-semibold uppercase tracking-wide mb-3">Próxima visita</p>
+              <div className="flex items-baseline gap-2 mb-1">
+                <p className="font-bold text-2xl text-brand-700">{nextVisit.time}</p>
+              </div>
+              <p className="font-semibold text-slate-800">{nextVisit.clientName}</p>
+              <p className="text-slate-400 text-sm mt-0.5 truncate">
                 {nextVisit.address.street} {nextVisit.address.number}, {nextVisit.address.city}
               </p>
               <button
                 onClick={() => setSelectedVisit(nextVisit)}
-                className="mt-3 w-full py-2 bg-white/20 hover:bg-white/30 rounded-lg text-sm font-medium transition-colors"
+                className="mt-3 w-full py-2 bg-brand-50 hover:bg-brand-100 text-brand-700 rounded-lg text-sm font-medium transition-colors"
               >
                 Ver detalhes
               </button>

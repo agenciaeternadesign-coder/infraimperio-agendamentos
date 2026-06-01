@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom'
+import { useApp } from '../contexts/AppContext'
 
 const NAV = [
   { to: '/',             label: 'Dashboard',    icon: HomeIcon },
@@ -6,10 +7,15 @@ const NAV = [
   { to: '/rota',         label: 'Rota do Dia',  icon: MapIcon },
   { to: '/clientes',     label: 'Clientes',     icon: UsersIcon },
   { to: '/nova-visita',  label: 'Nova Visita',  icon: PlusIcon, accent: true },
+  { to: '/premiacao',    label: 'Premiação',     icon: TrophyIcon },
   { to: '/configuracoes',label: 'Configurações', icon: CogIcon },
 ]
 
 export default function Sidebar({ open, onClose }) {
+  const { settings } = useApp()
+  const logo = settings.branding?.logoUrl
+  const companyName = settings.company?.name ?? 'Infraimpério'
+
   return (
     <>
       {/* Overlay mobile */}
@@ -18,26 +24,30 @@ export default function Sidebar({ open, onClose }) {
       )}
 
       <aside className={`
-        fixed top-0 left-0 z-40 h-screen w-64 bg-brand-900 flex flex-col
+        fixed top-0 left-0 z-40 h-screen w-64 bg-white border-r border-slate-100 flex flex-col
         transform transition-transform duration-300 ease-in-out
         ${open ? 'translate-x-0' : '-translate-x-full'}
         md:translate-x-0 md:static md:z-auto
       `}>
         {/* Logo */}
-        <div className="px-6 py-7 border-b border-brand-800">
+        <div className="px-6 py-6 border-b border-slate-100">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-brand-600 rounded-lg flex items-center justify-center flex-shrink-0">
-              <BuildingIcon />
-            </div>
+            {logo ? (
+              <img src={logo} alt="Logo" className="w-9 h-9 object-contain flex-shrink-0" />
+            ) : (
+              <div className="w-9 h-9 bg-brand-700 rounded-lg flex items-center justify-center flex-shrink-0">
+                <BuildingIcon />
+              </div>
+            )}
             <div>
-              <p className="text-white font-bold text-base leading-tight">Infraimpério</p>
-              <p className="text-brand-300 text-xs">Gestão de Agendamentos</p>
+              <p className="text-slate-800 font-bold text-base leading-tight">{companyName}</p>
+              <p className="text-slate-400 text-xs">Gestão de Agendamentos</p>
             </div>
           </div>
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
           {NAV.map(({ to, label, icon: Icon, accent }) => (
             <NavLink
               key={to}
@@ -48,11 +58,11 @@ export default function Sidebar({ open, onClose }) {
                 `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors duration-150 ${
                   accent
                     ? isActive
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-blue-600/20 text-blue-300 hover:bg-blue-600/40'
+                      ? 'bg-gold-50 text-gold-700 ring-1 ring-gold-200'
+                      : 'text-gold-700 hover:bg-gold-50'
                     : isActive
-                    ? 'bg-brand-700 text-white'
-                    : 'text-brand-300 hover:bg-brand-800 hover:text-white'
+                    ? 'bg-brand-50 text-brand-700'
+                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-800'
                 }`
               }
             >
@@ -63,8 +73,8 @@ export default function Sidebar({ open, onClose }) {
         </nav>
 
         {/* Footer */}
-        <div className="px-4 py-4 border-t border-brand-800">
-          <p className="text-brand-400 text-xs text-center">Rua Miguel Bombarda 78, Barreiro</p>
+        <div className="px-4 py-4 border-t border-slate-100">
+          <p className="text-slate-400 text-xs text-center">Rua Miguel Bombarda 78, Barreiro</p>
         </div>
       </aside>
     </>
@@ -78,3 +88,4 @@ function UsersIcon()    { return <svg className="w-5 h-5 flex-shrink-0" fill="no
 function PlusIcon()     { return <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg> }
 function CogIcon()      { return <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg> }
 function BuildingIcon() { return <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg> }
+function TrophyIcon()   { return <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg> }

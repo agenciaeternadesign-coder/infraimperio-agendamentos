@@ -6,11 +6,25 @@ import VisitModal from '../components/VisitModal'
 import { formatDate, formatDateShort } from '../utils/dateUtils'
 
 const WORK_TYPES = [
-  { value: 'remodelacao', label: 'Remodelação' },
-  { value: 'construcao', label: 'Construção Nova' },
+  { value: 'telhados', label: 'Telhados e Coberturas' },
+  { value: 'claraboias', label: 'Claraboias' },
+  { value: 'canalizacao', label: 'Canalização' },
+  { value: 'carpintaria', label: 'Carpintaria' },
+  { value: 'eletricidade', label: 'Eletricidade' },
+  { value: 'estores', label: 'Estores e Persianas' },
+  { value: 'isolamento', label: 'Isolamento' },
+  { value: 'manutencao', label: 'Manutenção' },
+  { value: 'montagens', label: 'Montagens' },
+  { value: 'coluna_agua', label: 'Coluna de Água de Prédios' },
+  { value: 'obras_construcao', label: 'Obras e Construção' },
+  { value: 'pavimentos', label: 'Pavimentos' },
   { value: 'pintura', label: 'Pintura' },
-  { value: 'instalacoes', label: 'Instalações' },
-  { value: 'outro', label: 'Outro' },
+  { value: 'piscinas', label: 'Piscinas' },
+  { value: 'reabilitacao', label: 'Reabilitação' },
+  { value: 'remodelacoes', label: 'Remodelações' },
+  { value: 'serralharia', label: 'Serralharia' },
+  { value: 'vidros', label: 'Vidros e Janelas' },
+  { value: 'pladur', label: 'Obras em Pladur' },
 ]
 
 export default function ClienteDetalhe() {
@@ -76,7 +90,7 @@ export default function ClienteDetalhe() {
               {client.name.charAt(0).toUpperCase()}
             </div>
             <div>
-              <h2 className="text-xl font-bold text-slate-800">{client.name}</h2>
+              <h2 className="text-xl font-bold text-slate-800">{client.salutation ? `${client.salutation} ${client.name}` : client.name}</h2>
               <p className="text-slate-500 text-sm">{client.address.city} · Cliente desde {formatDateShort(client.createdAt)}</p>
             </div>
           </div>
@@ -100,6 +114,14 @@ export default function ClienteDetalhe() {
           {editing ? (
             <>
               <div>
+                <label className="label">Tratamento</label>
+                <select className="input" value={field('salutation')} onChange={(e) => setField('salutation', e.target.value)}>
+                  <option value="">—</option>
+                  <option value="Sr.">Sr.</option>
+                  <option value="Sra.">Sra.</option>
+                </select>
+              </div>
+              <div>
                 <label className="label">Nome completo</label>
                 <input className="input" value={field('name')} onChange={(e) => setField('name', e.target.value)} />
               </div>
@@ -117,7 +139,7 @@ export default function ClienteDetalhe() {
                   {WORK_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
                 </select>
               </div>
-              <div className="sm:col-span-2 grid grid-cols-3 gap-2">
+              <div className="sm:col-span-2 grid grid-cols-4 gap-2">
                 <div className="col-span-2">
                   <label className="label">Rua</label>
                   <input className="input" value={field('address', 'street')} onChange={(e) => setField('address', e.target.value, 'street')} />
@@ -125,6 +147,10 @@ export default function ClienteDetalhe() {
                 <div>
                   <label className="label">Número</label>
                   <input className="input" value={field('address', 'number')} onChange={(e) => setField('address', e.target.value, 'number')} />
+                </div>
+                <div>
+                  <label className="label">Andar</label>
+                  <input className="input" placeholder="3º Esq." value={field('address', 'floor')} onChange={(e) => setField('address', e.target.value, 'floor')} />
                 </div>
               </div>
               <div>
@@ -149,7 +175,9 @@ export default function ClienteDetalhe() {
                 <a href={`mailto:${client.email}`} className="text-brand-600 hover:underline truncate block">{client.email}</a>
               </InfoRow>
               <InfoRow icon={<MapIcon />} label="Morada">
-                {client.address.street} {client.address.number}, {client.address.city}
+                {client.address.street} {client.address.number}
+                {client.address.floor && `, ${client.address.floor}`}
+                {', '}{client.address.city}
                 {client.address.postalCode && ` — ${client.address.postalCode}`}
               </InfoRow>
               <InfoRow icon={<HammerIcon />} label="Tipo de Obra">

@@ -1,9 +1,27 @@
 import { formatDateTime } from './dateUtils'
 
 const WORK_TYPE_LABELS = {
-  remodelacao: 'Remodelação',
-  construcao: 'Construção Nova',
+  telhados: 'Telhados e Coberturas',
+  claraboias: 'Claraboias',
+  canalizacao: 'Canalização',
+  carpintaria: 'Carpintaria',
+  eletricidade: 'Eletricidade',
+  estores: 'Estores e Persianas',
+  isolamento: 'Isolamento',
+  manutencao: 'Manutenção',
+  montagens: 'Montagens',
+  coluna_agua: 'Coluna de Água de Prédios',
+  obras_construcao: 'Obras e Construção',
+  pavimentos: 'Pavimentos',
   pintura: 'Pintura',
+  piscinas: 'Piscinas',
+  reabilitacao: 'Reabilitação',
+  remodelacoes: 'Remodelações',
+  serralharia: 'Serralharia',
+  vidros: 'Vidros e Janelas',
+  pladur: 'Obras em Pladur',
+  remodelacao: 'Remodelações',
+  construcao: 'Obras e Construção',
   instalacoes: 'Instalações',
   outro: 'Outro',
 }
@@ -22,17 +40,18 @@ export function buildWhatsAppUrl(phone, message) {
 
 export function buildConfirmationMessage(visit, company) {
   return [
-    `Olá ${visit.clientName.split(' ')[0]}! 👋`,
+    `Olá ${visit.clientName.split(' ')[0]}!`,
     ``,
     `A sua visita de orçamento com a *${company.name}* está confirmada:`,
     ``,
-    `📅 ${formatDateTime(visit.date, visit.time)}`,
-    `📍 ${visit.address.street} ${visit.address.number}, ${visit.address.city}`,
-    `🔨 ${WORK_TYPE_LABELS[visit.workType] ?? visit.workType}`,
+    `Data: ${formatDateTime(visit.date, visit.time)}`,
+    `Morada: ${visit.address.street} ${visit.address.number}, ${visit.address.city}`,
+    `Obra: ${WORK_TYPE_LABELS[visit.workType] ?? visit.workType}`,
     ``,
-    `Qualquer dúvida: ${company.phone}`,
+    `Qualquer dúvida contacte: ${company.phone}`,
     ``,
-    `Até breve! 🏗️`,
+    `Até breve,`,
+    `Equipa ${company.name}`,
   ].join('\n')
 }
 
@@ -44,12 +63,12 @@ export function buildReminderMessage(visit, company, type) {
   }[type] ?? 'em breve'
 
   return [
-    `Olá ${visit.clientName.split(' ')[0]}! 👋`,
+    `Olá ${visit.clientName.split(' ')[0]}!`,
     ``,
     `Lembrete: a sua visita de orçamento com a *${company.name}* é ${typeText}!`,
     ``,
-    `📅 ${formatDateTime(visit.date, visit.time)}`,
-    `📍 ${visit.address.street} ${visit.address.number}, ${visit.address.city}`,
+    `Data: ${formatDateTime(visit.date, visit.time)}`,
+    `Morada: ${visit.address.street} ${visit.address.number}, ${visit.address.city}`,
     ``,
     `*${company.name}* — ${company.phone}`,
   ].join('\n')

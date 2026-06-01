@@ -18,9 +18,10 @@ export default function RotaDia() {
   const { visits, settings, getVisitsByDate } = useApp()
   const [date, setDate]                 = useState(todayString())
   const [orderedVisits, setOrderedVisits] = useState([])
-  const [legInfo, setLegInfo]           = useState([])   // real leg data from Directions API
+  const [legInfo, setLegInfo]           = useState([])
   const [selectedVisit, setSelectedVisit] = useState(null)
   const [showMap, setShowMap]           = useState(true)
+  const [gapMinutes, setGapMinutes]     = useState(30)
 
   const apiKey    = settings.googleMaps?.apiKey ?? ''
   const companyAddr = settings.company
@@ -28,9 +29,9 @@ export default function RotaDia() {
   useEffect(() => {
     const dayVisits = getVisitsByDate(date).filter((v) => v.status !== 'cancelado')
     const optimized = optimizeRoute(dayVisits)
-    setOrderedVisits(buildRouteWithTimes(optimized))
-    setLegInfo([]) // reset real times on date change
-  }, [date, visits, getVisitsByDate])
+    setOrderedVisits(buildRouteWithTimes(optimized, gapMinutes))
+    setLegInfo([])
+  }, [date, visits, getVisitsByDate, gapMinutes])
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -42,14 +43,14 @@ export default function RotaDia() {
     setOrderedVisits((items) => {
       const oldIdx = items.findIndex((i) => i.id === active.id)
       const newIdx = items.findIndex((i) => i.id === over.id)
-      return buildRouteWithTimes(arrayMove(items, oldIdx, newIdx))
+      return buildRouteWithTimes(arrayMove(items, oldIdx, newIdx), gapMinutes)
     })
-    setLegInfo([]) // force re-fetch from Maps after reorder
+    setLegInfo([])
   }
 
   function handleOptimize() {
     const dayVisits = getVisitsByDate(date).filter((v) => v.status !== 'cancelado')
-    setOrderedVisits(buildRouteWithTimes(optimizeRoute(dayVisits)))
+    setOrderedVisits(buildRouteWithTimes(optimizeRoute(dayVisits), gapMinutes))
     setLegInfo([])
   }
 
@@ -75,6 +76,21 @@ export default function RotaDia() {
             value={date}
             onChange={(e) => setDate(e.target.value)}
           />
+        </div>
+        <div className="flex items-center gap-2 border-l border-slate-100 pl-4">
+          <label className="text-sm font-medium text-slate-600 whitespace-nowrap flex items-center gap-1">
+            <ClockIcon /> Intervalo
+          </label>
+          <input
+            type="number"
+            min={0}
+            max={120}
+            step={5}
+            className="input w-20 text-center"
+            value={gapMinutes}
+            onChange={(e) => setGapMinutes(Math.max(0, parseInt(e.target.value) || 0))}
+          />
+          <span className="text-sm text-slate-500">min</span>
         </div>
         <div className="flex gap-2 flex-wrap">
           <button onClick={() => setShowMap((v) => !v)} className="btn-secondary text-sm flex items-center gap-2">
@@ -207,7 +223,10 @@ function SortableVisitCard({ visit, index, leg, onSelect }) {
               </p>
             </div>
             <div className="flex flex-col items-end gap-1 flex-shrink-0">
-              <span className="text-lg font-bold text-brand-700">{visit.time}</span>
+              <span className="text-lg font-bold text-brand-700">{visit.scheduledTime ?? visit.time}</span>
+              {visit.scheduledTime && visit.scheduledTime !== visit.time && (
+                <span className="text-xs text-amber-600 line-through">{visit.time}</span>
+              )}
               <StatusBadge status={visit.status} size="xs" />
             </div>
           </div>

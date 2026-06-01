@@ -134,4 +134,32 @@ export const defaultSettings = {
       fromNumber: '',
     },
   },
+  branding: {
+    primaryColor: '#b91c1c',
+    accentColor:  '#d97706',
+    logoUrl: '',
+  },
 }
+
+export const sampleFuncionarios = [
+  { id: 'func1', name: 'Miguel Fonseca',  cargo: 'Pedreiro',      createdAt: '2026-01-15' },
+  { id: 'func2', name: 'Bruno Carvalho',  cargo: 'Pintor',        createdAt: '2026-01-15' },
+  { id: 'func3', name: 'André Martins',   cargo: 'Canalizador',   createdAt: '2026-02-01' },
+  { id: 'func4', name: 'Rui Gonçalves',   cargo: 'Eletricista',   createdAt: '2026-01-15' },
+]
+
+export const sampleAcoes = [
+  { id: 'ac1',  funcionarioId: 'func1', tipo: 'foto',       descricao: 'Foto da obra — remodelação cozinha Rua Augusta', data: '2026-05-10', pontos: 1 },
+  { id: 'ac2',  funcionarioId: 'func1', tipo: 'foto',       descricao: 'Foto do resultado final — cliente Maria Santos',  data: '2026-05-14', pontos: 1 },
+  { id: 'ac3',  funcionarioId: 'func1', tipo: 'foto',       descricao: 'Foto do progresso da obra',                       data: '2026-05-20', pontos: 1 },
+  { id: 'ac4',  funcionarioId: 'func2', tipo: 'foto',       descricao: 'Foto antes e depois da pintura',                  data: '2026-05-08', pontos: 1 },
+  { id: 'ac5',  funcionarioId: 'func2', tipo: 'reclamacao', descricao: 'Cliente relatou atraso na conclusão do trabalho', data: '2026-05-15', pontos: -2 },
+  { id: 'ac6',  funcionarioId: 'func3', tipo: 'foto',       descricao: 'Foto da instalação de canalização',               data: '2026-05-11', pontos: 1 },
+  { id: 'ac7',  funcionarioId: 'func3', tipo: 'foto',       descricao: 'Foto do resultado final — casa de banho',         data: '2026-05-13', pontos: 1 },
+  { id: 'ac8',  funcionarioId: 'func3', tipo: 'foto',       descricao: 'Foto da obra concluída',                          data: '2026-05-18', pontos: 1 },
+  { id: 'ac9',  funcionarioId: 'func3', tipo: 'foto',       descricao: 'Foto do atendimento em Lisboa',                   data: '2026-05-22', pontos: 1 },
+  { id: 'ac10', funcionarioId: 'func4', tipo: 'foto',       descricao: 'Foto da instalação elétrica concluída',           data: '2026-05-10', pontos: 1 },
+  { id: 'ac11', funcionarioId: 'func4', tipo: 'reclamacao', descricao: 'Reclamação sobre limpeza após a obra',            data: '2026-05-14', pontos: -2 },
+  { id: 'ac12', funcionarioId: 'func4', tipo: 'reclamacao', descricao: 'Cliente insatisfeito com prazo de entrega',       data: '2026-05-20', pontos: -2 },
+]
+

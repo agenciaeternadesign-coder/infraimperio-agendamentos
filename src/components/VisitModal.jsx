@@ -29,9 +29,20 @@ export default function VisitModal({ visit, onClose }) {
 
   const [twilioResult, setTwilioResult]   = useState(null)
   const [sendingTwilio, setSendingTwilio] = useState(false)
+  const [editDate, setEditDate] = useState(visit.date)
+  const [editTime, setEditTime] = useState(visit.time)
+  const [savedDT,  setSavedDT]  = useState(false)
 
   function handleStatusChange(e) {
     updateVisit(visit.id, { status: e.target.value })
+  }
+
+  function handleSaveDateTime() {
+    if (editDate && editTime) {
+      updateVisit(visit.id, { date: editDate, time: editTime })
+      setSavedDT(true)
+      setTimeout(() => setSavedDT(false), 2000)
+    }
   }
 
   function handleDelete() {
@@ -60,13 +71,13 @@ export default function VisitModal({ visit, onClose }) {
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="bg-brand-700 px-6 py-5 text-white sticky top-0 z-10">
+        <div className="bg-white border-b border-slate-100 px-6 py-5 sticky top-0 z-10">
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-brand-200 text-sm mb-1">Visita de Orçamento</p>
-              <h2 className="text-xl font-semibold">{visit.clientName}</h2>
+              <p className="text-brand-600 text-xs font-semibold uppercase tracking-wide mb-1">Visita de Orçamento</p>
+              <h2 className="text-xl font-semibold text-slate-800">{visit.clientName}</h2>
             </div>
-            <button onClick={onClose} className="text-brand-300 hover:text-white transition-colors">
+            <button onClick={onClose} className="text-slate-400 hover:text-slate-600 transition-colors">
               <XIcon />
             </button>
           </div>
@@ -74,16 +85,36 @@ export default function VisitModal({ visit, onClose }) {
 
         {/* Body */}
         <div className="px-6 py-5 space-y-5">
-          {/* Status + date */}
-          <div className="flex items-center gap-3">
+          {/* Status + date/time */}
+          <div className="space-y-3">
             <StatusBadge status={visit.status} />
-            <span className="text-sm text-slate-500">{formatDate(visit.date)} · {visit.time}</span>
+            <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <p className="text-xs font-medium text-slate-500 mb-2">Data e hora da visita</p>
+              <div className="flex items-end gap-2 flex-wrap">
+                <div className="flex-1 min-w-[130px]">
+                  <label className="block text-xs font-medium text-slate-600 mb-1">Data</label>
+                  <input type="date" className="input text-sm" value={editDate} onChange={(e) => setEditDate(e.target.value)} />
+                </div>
+                <div className="w-28">
+                  <label className="block text-xs font-medium text-slate-600 mb-1">Hora</label>
+                  <input type="time" className="input text-sm" value={editTime} onChange={(e) => setEditTime(e.target.value)} />
+                </div>
+                <button
+                  onClick={handleSaveDateTime}
+                  className="btn-primary text-sm whitespace-nowrap"
+                >
+                  {savedDT ? '✓ Guardado' : 'Guardar'}
+                </button>
+              </div>
+            </div>
           </div>
 
           {/* Info rows */}
           <div className="space-y-3">
             <Row icon={<MapIcon />} label="Morada">
-              {visit.address.street} {visit.address.number}, {visit.address.city}
+              {visit.address.street} {visit.address.number}
+              {visit.address.floor && `, ${visit.address.floor}`}
+              {', '}{visit.address.city}
               {visit.address.postalCode && ` — ${visit.address.postalCode}`}
             </Row>
             <Row icon={<HammerIcon />} label="Tipo de Obra">
