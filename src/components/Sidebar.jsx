@@ -57,7 +57,7 @@ export default function Sidebar({ open, onClose }) {
                       : 'bg-blue-600/20 text-blue-300 hover:bg-blue-600/40'
                     : isActive
                     ? 'bg-brand-700 text-white'
-                    : 'text-brand-300 hover:bg-brand-800 hover:text-white'
+                    : 'text-white/80 hover:bg-brand-800 hover:text-white'
                 }`
               }
             >
