@@ -4,4 +4,4 @@ dist/
 .env.local
 *.log
 .DS_Store
-*.zip
+gestaopro-v1.0.zip
