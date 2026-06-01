@@ -3106,9 +3106,16 @@ function premRenderEquipa() {
 function premAddFuncionario() {
   var nome = (document.getElementById('pnome') ? document.getElementById('pnome').value : '').trim();
   if (!nome) { premToast('Insere o nome do funcionário', true); return; }
+  var funcao = (document.getElementById('pfunc')?document.getElementById('pfunc').value:'').trim();
   var d = premLoad();
-  d.funcionarios.push({ id:'fp_'+Date.now().toString(36)+Math.random().toString(36).slice(2,5), nome:nome, funcao:(document.getElementById('pfunc')?document.getElementById('pfunc').value:'').trim(), obs:(document.getElementById('pobs')?document.getElementById('pobs').value:'').trim(), ativo:true });
+  d.funcionarios.push({ id:'fp_'+Date.now().toString(36)+Math.random().toString(36).slice(2,5), nome:nome, funcao:funcao, obs:(document.getElementById('pobs')?document.getElementById('pobs').value:'').trim(), ativo:true });
   premSave(d);
+  // Sync to shared inf_funcionarios
+  var shared = infFuncLoad();
+  if (!shared.some(function(f){ return f.nome.toLowerCase()===nome.toLowerCase(); })) {
+    shared.push({ id:'inf_'+Date.now().toString(36)+Math.random().toString(36).slice(2,5), nome:nome, cargo:funcao, ativo:true });
+    infFuncSave(shared);
+  }
   document.getElementById('pnome').value=''; document.getElementById('pfunc').value=''; document.getElementById('pobs').value='';
   premRenderEquipa(); premToast('✅ '+nome+' adicionado');
 }
@@ -8187,8 +8194,70 @@ function adiLoad() {
 }
 function adiSave(d) { localStorage.setItem(ADI_KEY, JSON.stringify(d)); }
 
+var INF_FUNC_KEY = 'inf_funcionarios';
+
+function infFuncLoad() {
+  try { return JSON.parse(localStorage.getItem(INF_FUNC_KEY)||'[]'); } catch(e) { return []; }
+}
+function infFuncSave(d) { localStorage.setItem(INF_FUNC_KEY, JSON.stringify(d)); }
+
 function adiGetFuncs() {
-  try { return JSON.parse(localStorage.getItem('premiacaoData')||'{}').funcionarios||[]; } catch(e){ return []; }
+  var shared = infFuncLoad().filter(function(f){ return f.ativo !== false; });
+  try {
+    var prem = JSON.parse(localStorage.getItem('premiacaoData')||'{}').funcionarios||[];
+    var nomes = new Set(shared.map(function(f){ return f.nome.toLowerCase().trim(); }));
+    prem.forEach(function(p) {
+      if (p.ativo !== false && !nomes.has(p.nome.toLowerCase().trim())) {
+        shared.push({ id: p.id, nome: p.nome, cargo: p.funcao||'', ativo: true });
+        nomes.add(p.nome.toLowerCase().trim());
+      }
+    });
+  } catch(e) {}
+  return shared.sort(function(a,b){ return a.nome.localeCompare(b.nome,'pt'); });
+}
+
+function infFuncRenderList() {
+  var list = infFuncLoad();
+  var el = document.getElementById('inf-func-list');
+  if (!el) return;
+  if (!list.length) {
+    el.innerHTML = '<div style="text-align:center;padding:24px;color:#9ca3af;font-size:0.85rem">Nenhum funcionário adicionado ainda.</div>';
+    return;
+  }
+  el.innerHTML = list.map(function(f) {
+    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border:1.5px solid #e5e7eb;border-radius:8px;margin-bottom:6px;background:#fff">' +
+      '<div>' +
+        '<div style="font-weight:700;font-size:0.88rem;color:#1a1a2e">' + escHtml(f.nome) + '</div>' +
+        (f.cargo ? '<div style="font-size:0.76rem;color:#6b7280">' + escHtml(f.cargo) + '</div>' : '') +
+      '</div>' +
+      '<button onclick="infFuncDelete(\'' + f.id + '\')" style="background:#fee2e2;color:#b91c1c;border:none;border-radius:6px;padding:4px 10px;font-size:0.75rem;cursor:pointer;font-family:inherit">🗑️</button>' +
+    '</div>';
+  }).join('');
+}
+
+function infFuncAdd() {
+  var nome  = (document.getElementById('inf-func-nome')||{}).value||'';
+  var cargo = (document.getElementById('inf-func-cargo')||{}).value||'';
+  nome = nome.trim(); cargo = cargo.trim();
+  if (!nome) { alert('Introduz o nome do funcionário.'); return; }
+  var list = infFuncLoad();
+  var existe = list.some(function(f){ return f.nome.toLowerCase()===nome.toLowerCase(); });
+  if (existe) { alert('Já existe um funcionário com esse nome.'); return; }
+  list.push({ id:'inf_'+Date.now().toString(36)+Math.random().toString(36).slice(2,5), nome:nome, cargo:cargo, ativo:true });
+  infFuncSave(list);
+  document.getElementById('inf-func-nome').value = '';
+  document.getElementById('inf-func-cargo').value = '';
+  infFuncRenderList();
+  adiPopulateFuncSelects();
+  premToast('✅ ' + nome + ' adicionado');
+}
+
+function infFuncDelete(id) {
+  if (!confirm('Remover este funcionário da lista partilhada?')) return;
+  infFuncSave(infFuncLoad().filter(function(f){ return f.id !== id; }));
+  infFuncRenderList();
+  adiPopulateFuncSelects();
+  premToast('🗑️ Funcionário removido');
 }
 
 function adiInit() {
@@ -8368,6 +8437,7 @@ function adiDelete(id) {
 function adiInit() {
   adiPopulateFuncSelects();
   adiRender();
+  infFuncRenderList();
 }
 // ─── End Adiantamentos ────────────────────────────────────────────────────────
 
@@ -8399,6 +8469,29 @@ function adiInit() {
     <!-- Lista -->
     <div id="adi-list"></div>
     <div id="adi-empty" style="display:none;text-align:center;padding:48px 16px;color:#9ca3af;font-size:0.9rem">Nenhum registo encontrado.</div>
+
+    <!-- Gerir Funcionários -->
+    <div style="margin-top:32px;border:2px solid #ede9fe;border-radius:12px;background:#faf5ff;padding:20px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+        <span style="font-size:1.1rem">👥</span>
+        <h3 style="margin:0;font-size:1rem;font-weight:700;color:#5b21b6;font-family:'Oswald',sans-serif;letter-spacing:0.03em">Gerir Funcionários</h3>
+        <span style="font-size:0.72rem;color:#7c3aed;background:#ede9fe;border-radius:20px;padding:2px 8px">Lista partilhada</span>
+      </div>
+      <!-- Form adicionar -->
+      <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:end;margin-bottom:16px">
+        <div>
+          <label class="si-label">Nome *</label>
+          <input type="text" id="inf-func-nome" class="si-input" placeholder="Ex: João Silva" onkeydown="if(event.key==='Enter')infFuncAdd()">
+        </div>
+        <div>
+          <label class="si-label">Cargo</label>
+          <input type="text" id="inf-func-cargo" class="si-input" placeholder="Ex: Técnico, Motorista..." onkeydown="if(event.key==='Enter')infFuncAdd()">
+        </div>
+        <button onclick="infFuncAdd()" style="background:#7950f2;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">+ Adicionar</button>
+      </div>
+      <!-- Lista de funcionários -->
+      <div id="inf-func-list"></div>
+    </div>
 
   </div>
 
