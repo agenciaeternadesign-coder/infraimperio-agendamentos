@@ -1,18 +1,26 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useApp } from '../contexts/AppContext'
 import StatusBadge, { WORK_TYPE_LABELS } from '../components/StatusBadge'
 import VisitModal from '../components/VisitModal'
 import { formatDate, todayString, daysUntilVisit } from '../utils/dateUtils'
 
+function fmt(valor) {
+  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor ?? 0)
+}
+
 export default function Dashboard() {
-  const { visits, clients, getTodayVisits } = useApp()
+  const { visits, clients, getTodayVisits, entregas, funcionarios } = useApp()
   const navigate = useNavigate()
   const [selectedVisit, setSelectedVisit] = useState(null)
 
   const today = todayString()
   const todayVisits = getTodayVisits()
   const nextVisit = todayVisits.find((v) => v.status !== 'cancelado' && v.status !== 'realizado')
+
+  const totalEntregas   = useMemo(() => entregas.reduce((s, e) => s + (e.valor ?? 0), 0), [entregas])
+  const pendentesCount  = useMemo(() => entregas.filter(e => e.status === 'pendente').length, [entregas])
+  const recentes        = useMemo(() => [...entregas].sort((a,b) => b.data.localeCompare(a.data)).slice(0, 3), [entregas])
 
   const upcomingVisits = visits
     .filter((v) => v.date > today && v.status !== 'cancelado')
@@ -159,6 +167,46 @@ export default function Dashboard() {
             )}
           </div>
         </div>
+      </div>
+
+      {/* Financeiro card */}
+      <div className="card">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-semibold text-slate-800">Controle Financeiro</h2>
+          <button onClick={() => navigate('/financeiro')} className="text-xs text-brand-600 hover:underline font-medium">
+            Ver tudo
+          </button>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-4">
+          <div className="rounded-xl bg-emerald-50 p-4">
+            <p className="text-xs text-emerald-600 font-medium mb-1">Total entregue</p>
+            <p className="text-xl font-bold text-emerald-700">{fmt(totalEntregas)}</p>
+          </div>
+          <div className="rounded-xl bg-amber-50 p-4">
+            <p className="text-xs text-amber-600 font-medium mb-1">Pendentes</p>
+            <p className="text-xl font-bold text-amber-700">{pendentesCount}</p>
+          </div>
+          <div className="rounded-xl bg-slate-50 p-4">
+            <p className="text-xs text-slate-500 font-medium mb-1">Funcionários</p>
+            <p className="text-xl font-bold text-slate-700">{funcionarios.length}</p>
+          </div>
+        </div>
+        {recentes.length === 0 ? (
+          <p className="text-xs text-slate-400 text-center py-2">Nenhuma entrega registrada ainda.</p>
+        ) : (
+          <div className="space-y-2">
+            {recentes.map(e => (
+              <div key={e.id} className="flex items-center justify-between text-sm px-1">
+                <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-brand-600 flex-shrink-0" />
+                  <span className="font-medium text-slate-700">{e.funcionario}</span>
+                  {e.descricao && <span className="text-slate-400 truncate max-w-[120px]">· {e.descricao}</span>}
+                </div>
+                <span className="font-bold text-emerald-700 flex-shrink-0">{fmt(e.valor)}</span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Quick action */}

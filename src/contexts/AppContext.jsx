@@ -25,20 +25,26 @@ function mergeSettings(defaults, saved) {
 }
 
 export function AppProvider({ children }) {
-  const [visits,      setVisits]      = useState([])
-  const [clients,     setClients]     = useState([])
-  const [settings,    setSettings]    = useState(defaultSettings)
-  const [initialized, setInitialized] = useState(false)
+  const [visits,        setVisits]        = useState([])
+  const [clients,       setClients]       = useState([])
+  const [settings,      setSettings]      = useState(defaultSettings)
+  const [entregas,      setEntregas]      = useState([])
+  const [funcionarios,  setFuncionarios]  = useState([])
+  const [initialized,   setInitialized]   = useState(false)
 
   // Load from localStorage on mount
   useEffect(() => {
-    const savedVisits   = storage.getVisits()
-    const savedClients  = storage.getClients()
-    const savedSettings = storage.getSettings()
+    const savedVisits       = storage.getVisits()
+    const savedClients      = storage.getClients()
+    const savedSettings     = storage.getSettings()
+    const savedEntregas     = storage.getEntregas()
+    const savedFuncionarios = storage.getFuncionarios()
 
     setVisits(savedVisits)
     setClients(savedClients)
     setSettings(mergeSettings(defaultSettings, savedSettings))
+    setEntregas(savedEntregas)
+    setFuncionarios(savedFuncionarios)
     setInitialized(true)
   }, [])
 
@@ -61,6 +67,18 @@ export function AppProvider({ children }) {
     if (!initialized) return
     storage.saveSettings(settings)
   }, [settings, initialized])
+
+  // Persist entregas
+  useEffect(() => {
+    if (!initialized) return
+    storage.saveEntregas(entregas)
+  }, [entregas, initialized])
+
+  // Persist funcionarios
+  useEffect(() => {
+    if (!initialized) return
+    storage.saveFuncionarios(funcionarios)
+  }, [funcionarios, initialized])
 
   // Check and send pending reminders on load
   useEffect(() => {
@@ -137,6 +155,14 @@ export function AppProvider({ children }) {
   const getTodayVisits   = useCallback(() => { const t = todayString(); return visits.filter((v) => v.date === t).sort((a, b) => a.time.localeCompare(b.time)) }, [visits])
   const getVisitsByDate  = useCallback((d) => visits.filter((v) => v.date === d).sort((a, b) => a.time.localeCompare(b.time)), [visits])
 
+  const addEntrega    = useCallback((data) => { const e = { ...data, id: genId('e'), createdAt: new Date().toISOString() }; setEntregas((prev) => [...prev, e]); return e }, [])
+  const updateEntrega = useCallback((id, updates) => setEntregas((prev) => prev.map((e) => e.id === id ? { ...e, ...updates } : e)), [])
+  const deleteEntrega = useCallback((id) => setEntregas((prev) => prev.filter((e) => e.id !== id)), [])
+
+  const addFuncionario    = useCallback((data) => { const f = { ...data, id: genId('f'), createdAt: new Date().toISOString() }; setFuncionarios((prev) => [...prev, f]); return f }, [])
+  const updateFuncionario = useCallback((id, updates) => setFuncionarios((prev) => prev.map((f) => f.id === id ? { ...f, ...updates } : f)), [])
+  const deleteFuncionario = useCallback((id) => setFuncionarios((prev) => prev.filter((f) => f.id !== id)), [])
+
   return (
     <AppContext.Provider value={{
       visits, clients, settings,
@@ -145,6 +171,8 @@ export function AppProvider({ children }) {
       updateSettings,
       findDuplicateClient, getClientVisits,
       getTodayVisits, getVisitsByDate,
+      entregas, addEntrega, updateEntrega, deleteEntrega,
+      funcionarios, addFuncionario, updateFuncionario, deleteFuncionario,
     }}>
       {children}
     </AppContext.Provider>
