@@ -2,6 +2,7 @@ import { HashRouter as Router, Routes, Route } from 'react-router-dom'
 import { AppProvider } from './contexts/AppContext'
 import { AuthProvider } from './contexts/AuthContext'
 import Layout from './components/Layout'
+import Hub from './pages/Hub'
 import Dashboard from './pages/Dashboard'
 import Agenda from './pages/Agenda'
 import RotaDia from './pages/RotaDia'
@@ -18,8 +19,12 @@ export default function App() {
       <AppProvider>
         <Router>
           <Routes>
+            {/* Hub — página inicial com tema escuro, sem sidebar */}
+            <Route path="/" element={<Hub />} />
+
+            {/* Módulos internos com layout sidebar */}
             <Route element={<Layout />}>
-              <Route path="/" element={<Dashboard />} />
+              <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/agenda" element={<Agenda />} />
               <Route path="/rota" element={<RotaDia />} />
               <Route path="/clientes" element={<Clientes />} />
