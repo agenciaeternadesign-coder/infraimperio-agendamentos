@@ -3,7 +3,6 @@ import { AppProvider } from './contexts/AppContext'
 import { AuthProvider } from './contexts/AuthContext'
 import Layout from './components/Layout'
 import Hub from './pages/Hub'
-import Dashboard from './pages/Dashboard'
 import Agenda from './pages/Agenda'
 import RotaDia from './pages/RotaDia'
 import Clientes from './pages/Clientes'
@@ -19,12 +18,11 @@ export default function App() {
       <AppProvider>
         <Router>
           <Routes>
-            {/* Hub — página inicial com tema escuro, sem sidebar */}
+            {/* Página inicial — Hub com tema escuro */}
             <Route path="/" element={<Hub />} />
 
-            {/* Módulos internos com layout sidebar */}
+            {/* Módulos internos com sidebar */}
             <Route element={<Layout />}>
-              <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/agenda" element={<Agenda />} />
               <Route path="/rota" element={<RotaDia />} />
               <Route path="/clientes" element={<Clientes />} />
