@@ -2718,17 +2718,6 @@ function suiteGoTo(id) {
   if (btn) suiteShowSection(id, btn);
 }
 
-// Abrir secção correcta via hash na URL (ex: suite.html#monitor)
-(function() {
-  const hash = (location.hash || '').replace('#', '').toLowerCase();
-  const validos = ['home', 'pagamentos', 'monitor', 'recibos', 'lembretes', 'instrucoes', 'premiacao', 'equipa', 'ponto', 'adiantamentos', 'orcamentos', 'obras'];
-  if (validos.includes(hash)) {
-    document.addEventListener('DOMContentLoaded', function() {
-      const btn = document.querySelector(`.suite-nav button[data-section="${hash}"]`);
-      if (btn) suiteShowSection(hash, btn);
-    });
-  }
-})();
 
 // Data de hoje na home
 document.addEventListener('DOMContentLoaded', function() {
@@ -8264,11 +8253,6 @@ function infFuncDelete(id) {
   infFuncRenderList();
   adiPopulateFuncSelects();
   premToast('🗑️ Funcionário removido');
-}
-
-function adiInit() {
-  adiPopulateFuncSelects();
-  adiRender();
 }
 
 function adiPopulateFuncSelects() {
