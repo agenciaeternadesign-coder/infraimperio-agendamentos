@@ -2659,8 +2659,6 @@ function suiteShowSection(id, btn) {
   document.querySelectorAll('.suite-nav button').forEach(b => b.classList.remove('suite-active'));
   document.getElementById('section-' + id).classList.add('suite-visible');
   btn.classList.add('suite-active');
-  // Atualizar hash na URL para deep-link
-  history.replaceState(null, '', '#' + id);
 
   // Init monitor when first shown
   if (id === 'monitor' && !window._monitorInited) {
