@@ -337,12 +337,20 @@ label { display: block; font-size: 12px; font-weight: 600; color: var(--text-mut
 .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: flex-start; padding: 40px 20px; overflow-y: auto; }
 .modal-overlay.active { display: flex; }
 .modal { background: var(--surface); border-radius: var(--radius-lg); max-width: 700px; width: 100%; max-height: calc(100vh - 80px); overflow-y: auto; box-shadow: var(--shadow); }
-.modal-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: #fafafa; }
+.modal-box { background: var(--surface); border-radius: var(--radius-lg); width: 100%; min-width: 320px; max-height: calc(100vh - 80px); overflow-y: auto; box-shadow: var(--shadow); }
+.modal-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: #fafafa; border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
 .modal-header h3 { color: var(--primary-dark); font-size: 16px; font-weight: 700; }
 .modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-muted); line-height: 1; padding: 0 4px; }
 .modal-close:hover { color: var(--text); }
 .modal-body { padding: 20px; }
-.modal-footer { padding: 12px 20px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; background: #fafafa; }
+.modal-footer { padding: 12px 20px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; background: #fafafa; border-radius: 0 0 var(--radius-lg) var(--radius-lg); }
+
+/* Shared form field components (.si-*) */
+.si-label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.4px; }
+.si-input { display: block; width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; font-family: inherit; color: var(--text); background: var(--surface); box-sizing: border-box; transition: border-color 0.15s, box-shadow 0.15s; }
+.si-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(201,42,42,0.1); }
+.si-input[readonly] { background: var(--surface2); cursor: default; }
+textarea.si-input { resize: vertical; min-height: 64px; }
 
 /* ============================================================
    RECIBO PRINT STYLES — unchanged
@@ -2713,7 +2721,7 @@ function suiteGoTo(id) {
 // Abrir secção correcta via hash na URL (ex: suite.html#monitor)
 (function() {
   const hash = (location.hash || '').replace('#', '').toLowerCase();
-  const validos = ['home', 'pagamentos', 'monitor', 'recibos', 'agendamentos', 'lembretes', 'instrucoes', 'premiacao', 'equipa', 'ponto', 'adiantamentos', 'orcamentos', 'obras'];
+  const validos = ['home', 'pagamentos', 'monitor', 'recibos', 'lembretes', 'instrucoes', 'premiacao', 'equipa', 'ponto', 'adiantamentos', 'orcamentos', 'obras'];
   if (validos.includes(hash)) {
     document.addEventListener('DOMContentLoaded', function() {
       const btn = document.querySelector(`.suite-nav button[data-section="${hash}"]`);
@@ -8495,57 +8503,65 @@ function adiInit() {
 
   <!-- Modal form -->
   <div id="adi-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)adiCloseForm()">
-    <div class="modal-box" style="max-width:480px;width:100%">
+    <div class="modal-box" style="max-width:560px;width:100%">
       <div class="modal-header">
-        <span id="adi-modal-title" style="font-weight:700;font-size:1rem">Novo Adiantamento</span>
-        <button onclick="adiCloseForm()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#6b7280">×</button>
+        <span id="adi-modal-title" style="font-weight:700;font-size:1rem;color:var(--text)">Novo Adiantamento</span>
+        <button onclick="adiCloseForm()" class="modal-close">×</button>
       </div>
-      <div style="padding:20px;display:grid;gap:12px">
+      <div style="padding:20px 24px;display:flex;flex-direction:column;gap:14px">
         <input type="hidden" id="adi-edit-id">
+
         <div>
           <label class="si-label">Funcionário *</label>
           <select id="adi-f-func" class="si-input">
             <option value="">Selecionar funcionário</option>
           </select>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
           <div>
             <label class="si-label">Data *</label>
             <input type="date" id="adi-f-data" class="si-input">
           </div>
           <div>
+            <label class="si-label">Estado</label>
+            <select id="adi-f-status" class="si-input">
+              <option value="aberto">Aberto</option>
+              <option value="pendente">Pendente retorno</option>
+              <option value="fechado">Fechado</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div>
             <label class="si-label">Quantia Liberada (€) *</label>
             <input type="number" id="adi-f-liberado" class="si-input" min="0" step="0.01" placeholder="0.00" oninput="adiCalcSaldo()">
           </div>
+          <div>
+            <label class="si-label">Quantia Retornada (€)</label>
+            <input type="number" id="adi-f-retorno" class="si-input" min="0" step="0.01" placeholder="0.00" oninput="adiCalcSaldo()">
+          </div>
         </div>
+
         <div>
-          <label class="si-label">Retorno (€)</label>
-          <input type="number" id="adi-f-retorno" class="si-input" min="0" step="0.01" placeholder="0.00" oninput="adiCalcSaldo()">
+          <label class="si-label">Saldo em Aberto (€)</label>
+          <input type="text" id="adi-f-saldo" class="si-input" readonly style="font-weight:700;color:#7950f2">
         </div>
-        <div>
-          <label class="si-label">Saldo em aberto (€)</label>
-          <input type="text" id="adi-f-saldo" class="si-input" readonly style="background:#f8fafc;font-weight:700;color:#7950f2">
-        </div>
+
         <div>
           <label class="si-label">Finalidade *</label>
           <input type="text" id="adi-f-finalidade" class="si-input" placeholder="Ex: combustível, matéria-prima...">
         </div>
-        <div>
-          <label class="si-label">Estado</label>
-          <select id="adi-f-status" class="si-input">
-            <option value="aberto">Aberto</option>
-            <option value="pendente">Pendente retorno</option>
-            <option value="fechado">Fechado</option>
-          </select>
-        </div>
+
         <div>
           <label class="si-label">Observações</label>
-          <textarea id="adi-f-obs" class="si-input" rows="2" placeholder="Notas adicionais..."></textarea>
+          <textarea id="adi-f-obs" class="si-input" rows="3" placeholder="Notas adicionais..."></textarea>
         </div>
       </div>
-      <div class="modal-footer" style="display:flex;gap:10px;justify-content:flex-end;padding:12px 20px;border-top:1px solid #e5e7eb">
-        <button onclick="adiCloseForm()" style="background:#f3f4f6;color:#374151;border:none;border-radius:8px;padding:9px 18px;font-size:0.88rem;font-weight:600;cursor:pointer;font-family:inherit">Cancelar</button>
-        <button onclick="adiSaveForm()" style="background:#7950f2;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:0.88rem;font-weight:700;cursor:pointer;font-family:inherit">Guardar</button>
+      <div class="modal-footer">
+        <button onclick="adiCloseForm()" class="si-btn si-btn-ghost">Cancelar</button>
+        <button onclick="adiSaveForm()" style="background:#7950f2;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Guardar</button>
       </div>
     </div>
   </div>
