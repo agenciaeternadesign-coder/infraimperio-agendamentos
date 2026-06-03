@@ -416,7 +416,7 @@ textarea.si-input { resize: vertical; min-height: 64px; }
    ============================================================ */
 #section-home {
   min-height: calc(100vh - 56px);
-  background: linear-gradient(160deg, #0d0d1a 0%, #1a1a2e 40%, #16213e 100%);
+  background: #f5f5f5;
   padding: 0 0 60px;
   overflow-y: auto;
   position: relative;
@@ -425,7 +425,7 @@ textarea.si-input { resize: vertical; min-height: 64px; }
 .home-hero {
   position: relative;
   text-align: center;
-  padding: 56px 24px 48px;
+  padding: 48px 24px 40px;
   max-width: 780px;
   margin: 0 auto 0;
   overflow: hidden;
@@ -435,7 +435,7 @@ textarea.si-input { resize: vertical; min-height: 64px; }
   position: absolute;
   top: -60px; left: 50%; transform: translateX(-50%);
   width: 600px; height: 600px;
-  background: radial-gradient(circle, rgba(201,42,42,0.18) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(201,42,42,0.07) 0%, transparent 70%);
   pointer-events: none;
 }
 .home-logo-img {
@@ -443,12 +443,12 @@ textarea.si-input { resize: vertical; min-height: 64px; }
   height: auto;
   margin: 0 auto 18px;
   display: block;
-  filter: drop-shadow(0 6px 20px rgba(255,255,255,0.15));
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.12));
 }
 .home-greeting {
   font-size: 13px;
   font-weight: 600;
-  color: rgba(255,255,255,0.55);
+  color: #9ca3af;
   letter-spacing: 0.15em;
   text-transform: uppercase;
   margin: 0 0 6px;
@@ -457,15 +457,15 @@ textarea.si-input { resize: vertical; min-height: 64px; }
   font-family: 'Oswald', sans-serif;
   font-size: 38px;
   font-weight: 800;
-  color: #fff;
+  color: #1a1a2e;
   margin: 0 0 6px;
   letter-spacing: -0.5px;
   line-height: 1.1;
 }
-.home-hero h1 span { color: #e03131; }
+.home-hero h1 span { color: #c92a2a; }
 .home-hero .tagline {
   font-size: 14px;
-  color: rgba(255,255,255,0.45);
+  color: #6b7280;
   margin: 0 0 20px;
   letter-spacing: 0.03em;
 }
@@ -473,14 +473,14 @@ textarea.si-input { resize: vertical; min-height: 64px; }
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.14);
+  background: #fff;
+  border: 1px solid #e5e7eb;
   border-radius: 24px;
   padding: 6px 16px;
   font-size: 12px;
   font-weight: 600;
-  color: rgba(255,255,255,0.7);
-  backdrop-filter: blur(6px);
+  color: #6b7280;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
 }
 .home-welcome-bar {
   max-width: 780px;
@@ -492,16 +492,17 @@ textarea.si-input { resize: vertical; min-height: 64px; }
   gap: 12px;
 }
 .home-welcome-chip {
-  background: linear-gradient(135deg, rgba(224,49,49,0.15), rgba(224,49,49,0.05));
-  border: 1px solid rgba(224,49,49,0.3);
+  background: #fff;
+  border: 1px solid #fecaca;
   border-radius: 12px;
   padding: 12px 18px;
   font-size: 15px;
   font-weight: 700;
-  color: #fff;
+  color: #1a1a2e;
   flex: 1;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
-.home-welcome-chip span { color: #ff6b6b; }
+.home-welcome-chip span { color: #c92a2a; }
 /* Grid */
 .home-grid {
   display: grid;
@@ -512,8 +513,8 @@ textarea.si-input { resize: vertical; min-height: 64px; }
   padding: 0 20px;
 }
 .home-card {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.09);
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
   border-radius: 18px;
   padding: 26px 22px 22px;
   cursor: pointer;
@@ -521,33 +522,32 @@ textarea.si-input { resize: vertical; min-height: 64px; }
   position: relative;
   overflow: hidden;
   text-align: left;
-  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 .home-card::after {
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0;
   height: 3px;
-  background: var(--card-color, #e03131);
+  background: var(--card-color, #c92a2a);
   border-radius: 18px 18px 0 0;
   opacity: 0.7;
   transition: opacity 0.2s;
 }
 .home-card:hover {
   transform: translateY(-5px);
-  background: rgba(255,255,255,0.09);
-  border-color: rgba(255,255,255,0.16);
-  box-shadow: 0 16px 40px rgba(0,0,0,0.40);
+  background: #fafafa;
+  border-color: var(--card-color, #c92a2a);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.12);
 }
 .home-card:hover::after { opacity: 1; }
 .home-card .hc-icon {
   font-size: 32px;
   margin-bottom: 14px;
   display: block;
-  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.3));
 }
-.home-card .hc-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 7px; }
-.home-card .hc-desc { font-size: 12.5px; color: rgba(255,255,255,0.5); line-height: 1.55; }
+.home-card .hc-title { font-size: 16px; font-weight: 700; color: #1a1a2e; margin-bottom: 7px; }
+.home-card .hc-desc { font-size: 12.5px; color: #6b7280; line-height: 1.55; }
 .home-card .hc-arrow {
   display: inline-flex;
   align-items: center;
@@ -555,20 +555,20 @@ textarea.si-input { resize: vertical; min-height: 64px; }
   margin-top: 16px;
   font-size: 12px;
   font-weight: 700;
-  color: var(--card-color, #e03131);
+  color: var(--card-color, #c92a2a);
   letter-spacing: 0.03em;
   text-transform: uppercase;
 }
 .home-footer {
   text-align: center;
   margin-top: 52px;
-  color: rgba(255,255,255,0.2);
+  color: #9ca3af;
   font-size: 11px;
   letter-spacing: 0.05em;
 }
 .home-divider {
   border: none;
-  border-top: 1px solid rgba(255,255,255,0.07);
+  border-top: 1px solid #e5e7eb;
   max-width: 1100px;
   margin: 0 auto 28px;
 }
@@ -1016,6 +1016,14 @@ textarea.si-input { resize: vertical; min-height: 64px; }
    AGENDAMENTOS SECTION
    ============================================================ */
 #section-agendamentos { height: calc(100vh - 96px); }
+
+/* ============================================================
+   PERSONALIZAÇÃO SECTION
+   ============================================================ */
+#section-personalizacao {
+  background: var(--bg);
+  min-height: calc(100vh - 96px);
+}
 </style>
 </head>
 <body>
@@ -1039,7 +1047,6 @@ textarea.si-input { resize: vertical; min-height: 64px; }
   <button class="suite-active" data-section="home" onclick="suiteShowSection('home', this)">🏠 Início</button>
   <button data-section="pagamentos" onclick="suiteShowSection('pagamentos', this)">💰 Pagamentos</button>
   <button data-section="equipa" onclick="suiteShowSection('equipa', this)">👤 Equipa</button>
-  <button data-section="ponto" onclick="suiteShowSection('ponto', this)">⏱️ Ponto</button>
   <button data-section="recibos" onclick="suiteShowSection('recibos', this)">🧾 Recibos</button>
   <button data-section="agendamentos" onclick="suiteShowSection('agendamentos', this)">📅 Agendamentos</button>
   <button data-section="lembretes" onclick="suiteShowSection('lembretes', this)">📌 Lembretes</button>
@@ -1048,6 +1055,7 @@ textarea.si-input { resize: vertical; min-height: 64px; }
   <button data-section="orcamentos" onclick="suiteShowSection('orcamentos', this)">📄 Orçamentos</button>
   <button data-section="obras" onclick="suiteShowSection('obras', this)">🏗️ Obras</button>
   <button data-section="adiantamentos" onclick="suiteShowSection('adiantamentos', this)">💵 Adiantamentos</button>
+  <button data-section="personalizacao" onclick="suiteShowSection('personalizacao', this)">⚙️ Personalização</button>
 </nav>
 
 <!-- =====================================================
@@ -1073,12 +1081,6 @@ textarea.si-input { resize: vertical; min-height: 64px; }
       <span class="hc-icon">👤</span>
       <div class="hc-title">Equipa</div>
       <div class="hc-desc">Fichas de funcionários, vales, premiação e histórico por colaborador.</div>
-      <span class="hc-arrow">Abrir →</span>
-    </div>
-    <div class="home-card" style="--card-color:#4dabf7" onclick="suiteGoTo('ponto')">
-      <span class="hc-icon">⏱️</span>
-      <div class="hc-title">Registo de Ponto</div>
-      <div class="hc-desc">Controlo de entradas e saídas diárias. Regista horas trabalhadas por funcionário.</div>
       <span class="hc-arrow">Abrir →</span>
     </div>
     <div class="home-card" style="--card-color:#2f9e44" onclick="suiteGoTo('recibos')">
@@ -1130,7 +1132,73 @@ textarea.si-input { resize: vertical; min-height: 64px; }
       <span class="hc-arrow">Abrir →</span>
     </div>
   </div>
-  <p class="home-footer">Infraimpério &copy; 2025 &mdash; Suite interna &nbsp;&bull;&nbsp; Desenvolvido por <strong style="color:rgba(255,255,255,0.35)">Alayane Nathalia</strong></p>
+  <p class="home-footer">Infraimpério &copy; 2025 &mdash; Suite interna &nbsp;&bull;&nbsp; Desenvolvido por <strong style="color:#6b7280">Alayane Nathalia</strong></p>
+</div>
+
+<!-- =====================================================
+     SECÇÃO: PERSONALIZAÇÃO
+     ===================================================== -->
+<div id="section-personalizacao" class="suite-section">
+  <div class="si-section-wrap" style="max-width:600px">
+    <div class="si-card">
+      <div class="si-card-head">
+        <span class="si-card-title">⚙️ Personalização do Sistema</span>
+      </div>
+      <div class="si-card-body" style="display:flex;flex-direction:column;gap:28px">
+
+        <!-- Logo -->
+        <div>
+          <label style="display:block;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#6b7280;margin-bottom:10px">Logo da Empresa</label>
+          <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+            <img id="pers-logo-preview" src="" alt="Logo" style="width:72px;height:72px;object-fit:contain;border:1px solid #e5e7eb;border-radius:10px;background:#f9fafb;display:none">
+            <div id="pers-logo-placeholder" style="width:72px;height:72px;border:2px dashed #d1d5db;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:11px;text-align:center;line-height:1.3">Sem<br>logo</div>
+            <div style="flex:1;min-width:200px">
+              <input type="file" id="pers-logo-input" accept="image/*" style="width:100%;font-size:13px">
+              <p style="font-size:11.5px;color:#9ca3af;margin-top:6px">PNG, JPG ou SVG. O logo aparecerá no cabeçalho da aplicação.</p>
+              <button class="si-btn si-btn-ghost si-btn-sm" style="margin-top:8px" onclick="persRemoveLogo()">🗑 Remover logo</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Greeting name -->
+        <div>
+          <label for="pers-greeting" style="display:block;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#6b7280;margin-bottom:8px">Nome de Saudação</label>
+          <input type="text" id="pers-greeting" placeholder="Ex: Ana Estética 👋" maxlength="60" style="max-width:340px">
+          <p style="font-size:11.5px;color:#9ca3af;margin-top:6px">Mostrado na página inicial: "Bem-vinda, <em>[nome]</em>!"</p>
+        </div>
+
+        <!-- Brand colours -->
+        <div>
+          <label style="display:block;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#6b7280;margin-bottom:10px">Cores da Marca</label>
+          <div style="display:flex;gap:24px;flex-wrap:wrap">
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <span style="font-size:12.5px;font-weight:600;color:#374151">Cor Principal</span>
+              <div style="display:flex;align-items:center;gap:8px">
+                <input type="color" id="pers-color-primary" value="#c92a2a" style="width:44px;height:36px;border:1px solid #e5e7eb;border-radius:6px;padding:2px;cursor:pointer">
+                <input type="text" id="pers-color-primary-hex" maxlength="7" placeholder="#c92a2a" style="width:90px;font-size:13px;font-family:monospace">
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <span style="font-size:12.5px;font-weight:600;color:#374151">Cor Secundária</span>
+              <div style="display:flex;align-items:center;gap:8px">
+                <input type="color" id="pers-color-secondary" value="#a51c1c" style="width:44px;height:36px;border:1px solid #e5e7eb;border-radius:6px;padding:2px;cursor:pointer">
+                <input type="text" id="pers-color-secondary-hex" maxlength="7" placeholder="#a51c1c" style="width:90px;font-size:13px;font-family:monospace">
+              </div>
+            </div>
+          </div>
+          <p style="font-size:11.5px;color:#9ca3af;margin-top:8px">As cores são aplicadas em todo o sistema imediatamente.</p>
+        </div>
+
+        <!-- Save button -->
+        <div style="display:flex;gap:10px;padding-top:4px;border-top:1px solid #f3f4f6">
+          <button class="si-btn si-btn-primary" onclick="persSave()">💾 Guardar Personalização</button>
+          <button class="si-btn si-btn-ghost" onclick="persReset()">↩ Repor Padrões</button>
+        </div>
+        <div id="pers-saved-msg" style="display:none;color:#2f9e44;font-size:13px;font-weight:600">✅ Personalização guardada com sucesso!</div>
+
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- =====================================================
@@ -2078,7 +2146,23 @@ textarea.si-input { resize: vertical; min-height: 64px; }
           <div id="cont-list-presenca" style="padding:8px 0;max-height:360px;overflow-y:auto"></div>
         </div>
 
+        <!-- Card Reclamações -->
+        <div style="background:#fff;border:1.5px solid #fecaca;border-radius:14px;overflow:hidden">
+          <div style="background:linear-gradient(135deg,#991b1b,#ef4444);padding:12px 16px;display:flex;align-items:center;justify-content:space-between">
+            <span style="font-family:'Oswald',sans-serif;font-size:1rem;font-weight:700;color:#fff">⚠️ Reclamações</span>
+            <button onclick="contadoresReset('reclamacoes')" style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);color:#fff;border-radius:6px;padding:3px 10px;font-size:0.72rem;font-weight:700;cursor:pointer;font-family:inherit">Reset</button>
+          </div>
+          <div id="cont-list-reclamacoes" style="padding:8px 0;max-height:360px;overflow-y:auto"></div>
+        </div>
+
       </div>
+
+      <!-- Pontuação Total -->
+      <div style="margin-top:24px">
+        <div style="font-family:'Oswald',sans-serif;font-size:1.05rem;font-weight:700;color:#1a1a2e;margin-bottom:10px">📊 Pontuação Total <span style="font-size:0.72rem;font-weight:400;color:#6b7280;font-family:inherit">(Fotos + Chave + Presença − Reclamações×4)</span></div>
+        <div id="cont-total-ranking" style="background:#fff;border:1.5px solid #e5e7eb;border-radius:14px;overflow:hidden"></div>
+      </div>
+
     </div>
 
     <!-- Panel: Ranking -->
@@ -2166,47 +2250,6 @@ textarea.si-input { resize: vertical; min-height: 64px; }
     </div>
   </div>
 </div>
-
-
-<!-- =====================================================
-     SECÇÃO: PONTO
-     ===================================================== -->
-<div id="section-ponto" class="suite-section">
-  <div style="padding:20px 24px 64px;max-width:1100px;margin:0 auto">
-
-    <!-- Header -->
-    <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;flex-wrap:wrap">
-      <div style="width:48px;height:48px;border-radius:14px;background:#1a1a2e;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">&#x23F1;&#xFE0F;</div>
-      <div style="flex:1;min-width:0">
-        <h2 style="font-family:'Oswald',sans-serif;font-size:1.45rem;font-weight:700;color:#1a1a2e;margin:0">Registo de Ponto</h2>
-        <div style="font-size:0.78rem;color:#9ca3af">Controlo de entradas e sa&#237;das di&#225;rias por funcion&#225;rio</div>
-      </div>
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <input type="date" id="ponto-data" oninput="pontoSetData(this.value)" style="border:1.5px solid #e5e7eb;border-radius:8px;padding:7px 12px;font-size:0.84rem;font-family:inherit;color:#1a1a2e;background:#fff;cursor:pointer">
-        <button onclick="pontoExportar()" style="background:#1a1a2e;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">&#x1F4CA; Resumo</button>
-      </div>
-    </div>
-
-    <!-- Date warning -->
-    <div id="ponto-date-warn" style="display:none;background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:0.82rem;color:#856404">
-      &#x26A0;&#xFE0F; Est&#225;s a registar ponto para uma data diferente de hoje.
-    </div>
-
-    <!-- Cards grid -->
-    <div id="ponto-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px"></div>
-    <div id="ponto-empty" style="display:none;text-align:center;padding:56px 16px;color:#9ca3af">
-      <div style="font-size:2.5rem;margin-bottom:10px">&#x1F477;</div>
-      <div>Nenhum funcion&#225;rio. Adiciona na Premia&#231;&#227;o &rarr; Equipa.</div>
-    </div>
-
-    <!-- Histórico do dia -->
-    <div id="ponto-hist-wrap" style="margin-top:28px;display:none">
-      <div style="font-family:'Oswald',sans-serif;font-size:1rem;font-weight:700;color:#1a1a2e;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.06em">&#x1F4CB; Hist&#243;rico do Dia</div>
-      <div id="ponto-hist-list"></div>
-    </div>
-  </div>
-</div>
-
 <!-- =====================================================
      SECÇÃO: ORÇAMENTOS
      ===================================================== -->
@@ -2527,24 +2570,6 @@ textarea.si-input { resize: vertical; min-height: 64px; }
   </div>
 </div>
 
-<!-- PONTO RESUMO MODAL -->
-<div id="ponto-resumo-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:9200;overflow-y:auto;padding:24px 16px">
-  <div style="background:#fff;max-width:680px;margin:0 auto;border-radius:16px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,0.35)">
-    <div style="background:linear-gradient(135deg,#1a1a2e,#2d1b69);padding:18px 20px;display:flex;align-items:center;justify-content:space-between">
-      <div>
-        <div style="font-size:0.7rem;color:#a5b4fc;letter-spacing:0.1em;text-transform:uppercase">Ponto</div>
-        <div style="font-family:'Oswald',sans-serif;font-size:1.3rem;font-weight:800;color:#fff">Resumo do M&#234;s</div>
-      </div>
-      <button onclick="pontoFecharResumo()" style="background:rgba(255,255,255,0.15);border:none;color:#fff;width:30px;height:30px;border-radius:7px;cursor:pointer;font-size:1rem">&#x2715;</button>
-    </div>
-    <div style="padding:16px 20px 8px">
-      <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
-        <select id="ponto-res-mes" onchange="pontoRenderResumo()" style="border:1.5px solid #e5e7eb;border-radius:8px;padding:7px 10px;font-size:0.84rem;font-family:inherit"></select>
-        <select id="ponto-res-ano" onchange="pontoRenderResumo()" style="border:1.5px solid #e5e7eb;border-radius:8px;padding:7px 10px;font-size:0.84rem;font-family:inherit"></select>
-      </div>
-    </div>
-    <div id="ponto-resumo-list" style="padding:0 20px 24px;max-height:65vh;overflow-y:auto"></div>
-  </div>
 </div>
 
 <!-- RELATÓRIO MENSAL PREMIAÇÃO MODAL -->
@@ -2613,16 +2638,6 @@ textarea.si-input { resize: vertical; min-height: 64px; }
 .eq-card:hover { border-color:#d97706;box-shadow:0 4px 16px rgba(217,119,6,0.12) }
 .eq-ficha-tab { background:transparent;border:none;color:rgba(255,255,255,0.65);border-radius:8px 8px 0 0;padding:8px 14px;font-size:0.8rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s }
 .eq-tab-active { background:rgba(255,255,255,0.18) !important;color:#fff !important }
-.ponto-card { background:#fff;border:2px solid #e5e7eb;border-radius:14px;padding:14px;transition:border-color 0.15s,box-shadow 0.15s }
-.ponto-card.ponto-dentro { border-color:#22c55e;background:#f0fdf4 }
-.ponto-card.ponto-fora { border-color:#e5e7eb }
-.ponto-btn { border:none;border-radius:8px;padding:7px 12px;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:inherit;transition:background 0.15s }
-.ponto-btn-in { background:#22c55e;color:#fff }
-.ponto-btn-in:hover { background:#16a34a }
-.ponto-btn-out { background:#ef4444;color:#fff }
-.ponto-btn-out:hover { background:#dc2626 }
-.ponto-log-row { display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #f3f4f6;font-size:0.8rem }
-.ponto-log-row:last-child { border-bottom:none }
 .eq-hv-filter { background:#f3f4f6;color:#374151;border:1.5px solid #e5e7eb;border-radius:20px;padding:5px 14px;font-size:0.78rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s }
 .eq-hv-filter:hover { border-color:#1a1a2e;color:#1a1a2e }
 .eq-hv-active { background:#1a1a2e !important;color:#fff !important;border-color:#1a1a2e !important }
@@ -2730,10 +2745,6 @@ function suiteShowSection(id, btn) {
   if (id === 'equipa') {
     eqInit();
   }
-  // Init ponto
-  if (id === 'ponto') {
-    pontoInit();
-  }
   // Init orçamentos
   if (id === 'orcamentos') {
     orcInit();
@@ -2753,6 +2764,162 @@ function suiteGoTo(id) {
   const btn = document.querySelector(`.suite-nav button[data-section="${id}"]`);
   if (btn) suiteShowSection(id, btn);
 }
+
+// Garantir que o home é sempre a primeira secção mostrada ao carregar a página
+document.addEventListener('DOMContentLoaded', function() {
+  var btn = document.querySelector('.suite-nav button[data-section="home"]');
+  if (btn) suiteShowSection('home', btn);
+});
+
+// ============================================================
+// PERSONALIZAÇÃO
+// ============================================================
+(function() {
+  var PERS_KEY = 'inf_personalizacao_v1';
+
+  function persLoad() {
+    try { return JSON.parse(localStorage.getItem(PERS_KEY) || '{}'); } catch(e) { return {}; }
+  }
+
+  function persApply(data) {
+    // Colours
+    if (data.primaryColor) {
+      document.documentElement.style.setProperty('--primary', data.primaryColor);
+      document.documentElement.style.setProperty('--accent', data.primaryColor);
+      document.documentElement.style.setProperty('--check-active', data.primaryColor);
+      document.documentElement.style.setProperty('--red', data.primaryColor);
+    }
+    if (data.secondaryColor) {
+      document.documentElement.style.setProperty('--primary-dark', data.secondaryColor);
+      document.documentElement.style.setProperty('--red-dark', data.secondaryColor);
+    }
+    // Logo
+    if (data.logo) {
+      var logos = document.querySelectorAll('#home-suite-logo,#orc-suite-logo,#header-suite-logo');
+      logos.forEach(function(el) { el.src = data.logo; el.style.display = ''; });
+    }
+    // Greeting name on home
+    if (data.greetingName) {
+      var h1Span = document.querySelector('#section-home .home-hero h1 span');
+      if (h1Span) h1Span.textContent = data.greetingName + '!';
+    }
+  }
+
+  function persUISync(data) {
+    var logoInput = document.getElementById('pers-logo-input');
+    var logoPreview = document.getElementById('pers-logo-preview');
+    var logoPlaceholder = document.getElementById('pers-logo-placeholder');
+    var greetingInput = document.getElementById('pers-greeting');
+    var colorPrimary = document.getElementById('pers-color-primary');
+    var colorPrimaryHex = document.getElementById('pers-color-primary-hex');
+    var colorSecondary = document.getElementById('pers-color-secondary');
+    var colorSecondaryHex = document.getElementById('pers-color-secondary-hex');
+
+    if (!colorPrimary) return; // section not yet in DOM
+
+    if (data.logo) {
+      logoPreview.src = data.logo;
+      logoPreview.style.display = '';
+      logoPlaceholder.style.display = 'none';
+    }
+    if (data.greetingName) greetingInput.value = data.greetingName;
+    var pc = data.primaryColor || '#c92a2a';
+    var sc = data.secondaryColor || '#a51c1c';
+    colorPrimary.value = pc;
+    colorPrimaryHex.value = pc;
+    colorSecondary.value = sc;
+    colorSecondaryHex.value = sc;
+
+    // Sync hex <-> picker
+    colorPrimary.addEventListener('input', function() { colorPrimaryHex.value = colorPrimary.value; persApply(persCollect()); });
+    colorPrimaryHex.addEventListener('input', function() { if (/^#[0-9a-fA-F]{6}$/.test(colorPrimaryHex.value)) { colorPrimary.value = colorPrimaryHex.value; persApply(persCollect()); } });
+    colorSecondary.addEventListener('input', function() { colorSecondaryHex.value = colorSecondary.value; persApply(persCollect()); });
+    colorSecondaryHex.addEventListener('input', function() { if (/^#[0-9a-fA-F]{6}$/.test(colorSecondaryHex.value)) { colorSecondary.value = colorSecondaryHex.value; persApply(persCollect()); } });
+
+    // Logo file input
+    logoInput.addEventListener('change', function() {
+      var file = logoInput.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var b64 = e.target.result;
+        logoPreview.src = b64;
+        logoPreview.style.display = '';
+        logoPlaceholder.style.display = 'none';
+        persApply({logo: b64});
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function persCollect() {
+    return {
+      logo: (document.getElementById('pers-logo-preview') || {}).src || '',
+      greetingName: (document.getElementById('pers-greeting') || {}).value || '',
+      primaryColor: (document.getElementById('pers-color-primary') || {}).value || '#c92a2a',
+      secondaryColor: (document.getElementById('pers-color-secondary') || {}).value || '#a51c1c'
+    };
+  }
+
+  window.persSave = function() {
+    var data = persCollect();
+    // Only store logo if it's a data: URL (not the empty SUITE_LOGO placeholder)
+    if (data.logo && !data.logo.startsWith('data:')) data.logo = '';
+    localStorage.setItem(PERS_KEY, JSON.stringify(data));
+    persApply(data);
+    var msg = document.getElementById('pers-saved-msg');
+    if (msg) { msg.style.display = ''; setTimeout(function() { msg.style.display = 'none'; }, 3000); }
+  };
+
+  window.persReset = function() {
+    localStorage.removeItem(PERS_KEY);
+    document.documentElement.style.removeProperty('--primary');
+    document.documentElement.style.removeProperty('--primary-dark');
+    document.documentElement.style.removeProperty('--accent');
+    document.documentElement.style.removeProperty('--check-active');
+    document.documentElement.style.removeProperty('--red');
+    document.documentElement.style.removeProperty('--red-dark');
+    var preview = document.getElementById('pers-logo-preview');
+    var placeholder = document.getElementById('pers-logo-placeholder');
+    if (preview) { preview.src = ''; preview.style.display = 'none'; }
+    if (placeholder) placeholder.style.display = '';
+    var greeting = document.getElementById('pers-greeting');
+    if (greeting) greeting.value = '';
+    var pc = document.getElementById('pers-color-primary');
+    var pch = document.getElementById('pers-color-primary-hex');
+    var sc = document.getElementById('pers-color-secondary');
+    var sch = document.getElementById('pers-color-secondary-hex');
+    if (pc) pc.value = '#c92a2a';
+    if (pch) pch.value = '#c92a2a';
+    if (sc) sc.value = '#a51c1c';
+    if (sch) sch.value = '#a51c1c';
+  };
+
+  window.persRemoveLogo = function() {
+    var preview = document.getElementById('pers-logo-preview');
+    var placeholder = document.getElementById('pers-logo-placeholder');
+    var input = document.getElementById('pers-logo-input');
+    if (preview) { preview.src = ''; preview.style.display = 'none'; }
+    if (placeholder) placeholder.style.display = '';
+    if (input) input.value = '';
+  };
+
+  // On section show, sync UI
+  var _persUIReady = false;
+  var _origSuiteShow = window.suiteShowSection;
+  window.suiteShowSection = function(id, btn) {
+    _origSuiteShow(id, btn);
+    if (id === 'personalizacao' && !_persUIReady) {
+      _persUIReady = true;
+      persUISync(persLoad());
+    }
+  };
+
+  // Apply saved settings on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    persApply(persLoad());
+  });
+})();
 
 
 // Data de hoje na home
@@ -5834,7 +6001,7 @@ function contadoresRender() {
     } catch(e) {}
   }
 
-  ['fotos','chave','presenca'].forEach(function(cat) {
+  ['fotos','chave','presenca','reclamacoes'].forEach(function(cat) {
     var el = document.getElementById('cont-list-' + cat);
     if (!el) return;
     var counts = data[cat] || {};
@@ -5850,17 +6017,49 @@ function contadoresRender() {
     }
 
     var medal = ['🥇','🥈','🥉'];
+    var isRecl = cat === 'reclamacoes';
     el.innerHTML = rows.map(function(r, i) {
       var pos = medal[i] || ('<span style="font-size:0.75rem;color:#9ca3af;font-weight:700;min-width:20px;display:inline-block">' + (i+1) + 'º</span>');
       var q = "'";
+      var btnBg = isRecl ? '#fee2e2' : '#e5e7eb';
+      var btnBgHover = isRecl ? '#fca5a5' : '#d1d5db';
+      var btnColor = isRecl ? '#991b1b' : '#374151';
       return '<div style="display:flex;align-items:center;gap:8px;padding:7px 14px;border-bottom:1px solid #f3f4f6;transition:background 0.1s" onmouseover="this.style.background='+q+'#f9fafb'+q+'" onmouseout="this.style.background='+q+''+q+'">'
         + '<span style="width:28px;text-align:center;flex-shrink:0;font-size:0.88rem">' + pos + '</span>'
         + '<span style="flex:1;font-size:0.85rem;font-weight:600;color:#1a1a2e;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + r.nome + '</span>'
-        + '<span style="font-size:0.9rem;font-weight:800;color:#374151;min-width:28px;text-align:right">' + r.count + '</span>'
-        + '<button onclick="contadoresAdd('+q+cat+q+','+q+r.nome+q+')" style="background:#e5e7eb;border:none;border-radius:6px;width:28px;height:28px;font-size:1rem;font-weight:800;cursor:pointer;color:#374151;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.12s" onmouseover="this.style.background='+q+'#d1d5db'+q+'" onmouseout="this.style.background='+q+'#e5e7eb'+q+'">+</button>'
+        + '<span style="font-size:0.9rem;font-weight:800;color:' + (isRecl ? '#dc2626' : '#374151') + ';min-width:28px;text-align:right">' + r.count + '</span>'
+        + '<button onclick="contadoresAdd('+q+cat+q+','+q+r.nome+q+')" style="background:'+btnBg+';border:none;border-radius:6px;width:28px;height:28px;font-size:1rem;font-weight:800;cursor:pointer;color:'+btnColor+';display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.12s" onmouseover="this.style.background='+q+btnBgHover+q+'" onmouseout="this.style.background='+q+btnBg+q+'">+</button>'
         + '</div>';
     }).join('');
   });
+
+  // Render pontuação total
+  var totalEl = document.getElementById('cont-total-ranking');
+  if (totalEl && funcionarios.length) {
+    var fotos    = data['fotos']       || {};
+    var chave    = data['chave']       || {};
+    var presenca = data['presenca']    || {};
+    var recl     = data['reclamacoes'] || {};
+    var medal    = ['🥇','🥈','🥉'];
+    var totals = funcionarios.map(function(f) {
+      var pts = (fotos[f.nome]||0) + (chave[f.nome]||0) + (presenca[f.nome]||0) - ((recl[f.nome]||0) * 4);
+      return { nome: f.nome, pts: pts };
+    }).sort(function(a,b){ return b.pts - a.pts || a.nome.localeCompare(b.nome,'pt'); });
+
+    totalEl.innerHTML = totals.map(function(r, i) {
+      var pos = medal[i] || ('<span style="font-size:0.75rem;color:#9ca3af;font-weight:700;min-width:20px;display:inline-block">' + (i+1) + 'º</span>');
+      var ptsColor = r.pts < 0 ? '#dc2626' : '#1a1a2e';
+      var rowBg = i < 3 ? ['#fffbeb','#f9fafb','#f0fdf4'][i] : '';
+      var q = "'";
+      return '<div style="display:flex;align-items:center;gap:8px;padding:8px 16px;border-bottom:1px solid #f3f4f6;background:'+rowBg+';transition:background 0.1s" onmouseover="this.style.background='+q+'#f3f4f6'+q+'" onmouseout="this.style.background='+q+rowBg+q+'">'
+        + '<span style="width:28px;text-align:center;flex-shrink:0;font-size:0.88rem">' + pos + '</span>'
+        + '<span style="flex:1;font-size:0.85rem;font-weight:600;color:#1a1a2e;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + r.nome + '</span>'
+        + '<span style="font-size:1rem;font-weight:800;color:'+ptsColor+';min-width:36px;text-align:right">' + (r.pts > 0 ? '+' : '') + r.pts + '</span>'
+        + '</div>';
+    }).join('');
+  } else if (totalEl) {
+    totalEl.innerHTML = '<div style="text-align:center;padding:20px;color:#9ca3af;font-size:0.82rem">Nenhum funcionário.</div>';
+  }
 }
 
 function contadoresAdd(cat, nome) {
@@ -5872,7 +6071,7 @@ function contadoresAdd(cat, nome) {
 }
 
 function contadoresReset(cat) {
-  var labels = { fotos:'Fotos', chave:'Chave', presenca:'Presença' };
+  var labels = { fotos:'Fotos', chave:'Chave', presenca:'Presença', reclamacoes:'Reclamações' };
   if (!confirm('Zerar todos os contadores de "' + (labels[cat]||cat) + '"?')) return;
   var data = contLoad();
   data[cat] = {};
@@ -6996,281 +7195,6 @@ document.addEventListener('DOMContentLoaded', function() {
     el.textContent = d.toLocaleDateString('pt-PT', opts);
   }
 });
-
-// =============================================================
-//  PONTO — Registo de Ponto
-// =============================================================
-var PONTO_KEY   = 'inf_ponto_v1';
-var PONTO_DATE  = new Date().toISOString().slice(0,10);
-var PONTO_FEEDBACK_T = null;
-
-function pontoLoad() {
-  try { return JSON.parse(localStorage.getItem(PONTO_KEY)||'{}'); } catch(e){ return {}; }
-}
-function pontoSave(d) {
-  localStorage.setItem(PONTO_KEY, JSON.stringify(d));
-}
-function pontoInit() {
-  var inp = document.getElementById('ponto-data');
-  if (inp) { inp.value = PONTO_DATE; }
-  var today = new Date().toISOString().slice(0,10);
-  var warn  = document.getElementById('ponto-date-warn');
-  if (warn) warn.style.display = (PONTO_DATE !== today) ? '' : 'none';
-  pontoRenderGrid();
-}
-function pontoSetData(val) {
-  if (!val) return;
-  PONTO_DATE = val;
-  var today = new Date().toISOString().slice(0,10);
-  var warn  = document.getElementById('ponto-date-warn');
-  if (warn) warn.style.display = (val !== today) ? '' : 'none';
-  pontoRenderGrid();
-}
-
-function pontoRenderGrid() {
-  var grid  = document.getElementById('ponto-grid');
-  var empty = document.getElementById('ponto-empty');
-  var histW = document.getElementById('ponto-hist-wrap');
-  if (!grid) return;
-  var pd    = premLoad();
-  var funcs = (pd.funcionarios||[]).filter(function(f){ return f.ativo!==false; })
-              .slice().sort(function(a,b){ return a.nome.localeCompare(b.nome,'pt'); });
-  if (!funcs.length) {
-    grid.innerHTML=''; if(empty) empty.style.display=''; if(histW) histW.style.display='none'; return;
-  }
-  if (empty) empty.style.display='none';
-  var d  = pontoLoad();
-  var day= d[PONTO_DATE] || {};
-  var q  = '\x27';
-  grid.innerHTML = funcs.map(function(f) {
-    var reg    = day[f.id] || { logs: [] };
-    var logs   = reg.logs || [];
-    var dentro = false;
-    if (logs.length > 0) { dentro = logs[logs.length-1].tipo === 'entrada'; }
-    var totalMin = pontoCalcMinutos(logs);
-    var totalStr = pontFmtHoras(totalMin);
-    var statusIcon = logs.length ? (dentro ? '🟢' : '🔴') : '⚪';
-    var statusTxt  = logs.length ? (dentro ? 'Dentro' : 'Saiu') : 'Sem registo';
-    return '<div class="ponto-card'+(dentro?' ponto-dentro':' ponto-fora')+'">' +
-      '<div style="display:flex;align-items:center;gap:9px;margin-bottom:10px">' +
-        '<div style="width:38px;height:38px;border-radius:50%;background:#1a1a2e;color:#fef3c7;font-family:\'Oswald\',sans-serif;font-size:0.88rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+_initials(f.nome)+'</div>' +
-        '<div style="flex:1;min-width:0">' +
-          '<div style="font-weight:700;font-size:0.85rem;color:#1a1a2e;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+escHtml(f.nome)+'</div>' +
-          '<div style="font-size:0.7rem;color:#9ca3af">'+escHtml(f.funcao||'—')+'</div>' +
-        '</div>' +
-      '</div>' +
-      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">' +
-        '<div style="font-size:0.75rem;color:#6b7280">'+statusIcon+' '+statusTxt+'</div>' +
-        (totalMin>0 ? '<div style="font-family:\'Oswald\',sans-serif;font-size:1rem;font-weight:700;color:#1a1a2e">'+totalStr+'</div>' : '') +
-      '</div>' +
-      '<div style="display:flex;gap:6px">' +
-        '<button class="ponto-btn ponto-btn-in" onclick="pontoRegistar('+q+f.id+q+','+q+'entrada'+q+')" '+(dentro?'disabled style="opacity:0.4;cursor:not-allowed"':'')+'>&#x23F5; Entrada</button>' +
-        '<button class="ponto-btn ponto-btn-out" onclick="pontoRegistar('+q+f.id+q+','+q+'saida'+q+')" '+(dentro?'':'disabled style="opacity:0.4;cursor:not-allowed"')+'>&#x23F9; Sa&#237;da</button>' +
-        (logs.length ? '<button onclick="pontoVerLogs('+q+f.id+q+')" style="background:#f3f4f6;color:#374151;border:none;border-radius:8px;padding:7px 8px;font-size:0.78rem;cursor:pointer;font-family:inherit;font-weight:600">&#x1F4CB;</button>' : '') +
-      '</div>' +
-    '</div>';
-  }).join('');
-  pontoRenderHist();
-}
-
-function pontoRegistar(funcId, tipo) {
-  var pd   = premLoad();
-  var func = (pd.funcionarios||[]).find(function(f){ return f.id===funcId; });
-  if (!func) return;
-  var d    = pontoLoad();
-  if (!d[PONTO_DATE]) d[PONTO_DATE] = {};
-  if (!d[PONTO_DATE][funcId]) d[PONTO_DATE][funcId] = { funcNome: func.nome, logs: [] };
-  var logs = d[PONTO_DATE][funcId].logs;
-  // Validate: can't enter twice without leaving, can't leave without entering
-  if (tipo==='entrada') {
-    if (logs.length>0 && logs[logs.length-1].tipo==='entrada') {
-      alert('Regista primeiro a saída antes de registar nova entrada.'); return;
-    }
-  } else {
-    if (!logs.length || logs[logs.length-1].tipo==='saida') {
-      alert('Regista primeiro a entrada antes de registar saída.'); return;
-    }
-  }
-  var now  = new Date();
-  var hora = ('0'+now.getHours()).slice(-2)+':'+('0'+now.getMinutes()).slice(-2);
-  logs.push({ tipo: tipo, hora: hora, ts: now.getTime() });
-  pontoSave(d);
-  pontoRenderGrid();
-}
-
-function pontoVerLogs(funcId) {
-  var d    = pontoLoad();
-  var day  = (d[PONTO_DATE]||{})[funcId];
-  if (!day) return;
-  var pd   = premLoad();
-  var func = (pd.funcionarios||[]).find(function(f){ return f.id===funcId; });
-  var nome = func ? func.nome : funcId;
-  var logs = day.logs||[];
-  if (!logs.length) return;
-  var html = '<b>'+escHtml(nome)+'</b> — '+PONTO_DATE+'<br><br>';
-  logs.forEach(function(l,i) {
-    html += (l.tipo==='entrada'?'&#x23F5; Entrada':'&#x23F9; Sa&#237;da')+' &nbsp; <b>'+l.hora+'</b>';
-    if (l.tipo==='saida' && i>0 && logs[i-1].tipo==='entrada') {
-      var diff = pontoCalcMinutos([logs[i-1], l]);
-      html += ' &nbsp; <span style="color:#6b7280;font-size:0.85em">('+pontFmtHoras(diff)+')</span>';
-    }
-    html += (i<logs.length-1?'<br>':'');
-  });
-  var totalMin = pontoCalcMinutos(logs);
-  html += '<br><br><b>Total: '+pontFmtHoras(totalMin)+'</b>';
-  html += '<br><br><button onclick="pontoApagarUltimo(\''+funcId+'\')" style="background:#fee2e2;color:#b91c1c;border:none;border-radius:6px;padding:5px 10px;font-size:0.78rem;cursor:pointer;font-family:inherit;font-weight:600">&#x21A9; Apagar &#xFA;ltimo</button>';
-  var ov = document.getElementById('ponto-log-overlay');
-  if (!ov) {
-    ov = document.createElement('div');
-    ov.id = 'ponto-log-overlay';
-    ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:9300;display:flex;align-items:center;justify-content:center;padding:24px';
-    ov.onclick=function(e){ if(e.target===ov) ov.style.display='none'; };
-    document.body.appendChild(ov);
-  }
-  ov.innerHTML = '<div style="background:#fff;border-radius:14px;padding:24px;max-width:360px;width:100%;box-shadow:0 16px 48px rgba(0,0,0,0.3)">' +
-    '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px"><div style="font-size:0.9rem">'+html+'</div>' +
-    '<button onclick="document.getElementById(\'ponto-log-overlay\').style.display=\'none\'" style="background:#f3f4f6;border:none;border-radius:6px;width:28px;height:28px;cursor:pointer;font-size:0.9rem;flex-shrink:0;margin-left:10px">&#x2715;</button></div></div>';
-  ov.style.display='flex';
-}
-
-function pontoApagarUltimo(funcId) {
-  var d = pontoLoad();
-  if (!(d[PONTO_DATE]&&d[PONTO_DATE][funcId])) return;
-  var logs = d[PONTO_DATE][funcId].logs;
-  if (!logs.length) return;
-  if (!confirm('Apagar o último registo?')) return;
-  logs.pop();
-  pontoSave(d);
-  var ov = document.getElementById('ponto-log-overlay');
-  if (ov) ov.style.display='none';
-  pontoRenderGrid();
-}
-
-function pontoCalcMinutos(logs) {
-  var total=0;
-  for (var i=0; i<logs.length-1; i++) {
-    if (logs[i].tipo==='entrada' && logs[i+1].tipo==='saida') {
-      var a=logs[i].hora.split(':'), b=logs[i+1].hora.split(':');
-      total += (parseInt(b[0])*60+parseInt(b[1])) - (parseInt(a[0])*60+parseInt(a[1]));
-    }
-  }
-  return Math.max(0, total);
-}
-
-function pontFmtHoras(min) {
-  var h=Math.floor(min/60), m=min%60;
-  return h+'h'+(m>0?('0'+m).slice(-2):'');
-}
-
-function pontoRenderHist() {
-  var histW = document.getElementById('ponto-hist-wrap');
-  var list  = document.getElementById('ponto-hist-list');
-  if (!histW||!list) return;
-  var d   = pontoLoad();
-  var day = d[PONTO_DATE]||{};
-  var pd  = premLoad();
-  var rows = [];
-  Object.keys(day).forEach(function(fId) {
-    var reg  = day[fId]; if (!reg.logs||!reg.logs.length) return;
-    var func = (pd.funcionarios||[]).find(function(f){ return f.id===fId; });
-    var nome = func ? func.nome : (reg.funcNome||fId);
-    var total= pontoCalcMinutos(reg.logs);
-    rows.push({ nome: nome, logs: reg.logs, total: total, id: fId });
-  });
-  if (!rows.length) { histW.style.display='none'; return; }
-  histW.style.display='';
-  rows.sort(function(a,b){ return a.nome.localeCompare(b.nome,'pt'); });
-  list.innerHTML='<div style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden">' +
-    rows.map(function(r,i) {
-      var lastLog = r.logs[r.logs.length-1];
-      var dentro  = lastLog.tipo==='entrada';
-      return '<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;'+(i>0?'border-top:1px solid #f3f4f6;':'')+'">' +
-        '<div style="width:32px;height:32px;border-radius:50%;background:#1a1a2e;color:#fef3c7;font-family:\'Oswald\',sans-serif;font-size:0.78rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+_initials(r.nome)+'</div>' +
-        '<div style="flex:1;min-width:0"><div style="font-weight:700;font-size:0.82rem;color:#1a1a2e">'+escHtml(r.nome)+'</div>' +
-          '<div style="font-size:0.72rem;color:#9ca3af">'+r.logs.length+' registo'+(r.logs.length!==1?'s':'')+' &nbsp;·&nbsp; Ult: '+lastLog.hora+'</div></div>' +
-        '<div style="text-align:right">' +
-          (r.total>0?'<div style="font-family:\'Oswald\',sans-serif;font-size:0.95rem;font-weight:700;color:#1a1a2e">'+pontFmtHoras(r.total)+'</div>':'') +
-          '<div style="font-size:0.68rem;'+(dentro?'color:#16a34a':'color:#9ca3af')+'">'+(dentro?'Dentro':'Saiu')+'</div>' +
-        '</div>' +
-      '</div>';
-    }).join('') + '</div>';
-}
-
-function pontoExportar() {
-  var now   = new Date();
-  var selM  = document.getElementById('ponto-res-mes');
-  var selA  = document.getElementById('ponto-res-ano');
-  var ov    = document.getElementById('ponto-resumo-overlay');
-  if (!ov) return;
-  // Populate month/year selects
-  if (selM) {
-    var MONTHS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-    if (!selM.options.length) {
-      MONTHS.forEach(function(m,i){ var o=document.createElement('option'); o.value=i; o.textContent=m; selM.appendChild(o); });
-    }
-    selM.value = now.getMonth();
-  }
-  if (selA) {
-    if (!selA.options.length) {
-      for (var y=now.getFullYear()-2; y<=now.getFullYear()+1; y++) {
-        var o=document.createElement('option'); o.value=y; o.textContent=y; selA.appendChild(o);
-      }
-    }
-    selA.value = now.getFullYear();
-  }
-  ov.style.display='';
-  pontoRenderResumo();
-}
-function pontoFecharResumo() {
-  var ov=document.getElementById('ponto-resumo-overlay'); if(ov) ov.style.display='none';
-}
-function pontoRenderResumo() {
-  var list = document.getElementById('ponto-resumo-list');
-  if (!list) return;
-  var selM = document.getElementById('ponto-res-mes');
-  var selA = document.getElementById('ponto-res-ano');
-  var mes  = parseInt(selM ? selM.value : new Date().getMonth());
-  var ano  = parseInt(selA ? selA.value : new Date().getFullYear());
-  var d    = pontoLoad();
-  var pd   = premLoad();
-  // Collect all days in that month
-  var prefix = ano+'-'+('0'+(mes+1)).slice(-2);
-  var funcsMap = {};
-  (pd.funcionarios||[]).forEach(function(f){ funcsMap[f.id] = f.nome; });
-  // Aggregate per funcionário
-  var agg = {}; // fId -> { nome, dias:{}, totalMin }
-  Object.keys(d).forEach(function(dt) {
-    if (!dt.startsWith(prefix)) return;
-    var day = d[dt];
-    Object.keys(day).forEach(function(fId) {
-      var reg = day[fId]; if (!reg.logs||!reg.logs.length) return;
-      if (!agg[fId]) agg[fId]={ nome:(funcsMap[fId]||reg.funcNome||fId), dias:{}, totalMin:0 };
-      var min = pontoCalcMinutos(reg.logs);
-      agg[fId].dias[dt] = min;
-      agg[fId].totalMin += min;
-    });
-  });
-  var rows = Object.values(agg).sort(function(a,b){ return a.nome.localeCompare(b.nome,'pt'); });
-  var MONTHS2 = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-  if (!rows.length) {
-    list.innerHTML='<div style="text-align:center;padding:32px;color:#9ca3af;font-size:0.88rem">Sem registos para '+MONTHS2[mes]+' '+ano+'.</div>'; return;
-  }
-  list.innerHTML='<div style="font-weight:700;color:#1a1a2e;font-size:0.82rem;margin-bottom:10px">'+MONTHS2[mes]+' '+ano+'</div>' +
-    '<div style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden">' +
-    rows.map(function(r,i) {
-      var dias = Object.keys(r.dias).length;
-      return '<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;'+(i>0?'border-top:1px solid #f3f4f6;':'')+'">' +
-        '<div style="width:32px;height:32px;border-radius:50%;background:#1a1a2e;color:#fef3c7;font-family:\'Oswald\',sans-serif;font-size:0.78rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+_initials(r.nome)+'</div>' +
-        '<div style="flex:1;min-width:0"><div style="font-weight:700;font-size:0.85rem;color:#1a1a2e">'+escHtml(r.nome)+'</div>' +
-          '<div style="font-size:0.72rem;color:#9ca3af">'+dias+' dia'+(dias!==1?'s':'')+' com registo</div></div>' +
-        '<div style="text-align:right">' +
-          '<div style="font-family:\'Oswald\',sans-serif;font-size:1rem;font-weight:800;color:#1a1a2e">'+pontFmtHoras(r.totalMin)+'</div>' +
-          '<div style="font-size:0.65rem;color:#9ca3af;text-transform:uppercase">Total</div>' +
-        '</div>' +
-      '</div>';
-    }).join('') + '</div>';
-}
-// End PONTO
 
 
 // ─── Histórico Global de Vales ──────────────────────────────────────────────
