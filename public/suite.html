@@ -1131,6 +1131,12 @@ textarea.si-input { resize: vertical; min-height: 64px; }
       <div class="hc-desc">Controlo de dinheiro adiantado a funcionários. Liberação, retorno, finalidade e saldo em aberto.</div>
       <span class="hc-arrow">Abrir →</span>
     </div>
+    <div class="home-card" style="--card-color:#475569" onclick="suiteGoTo('personalizacao')">
+      <span class="hc-icon">⚙️</span>
+      <div class="hc-title">Personalização</div>
+      <div class="hc-desc">Logótipo, nome de utilizador e cores da suite. Aplica as preferências a toda a aplicação.</div>
+      <span class="hc-arrow">Abrir →</span>
+    </div>
   </div>
   <p class="home-footer">Infraimpério &copy; 2025 &mdash; Suite interna &nbsp;&bull;&nbsp; Desenvolvido por <strong style="color:#6b7280">Alayane Nathalia</strong></p>
 </div>
@@ -2714,9 +2720,11 @@ if (document.readyState === 'loading') {
 }
 
 function suiteShowSection(id, btn) {
+  var _sec = document.getElementById('section-' + id);
+  if (!_sec || !btn) { console.warn('suiteShowSection: secção ou botão em falta para id=', id); return; }
   document.querySelectorAll('.suite-section').forEach(s => s.classList.remove('suite-visible'));
   document.querySelectorAll('.suite-nav button').forEach(b => b.classList.remove('suite-active'));
-  document.getElementById('section-' + id).classList.add('suite-visible');
+  _sec.classList.add('suite-visible');
   btn.classList.add('suite-active');
 
   // Init monitor when first shown
