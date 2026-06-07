@@ -52,13 +52,18 @@ export default function VisitModal({ visit, onClose }) {
     }
   }
 
-  async function handleTwilioSend(message) {
+  async function handleTwilioSend(message, waKey) {
     if (!visit.clientPhone) return
     setSendingTwilio(true)
     setTwilioResult(null)
     const result = await sendTwilioWhatsApp(visit.clientPhone, message, twilio)
     setTwilioResult(result)
     setSendingTwilio(false)
+    if (result.success && waKey) {
+      updateVisit(visit.id, {
+        whatsappSent: { ...visit.whatsappSent, [waKey]: true },
+      })
+    }
   }
 
   const confirmMsg  = buildConfirmationMessage(visit, company)
@@ -174,25 +179,28 @@ export default function VisitModal({ visit, onClose }) {
               {/* Level 2 — Twilio auto */}
               {hasTwilio ? (
                 <div>
-                  <p className="text-xs text-slate-500 mb-2">Envio automático via Twilio</p>
+                  <p className="text-xs text-slate-500 mb-2">Envio via Twilio (automático ao criar, ou manual)</p>
                   <div className="flex flex-wrap gap-2">
                     <button
                       disabled={sendingTwilio}
-                      onClick={() => handleTwilioSend(confirmMsg)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-700 hover:bg-brand-800 disabled:opacity-50 text-white text-xs font-medium transition-colors"
+                      onClick={() => handleTwilioSend(confirmMsg, 'confirmation')}
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg disabled:opacity-50 text-xs font-medium transition-colors ${visit.whatsappSent?.confirmation ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-brand-700 hover:bg-brand-800 text-white'}`}
                     >
-                      {sendingTwilio ? <SpinIcon /> : <WAIcon sm />} Enviar confirmação
+                      {sendingTwilio ? <SpinIcon /> : <WAIcon sm />}
+                      {visit.whatsappSent?.confirmation ? '✓ Confirmação' : 'Enviar confirmação'}
                     </button>
                     {REMINDER_TYPES.map(({ key, label }) => {
                       const msg = buildReminderMessage(visit, company, key)
+                      const sent = visit.whatsappSent?.[key]
                       return (
                         <button
                           key={key}
                           disabled={sendingTwilio}
-                          onClick={() => handleTwilioSend(msg)}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 disabled:opacity-50 text-slate-700 text-xs font-medium transition-colors"
+                          onClick={() => handleTwilioSend(msg, key)}
+                          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg disabled:opacity-50 text-xs font-medium transition-colors ${sent ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'}`}
                         >
-                          {sendingTwilio ? <SpinIcon /> : <WAIcon sm />} {label}
+                          {sendingTwilio ? <SpinIcon /> : <WAIcon sm />}
+                          {sent ? `✓ ${label}` : label}
                         </button>
                       )
                     })}
@@ -211,20 +219,37 @@ export default function VisitModal({ visit, onClose }) {
             </div>
           )}
 
-          {/* Email sent status */}
-          <div>
-            <p className="text-xs font-medium text-slate-500 mb-2">E-mails enviados</p>
-            <div className="flex flex-wrap gap-2">
-              {[
-                { key: 'confirmation',  label: 'Confirmação' },
-                { key: 'reminder3days', label: '3 dias antes' },
-                { key: 'reminder1day',  label: '1 dia antes' },
-                { key: 'reminderDay',   label: 'Dia da visita' },
-              ].map(({ key, label }) => (
-                <span key={key} className={`text-xs px-2 py-1 rounded-full ${visit.emailsSent?.[key] ? 'bg-green-50 text-green-700' : 'bg-slate-100 text-slate-400'}`}>
-                  {visit.emailsSent?.[key] ? '✓' : '○'} {label}
-                </span>
-              ))}
+          {/* Sent status — email + WhatsApp */}
+          <div className="space-y-2">
+            <div>
+              <p className="text-xs font-medium text-slate-500 mb-1.5">E-mails enviados</p>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { key: 'confirmation',  label: 'Confirmação' },
+                  { key: 'reminder3days', label: '3 dias antes' },
+                  { key: 'reminder1day',  label: '1 dia antes' },
+                  { key: 'reminderDay',   label: 'Dia da visita' },
+                ].map(({ key, label }) => (
+                  <span key={key} className={`text-xs px-2 py-1 rounded-full ${visit.emailsSent?.[key] ? 'bg-green-50 text-green-700' : 'bg-slate-100 text-slate-400'}`}>
+                    {visit.emailsSent?.[key] ? '✓' : '○'} {label}
+                  </span>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p className="text-xs font-medium text-slate-500 mb-1.5">WhatsApp enviados</p>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { key: 'confirmation',  label: 'Confirmação' },
+                  { key: 'reminder3days', label: '3 dias antes' },
+                  { key: 'reminder1day',  label: '1 dia antes' },
+                  { key: 'reminderDay',   label: 'Dia da visita' },
+                ].map(({ key, label }) => (
+                  <span key={key} className={`text-xs px-2 py-1 rounded-full ${visit.whatsappSent?.[key] ? 'bg-green-50 text-green-700' : 'bg-slate-100 text-slate-400'}`}>
+                    {visit.whatsappSent?.[key] ? '✓' : '○'} {label}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
 

@@ -3,6 +3,7 @@ import { storage } from '../utils/storage'
 import { supabase, isCloudEnabled } from '../utils/supabase'
 import { sampleClients, sampleVisits, defaultSettings, sampleFuncionarios, sampleAcoes } from '../data/sampleData'
 import { sendConfirmationEmail, sendReminderEmail } from '../utils/emailUtils'
+import { sendTwilioWhatsApp, buildConfirmationMessage, buildReminderMessage } from '../utils/whatsappUtils'
 import { daysUntilVisit, todayString } from '../utils/dateUtils'
 import { toExportFormat, autoSyncToFile } from '../utils/exportUtils'
 
@@ -172,14 +173,20 @@ export function AppProvider({ children }) {
   useEffect(() => { if (initialized) storage.saveFuncionarios(funcionarios) }, [funcionarios, initialized])
   useEffect(() => { if (initialized) storage.saveAcoes(acoes) }, [acoes, initialized])
 
-  // ── Auto-send pending email reminders on load ───────────────────────────────
+  // ── Auto-send pending email + WhatsApp reminders on load ───────────────────
   useEffect(() => {
     if (!initialized) return
     const today = todayString()
+    const twilio   = settings.whatsapp?.twilio
+    const hasTwilio = !!(twilio?.accountSid && twilio?.authToken && twilio?.fromNumber)
     const updated = visits.map((v) => {
       if (v.status === 'cancelado' || v.status === 'realizado') return v
       const days = daysUntilVisit(v.date)
-      let copy = { ...v, emailsSent: { ...v.emailsSent } }
+      let copy = {
+        ...v,
+        emailsSent:    { ...v.emailsSent },
+        whatsappSent:  { ...v.whatsappSent },
+      }
       let changed = false
       const checks = [
         { key: 'reminderDay',   cond: v.date === today },
@@ -190,6 +197,12 @@ export function AppProvider({ children }) {
         if (cond && !copy.emailsSent?.[key]) {
           sendReminderEmail(copy, settings, key)
           copy.emailsSent[key] = true
+          changed = true
+        }
+        if (cond && hasTwilio && copy.clientPhone && !copy.whatsappSent?.[key]) {
+          const msg = buildReminderMessage(copy, settings.company, key)
+          sendTwilioWhatsApp(copy.clientPhone, msg, twilio)
+          copy.whatsappSent[key] = true
           changed = true
         }
       })
@@ -206,12 +219,22 @@ export function AppProvider({ children }) {
     const newVisit = {
       ...visitData,
       id: visitData.id ?? genId('v'),
-      emailsSent: visitData.emailsSent ?? { confirmation: false, reminder3days: false, reminder1day: false, reminderDay: false },
+      emailsSent:   visitData.emailsSent   ?? { confirmation: false, reminder3days: false, reminder1day: false, reminderDay: false },
+      whatsappSent: visitData.whatsappSent ?? { confirmation: false, reminder3days: false, reminder1day: false, reminderDay: false },
       createdAt: visitData.createdAt ?? new Date().toISOString(),
     }
+    // ── Confirmação por email ──
     if (!newVisit.emailsSent.confirmation) {
       const sent = await sendConfirmationEmail(newVisit, settings)
       if (sent) newVisit.emailsSent = { ...newVisit.emailsSent, confirmation: true }
+    }
+    // ── Confirmação por WhatsApp (se Twilio configurado) ──
+    const twilio = settings.whatsapp?.twilio
+    if (!newVisit.whatsappSent.confirmation && newVisit.clientPhone &&
+        twilio?.accountSid && twilio?.authToken && twilio?.fromNumber) {
+      const msg = buildConfirmationMessage(newVisit, settings.company)
+      const result = await sendTwilioWhatsApp(newVisit.clientPhone, msg, twilio)
+      if (result.success) newVisit.whatsappSent = { ...newVisit.whatsappSent, confirmation: true }
     }
     setVisits((prev) => [...prev, newVisit])
     if (isCloudEnabled) await dbSaveVisit(newVisit)

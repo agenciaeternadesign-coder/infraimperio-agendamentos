@@ -55,6 +55,7 @@ export const sampleVisits = [
     observations: 'Remodelação completa da cozinha e casa de banho.',
     status: 'confirmado',
     emailsSent: { confirmation: true, reminder3days: true, reminder1day: true, reminderDay: false },
+    whatsappSent: { confirmation: true, reminder3days: true, reminder1day: false, reminderDay: false },
     createdAt: '2026-05-10T10:00:00.000Z',
   },
   {
@@ -70,6 +71,7 @@ export const sampleVisits = [
     observations: 'Pintura de sala, quarto e cozinha.',
     status: 'agendado',
     emailsSent: { confirmation: true, reminder3days: false, reminder1day: false, reminderDay: false },
+    whatsappSent: { confirmation: true, reminder3days: false, reminder1day: false, reminderDay: false },
     createdAt: '2026-05-12T14:00:00.000Z',
   },
   {
@@ -85,6 +87,7 @@ export const sampleVisits = [
     observations: 'Primeira visita para avaliação do terreno e levantamento.',
     status: 'agendado',
     emailsSent: { confirmation: true, reminder3days: false, reminder1day: false, reminderDay: false },
+    whatsappSent: { confirmation: false, reminder3days: false, reminder1day: false, reminderDay: false },
     createdAt: '2026-05-14T09:00:00.000Z',
   },
   {
@@ -100,6 +103,7 @@ export const sampleVisits = [
     observations: 'Verificar instalações elétricas e canalização.',
     status: 'agendado',
     emailsSent: { confirmation: true, reminder3days: false, reminder1day: false, reminderDay: false },
+    whatsappSent: { confirmation: false, reminder3days: false, reminder1day: false, reminderDay: false },
     createdAt: '2026-05-15T11:00:00.000Z',
   },
 ]
