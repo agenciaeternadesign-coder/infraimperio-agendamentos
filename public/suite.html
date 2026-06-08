@@ -1037,7 +1037,13 @@ textarea.si-input { resize: vertical; min-height: 64px; }
     <div style="font-size:16px;font-weight:700;color:var(--primary-dark);line-height:1.2;font-family:'Oswald',sans-serif;letter-spacing:0.02em;">Infraimpério</div>
     <div style="font-size:11px;color:var(--text-muted);line-height:1.2;">Suite de Gestão — Obras &amp; Remodelações</div>
   </div>
-  <div style="margin-left:auto;font-size:12px;color:var(--text-muted)" id="header-date"></div>
+  <div style="margin-left:auto;display:flex;align-items:center;gap:12px;">
+    <button onclick="suiteBackup()" id="btn-backup" title="Fazer backup de todos os dados"
+      style="display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text-muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .18s;">
+      💾 Backup
+    </button>
+    <div style="font-size:12px;color:var(--text-muted)" id="header-date"></div>
+  </div>
 </header>
 
 <!-- =====================================================
@@ -7203,6 +7209,61 @@ document.addEventListener('DOMContentLoaded', function() {
     el.textContent = d.toLocaleDateString('pt-PT', opts);
   }
 });
+
+// ─── Backup Manual ──────────────────────────────────────────────────────────
+function suiteBackup() {
+  var KEYS = [
+    // Suite keys
+    'inf_personalizacao_v1', 'inf_lembretes', 'inf_instrucoes_pages',
+    'inf_prem_v2', 'inf_premiacao_v1', 'infraimperio_recibos_v1',
+    'recibo_historico_v1', 'recibo_avulso_v2', 'inf_vales_v1',
+    'inf_collabs', 'inf_obras', 'inf_registos', 'inf_carros',
+    'inf_apikey', 'inf_funcionarios',
+    // React app keys
+    'infraimperio_visits', 'infraimperio_clients', 'infraimperio_settings',
+    'infraimperio_funcionarios', 'infraimperio_acoes', 'infraimperio_app_inited',
+  ];
+
+  var backup = {
+    versao: '1.0',
+    data: new Date().toISOString(),
+    dados: {}
+  };
+
+  KEYS.forEach(function(k) {
+    var raw = localStorage.getItem(k);
+    if (raw !== null) {
+      try { backup.dados[k] = JSON.parse(raw); }
+      catch(e) { backup.dados[k] = raw; }
+    }
+  });
+
+  var dateStr = new Date().toISOString().slice(0, 10);
+  var filename = 'infraimperio_backup_' + dateStr + '.json';
+  var blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  // Feedback visual
+  var btn = document.getElementById('btn-backup');
+  if (btn) {
+    var orig = btn.innerHTML;
+    btn.innerHTML = '✓ Guardado!';
+    btn.style.background = '#dcfce7';
+    btn.style.color = '#16a34a';
+    btn.style.borderColor = '#86efac';
+    setTimeout(function() {
+      btn.innerHTML = orig;
+      btn.style.background = '';
+      btn.style.color = '';
+      btn.style.borderColor = '';
+    }, 2500);
+  }
+}
 
 
 // ─── Histórico Global de Vales ──────────────────────────────────────────────
