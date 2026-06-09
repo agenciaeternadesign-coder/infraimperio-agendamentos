@@ -4339,7 +4339,7 @@ document.querySelectorAll('#section-pagamentos nav button').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('#section-pagamentos nav button').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    document.querySelectorAll('#section-pagamentos main > section').forEach(s => s.style.display = 'none');
+    document.querySelectorAll('#section-pagamentos .pag-main > section').forEach(s => s.style.display = 'none');
     document.getElementById('tab-' + btn.dataset.tab).style.display = '';
     if (btn.dataset.tab === 'folha') renderFolha();
     if (btn.dataset.tab === 'funcionarios') renderFuncionarios();
