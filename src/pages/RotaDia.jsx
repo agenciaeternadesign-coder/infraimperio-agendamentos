@@ -15,13 +15,15 @@ import MapaRota from '../components/MapaRota'
 import { todayString, formatDate } from '../utils/dateUtils'
 
 export default function RotaDia() {
-  const { visits, settings, getVisitsByDate } = useApp()
+  const { visits, settings, getVisitsByDate, updateVisit } = useApp()
   const [date, setDate]                 = useState(todayString())
   const [orderedVisits, setOrderedVisits] = useState([])
   const [legInfo, setLegInfo]           = useState([])
   const [selectedVisit, setSelectedVisit] = useState(null)
   const [showMap, setShowMap]           = useState(true)
   const [gapMinutes, setGapMinutes]     = useState(30)
+  const [applying, setApplying]         = useState(false)
+  const [appliedMsg, setAppliedMsg]     = useState(false)
 
   const apiKey    = settings.googleMaps?.apiKey ?? ''
   const companyAddr = settings.company
@@ -53,6 +55,21 @@ export default function RotaDia() {
     setOrderedVisits(buildRouteWithTimes(optimizeRoute(dayVisits), gapMinutes))
     setLegInfo([])
   }
+
+  // Grava as horas calculadas pela rota em cada visita (define hora nas visitas sem horário)
+  async function handleApplyTimes() {
+    setApplying(true)
+    for (const v of orderedVisits) {
+      if (v.scheduledTime && v.scheduledTime !== v.time) {
+        await updateVisit(v.id, { time: v.scheduledTime })
+      }
+    }
+    setApplying(false)
+    setAppliedMsg(true)
+    setTimeout(() => setAppliedMsg(false), 3000)
+  }
+
+  const hasTimeChanges = orderedVisits.some((v) => v.scheduledTime && v.scheduledTime !== v.time)
 
   // Leg 0 = HQ→visit[0], leg 1 = visit[0]→visit[1], ..., last = visit[n]→HQ
   const returnLeg = legInfo.length > 0 ? legInfo[legInfo.length - 1] : null
@@ -101,6 +118,19 @@ export default function RotaDia() {
             <AutoIcon />
             Otimizar
           </button>
+          {hasTimeChanges && (
+            <button
+              onClick={handleApplyTimes}
+              disabled={applying}
+              className="btn-secondary text-sm flex items-center gap-2 !text-green-700 !border-green-300 hover:!bg-green-50"
+            >
+              <CheckSmallIcon />
+              {applying ? 'A aplicar…' : 'Aplicar horários'}
+            </button>
+          )}
+          {appliedMsg && (
+            <span className="text-xs text-green-600 font-semibold self-center">✓ Horários gravados!</span>
+          )}
           <a
             href={mapsUrl}
             target="_blank"
@@ -223,9 +253,12 @@ function SortableVisitCard({ visit, index, leg, onSelect }) {
               </p>
             </div>
             <div className="flex flex-col items-end gap-1 flex-shrink-0">
-              <span className="text-lg font-bold text-brand-700">{visit.scheduledTime ?? visit.time}</span>
-              {visit.scheduledTime && visit.scheduledTime !== visit.time && (
+              <span className="text-lg font-bold text-brand-700">{visit.scheduledTime ?? visit.time ?? '—'}</span>
+              {visit.scheduledTime && visit.time && visit.scheduledTime !== visit.time && (
                 <span className="text-xs text-amber-600 line-through">{visit.time}</span>
+              )}
+              {!visit.time && (
+                <span className="text-[10px] font-semibold text-amber-600 bg-amber-50 border border-amber-200 rounded px-1.5 py-0.5">sem hora marcada</span>
               )}
               <StatusBadge status={visit.status} size="xs" />
             </div>
@@ -267,3 +300,4 @@ function MapsIcon()  { return <svg className="w-4 h-4" fill="none" viewBox="0 0 
 function MapIcon()   { return <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" /></svg> }
 function HomeIcon()  { return <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg> }
 function ClockIcon() { return <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> }
+function CheckSmallIcon() { return <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg> }

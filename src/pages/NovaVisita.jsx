@@ -21,6 +21,7 @@ export default function NovaVisita() {
   const [selectedClient, setSelectedClient] = useState(null)
   const [newClientForm, setNewClientForm] = useState(EMPTY_CLIENT)
   const [visitForm, setVisitForm] = useState(EMPTY_VISIT)
+  const [noTime, setNoTime] = useState(false)
   const [duplicateAlert, setDuplicateAlert] = useState(null)
   const [sameAddressAsClient, setSameAddressAsClient] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -100,6 +101,7 @@ export default function NovaVisita() {
       clientPhone: client.phone,
       clientEmail: client.email,
       ...visitForm,
+      time: noTime ? '' : visitForm.time,
     })
 
     setSaving(false)
@@ -285,8 +287,17 @@ export default function NovaVisita() {
               <input className="input" type="date" value={visitForm.date} onChange={(e) => handleVisitChange('date', e.target.value)} required min={todayString()} />
             </div>
             <div>
-              <label className="label">Hora *</label>
-              <input className="input" type="time" value={visitForm.time} onChange={(e) => handleVisitChange('time', e.target.value)} required />
+              <label className="label">Hora {noTime ? '' : '*'}</label>
+              <input className="input" type="time" value={visitForm.time} onChange={(e) => handleVisitChange('time', e.target.value)} required={!noTime} disabled={noTime} />
+              <label className="flex items-center gap-2 mt-2 text-xs text-slate-600 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={noTime}
+                  onChange={(e) => setNoTime(e.target.checked)}
+                  className="rounded accent-brand-700"
+                />
+                Sem horário definido (ajustar depois na Rota do Dia)
+              </label>
             </div>
             <div className="sm:col-span-2">
               <label className="label">Tipo de Obra</label>

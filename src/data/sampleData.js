@@ -133,9 +133,9 @@ export const defaultSettings = {
   },
   whatsapp: {
     twilio: {
-      accountSid: '',
-      authToken: '',
-      fromNumber: '',
+      accountSid: import.meta.env.VITE_TWILIO_ACCOUNT_SID || '',
+      authToken:  import.meta.env.VITE_TWILIO_AUTH_TOKEN  || '',
+      fromNumber: import.meta.env.VITE_TWILIO_FROM_NUMBER || '',
     },
   },
   branding: {

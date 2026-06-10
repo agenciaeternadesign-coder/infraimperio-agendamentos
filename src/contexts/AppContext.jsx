@@ -24,7 +24,13 @@ function mergeSettings(defaults, saved) {
     whatsapp: {
       ...defaults.whatsapp,
       ...saved.whatsapp,
-      twilio: { ...defaults.whatsapp.twilio, ...saved.whatsapp?.twilio },
+      // Valores vazios guardados não substituem as credenciais predefinidas
+      twilio: {
+        ...defaults.whatsapp.twilio,
+        ...Object.fromEntries(
+          Object.entries(saved.whatsapp?.twilio ?? {}).filter(([, v]) => v)
+        ),
+      },
     },
     branding: { ...defaults.branding, ...saved.branding },
   }
@@ -317,8 +323,8 @@ export function AppProvider({ children }) {
   , [clients])
 
   const getClientVisits  = useCallback((clientId) => visits.filter((v) => v.clientId === clientId).sort((a, b) => b.date.localeCompare(a.date)), [visits])
-  const getTodayVisits   = useCallback(() => { const t = todayString(); return visits.filter((v) => v.date === t).sort((a, b) => a.time.localeCompare(b.time)) }, [visits])
-  const getVisitsByDate  = useCallback((d) => visits.filter((v) => v.date === d).sort((a, b) => a.time.localeCompare(b.time)), [visits])
+  const getTodayVisits   = useCallback(() => { const t = todayString(); return visits.filter((v) => v.date === t).sort((a, b) => (a.time || '99:99').localeCompare(b.time || '99:99')) }, [visits])
+  const getVisitsByDate  = useCallback((d) => visits.filter((v) => v.date === d).sort((a, b) => (a.time || '99:99').localeCompare(b.time || '99:99')), [visits])
 
   // Memoizar o valor do contexto: evita re-renders em cascata quando o provider re-renderiza
   const contextValue = useMemo(() => ({

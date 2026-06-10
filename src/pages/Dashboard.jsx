@@ -100,7 +100,7 @@ export default function Dashboard() {
                   className="w-full text-left flex items-center gap-4 p-3 rounded-xl hover:bg-slate-50 transition-colors border border-slate-100"
                 >
                   <div className="text-center w-14 flex-shrink-0">
-                    <p className="text-lg font-bold text-brand-700">{v.time}</p>
+                    <p className="text-lg font-bold text-brand-700">{v.time || 's/ hora'}</p>
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-slate-800 truncate">{v.clientName}</p>
@@ -174,7 +174,7 @@ export default function Dashboard() {
                     <div className="w-1.5 h-1.5 rounded-full bg-brand-600 mt-1.5 flex-shrink-0" />
                     <div className="min-w-0">
                       <p className="text-sm font-medium text-slate-700 truncate">{v.clientName}</p>
-                      <p className="text-xs text-slate-400">{formatDate(v.date)} · {v.time}</p>
+                      <p className="text-xs text-slate-400">{formatDate(v.date)} · {v.time || 's/ hora'}</p>
                     </div>
                   </button>
                 ))}

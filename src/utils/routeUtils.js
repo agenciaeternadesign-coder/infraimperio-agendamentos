@@ -96,7 +96,8 @@ export function generateGoogleMapsUrl(visits, companySettings) {
 }
 
 function timeToMinutes(time) {
-  const [h, m] = (time ?? '09:00').split(':').map(Number)
+  if (!time) return null // visita sem horário definido
+  const [h, m] = time.split(':').map(Number)
   return h * 60 + m
 }
 
@@ -108,6 +109,9 @@ function minutesToTime(mins) {
 
 // Build route list with travel estimates and gap-aware scheduled times.
 // gapMinutes = minimum minutes between consecutive visit start times.
+// Visitas sem horário (time vazio) recebem hora calculada pela rota.
+const DEFAULT_START_MINS = 9 * 60 // 09:00
+
 export function buildRouteWithTimes(orderedVisits, gapMinutes = 30) {
   const HQ_CITY = 'Barreiro'
   const result = []
@@ -118,12 +122,14 @@ export function buildRouteWithTimes(orderedVisits, gapMinutes = 30) {
     const travel = estimateTravelMinutes(lastCity, visit.address.city)
     const originalMins = timeToMinutes(visit.time)
 
-    let scheduledMins = originalMins
-    if (prevScheduledMins !== null) {
+    let scheduledMins
+    if (prevScheduledMins === null) {
+      scheduledMins = originalMins ?? DEFAULT_START_MINS
+    } else {
       // Next visit must start at least gapMinutes after previous, and at least travel time after previous
       const minByGap    = prevScheduledMins + gapMinutes
       const minByTravel = prevScheduledMins + travel
-      scheduledMins = Math.max(originalMins, minByGap, minByTravel)
+      scheduledMins = Math.max(originalMins ?? 0, minByGap, minByTravel)
     }
 
     result.push({

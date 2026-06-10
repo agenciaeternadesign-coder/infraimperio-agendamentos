@@ -10,6 +10,7 @@ export function formatDateShort(dateStr) {
 }
 
 export function formatDateTime(dateStr, timeStr) {
+  if (!timeStr) return `${formatDateShort(dateStr)} (horário a confirmar)`
   return `${formatDateShort(dateStr)} às ${timeStr}`
 }
 

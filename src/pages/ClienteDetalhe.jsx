@@ -220,7 +220,7 @@ export default function ClienteDetalhe() {
               >
                 <div className="flex-shrink-0 text-center w-20">
                   <p className="text-xs text-slate-500">{formatDateShort(v.date)}</p>
-                  <p className="font-bold text-brand-700 text-sm">{v.time}</p>
+                  <p className="font-bold text-brand-700 text-sm">{v.time || 's/ hora'}</p>
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-slate-700">{v.address.street} {v.address.number}, {v.address.city}</p>

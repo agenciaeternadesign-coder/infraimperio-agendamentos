@@ -30,9 +30,9 @@ export default function Agenda() {
       if (!map[v.date]) map[v.date] = []
       map[v.date].push(v)
     }
-    // ordenar cada dia por hora
+    // ordenar cada dia por hora (sem hora fica no fim)
     for (const key of Object.keys(map)) {
-      map[key].sort((a, b) => a.time.localeCompare(b.time))
+      map[key].sort((a, b) => (a.time || '99:99').localeCompare(b.time || '99:99'))
     }
     return map
   }, [visits])
@@ -134,7 +134,7 @@ function MonthView({ current, visitsForDay, onSelectVisit, onSelectDay }) {
                       v.status === 'cancelado' ? 'opacity-40' : ''
                     } bg-brand-50 hover:bg-brand-100 transition-colors`}>
                       <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${STATUS_DOT[v.status]}`} />
-                      <span className="truncate text-brand-800 font-medium">{v.time} {v.clientName.split(' ')[0]}</span>
+                      <span className="truncate text-brand-800 font-medium">{v.time || 's/ hora'} {v.clientName.split(' ')[0]}</span>
                     </div>
                   </button>
                 ))}
@@ -182,7 +182,7 @@ function WeekView({ current, visitsForDay, onSelectVisit }) {
                   onClick={() => onSelectVisit(v)}
                   className={`w-full text-left p-2 rounded-lg text-xs bg-white border hover:border-brand-300 shadow-sm transition-colors ${v.status === 'cancelado' ? 'opacity-40' : ''}`}
                 >
-                  <p className="font-bold text-brand-700">{v.time}</p>
+                  <p className="font-bold text-brand-700">{v.time || 's/ hora'}</p>
                   <p className="font-medium text-slate-700 truncate">{v.clientName.split(' ')[0]}</p>
                   <div className="flex items-center gap-1 mt-1">
                     <span className={`w-1.5 h-1.5 rounded-full ${STATUS_DOT[v.status]}`} />
@@ -219,7 +219,7 @@ function DayPanel({ date, visits, onClose, onSelectVisit }) {
               onClick={() => { onSelectVisit(v); onClose() }}
               className="w-full text-left flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 border border-slate-100 transition-colors"
             >
-              <p className="text-brand-700 font-bold w-12 text-sm">{v.time}</p>
+              <p className="text-brand-700 font-bold w-12 text-sm">{v.time || 's/ hora'}</p>
               <div className="flex-1 min-w-0">
                 <p className="font-medium text-slate-800 truncate">{v.clientName}</p>
                 <p className="text-xs text-slate-500 truncate">{v.address.street} {v.address.number}, {v.address.city}</p>
