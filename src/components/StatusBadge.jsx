@@ -42,8 +42,14 @@ export const WORK_TYPE_LABELS = {
   outro: 'Outro',
 }
 
-export function WorkTypeBadge({ type }) {
-  const label = WORK_TYPE_LABELS[type] ?? type
+// Devolve o rótulo do tipo de obra; se for "outro" e houver descrição, usa-a
+export function workTypeLabel(workType, workTypeOther) {
+  if (workType === 'outro' && workTypeOther?.trim()) return workTypeOther.trim()
+  return WORK_TYPE_LABELS[workType] ?? workType
+}
+
+export function WorkTypeBadge({ type, other }) {
+  const label = workTypeLabel(type, other)
   return (
     <span className="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-full bg-amber-50 text-amber-700">
       {label}

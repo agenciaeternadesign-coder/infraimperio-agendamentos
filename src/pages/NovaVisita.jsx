@@ -5,10 +5,13 @@ import { WORK_TYPE_LABELS } from '../components/StatusBadge'
 import { todayString } from '../utils/dateUtils'
 import { formatDateShort } from '../utils/dateUtils'
 
-const WORK_TYPES = Object.entries(WORK_TYPE_LABELS).filter(([v]) => !['remodelacao','construcao','instalacoes','outro'].includes(v))
+const WORK_TYPES = [
+  ...Object.entries(WORK_TYPE_LABELS).filter(([v]) => !['remodelacao','construcao','instalacoes','outro'].includes(v)),
+  ['outro', 'Outro (especificar)'],
+]
 
-const EMPTY_CLIENT = { salutation: '', name: '', phone: '', email: '', address: { street: '', number: '', floor: '', city: '', postalCode: '' }, workType: 'telhados', notes: '' }
-const EMPTY_VISIT  = { date: todayString(), time: '09:00', address: { street: '', number: '', floor: '', city: '', postalCode: '' }, workType: 'telhados', observations: '', status: 'agendado' }
+const EMPTY_CLIENT = { salutation: '', name: '', phone: '', email: '', address: { street: '', number: '', floor: '', city: '', postalCode: '' }, workType: 'telhados', workTypeOther: '', notes: '' }
+const EMPTY_VISIT  = { date: todayString(), time: '09:00', address: { street: '', number: '', floor: '', city: '', postalCode: '' }, workType: 'telhados', workTypeOther: '', observations: '', status: 'agendado' }
 
 export default function NovaVisita() {
   const { clients, addVisit, addClient, findDuplicateClient, getClientVisits } = useApp()
@@ -40,7 +43,7 @@ export default function NovaVisita() {
   useEffect(() => {
     if (!sameAddressAsClient) return
     if (selectedClient) {
-      setVisitForm((f) => ({ ...f, address: { ...selectedClient.address }, workType: selectedClient.workType ?? f.workType }))
+      setVisitForm((f) => ({ ...f, address: { ...selectedClient.address }, workType: selectedClient.workType ?? f.workType, workTypeOther: selectedClient.workTypeOther ?? f.workTypeOther }))
     } else if (clientMode === 'new' && newClientForm.address.street) {
       setVisitForm((f) => ({ ...f, address: { ...newClientForm.address } }))
     }
@@ -211,6 +214,12 @@ export default function NovaVisita() {
                   {WORK_TYPES.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
                 </select>
               </div>
+              {newClientForm.workType === 'outro' && (
+                <div className="sm:col-span-2">
+                  <label className="label">Descrição do serviço *</label>
+                  <input className="input" placeholder="Descreva o serviço pretendido" value={newClientForm.workTypeOther} onChange={(e) => handleNewClientChange('workTypeOther', e.target.value)} />
+                </div>
+              )}
               <div className="sm:col-span-2 grid grid-cols-4 gap-2">
                 <div className="col-span-2">
                   <label className="label">Rua</label>
@@ -305,6 +314,12 @@ export default function NovaVisita() {
                 {WORK_TYPES.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
               </select>
             </div>
+            {visitForm.workType === 'outro' && (
+              <div className="sm:col-span-2">
+                <label className="label">Descrição do serviço *</label>
+                <input className="input" placeholder="Descreva o serviço pretendido" value={visitForm.workTypeOther} onChange={(e) => handleVisitChange('workTypeOther', e.target.value)} />
+              </div>
+            )}
 
             {/* Visit address */}
             <div className="sm:col-span-2">

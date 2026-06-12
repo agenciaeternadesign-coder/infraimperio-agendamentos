@@ -8,6 +8,7 @@ import { pt } from 'date-fns/locale'
 import { useApp } from '../contexts/AppContext'
 import StatusBadge from '../components/StatusBadge'
 import VisitModal from '../components/VisitModal'
+import { printVisitsSheet, downloadVisitsCsv } from '../utils/printUtils'
 
 const STATUS_DOT = {
   agendado:  'bg-blue-500',
@@ -42,6 +43,20 @@ export default function Agenda() {
     return visitsByDate[str] ?? []
   }, [visitsByDate])
 
+  // Visitas no intervalo da vista atual (mês ou semana), sem canceladas
+  const visitsInView = useMemo(() => {
+    const start = view === 'month' ? startOfMonth(current) : startOfWeek(current, { weekStartsOn: 1 })
+    const end   = view === 'month' ? endOfMonth(current)   : endOfWeek(current, { weekStartsOn: 1 })
+    const startStr = format(start, 'yyyy-MM-dd')
+    const endStr   = format(end, 'yyyy-MM-dd')
+    return visits
+      .filter((v) => v.status !== 'cancelado' && v.date >= startStr && v.date <= endStr)
+  }, [visits, view, current])
+
+  const viewLabel = view === 'month'
+    ? format(current, "MMMM 'de' yyyy", { locale: pt })
+    : `Semana de ${format(startOfWeek(current, { weekStartsOn: 1 }), 'd MMM', { locale: pt })}`
+
   return (
     <div className="max-w-5xl space-y-4">
       {/* Toolbar */}
@@ -61,16 +76,32 @@ export default function Agenda() {
           </button>
           <button onClick={() => setCurrent(new Date())} className="btn-secondary text-sm px-3 py-2">Hoje</button>
         </div>
-        <div className="flex gap-1 bg-slate-100 rounded-lg p-1">
-          {['month', 'week'].map((v) => (
-            <button
-              key={v}
-              onClick={() => setView(v)}
-              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${view === v ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500'}`}
-            >
-              {v === 'month' ? 'Mês' : 'Semana'}
-            </button>
-          ))}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => printVisitsSheet(visitsInView, `Visitas — ${viewLabel}`)}
+            className="btn-secondary text-sm flex items-center gap-2"
+            title="Imprimir planilha de visitas"
+          >
+            <PrintIcon /> Imprimir
+          </button>
+          <button
+            onClick={() => downloadVisitsCsv(visitsInView, `visitas-${format(current, 'yyyy-MM')}.csv`)}
+            className="btn-secondary text-sm flex items-center gap-2"
+            title="Exportar para Excel (CSV)"
+          >
+            <SheetIcon /> CSV
+          </button>
+          <div className="flex gap-1 bg-slate-100 rounded-lg p-1">
+            {['month', 'week'].map((v) => (
+              <button
+                key={v}
+                onClick={() => setView(v)}
+                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${view === v ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500'}`}
+              >
+                {v === 'month' ? 'Mês' : 'Semana'}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -82,7 +113,7 @@ export default function Agenda() {
 
       {/* Day panel */}
       {selectedDay && (
-        <DayPanel date={selectedDay} visits={visitsForDay(selectedDay)} onClose={() => setSelectedDay(null)} onSelectVisit={setSelectedVisit} />
+        <DayPanel date={selectedDay} visits={visitsForDay(selectedDay)} onClose={() => setSelectedDay(null)} onSelectVisit={setSelectedVisit} onPrint={() => printVisitsSheet(visitsForDay(selectedDay).filter((v) => v.status !== 'cancelado'), `Visitas — ${format(selectedDay, "d 'de' MMMM", { locale: pt })}`)} />
       )}
 
       {selectedVisit && <VisitModal visit={selectedVisit} onClose={() => setSelectedVisit(null)} />}
@@ -198,16 +229,24 @@ function WeekView({ current, visitsForDay, onSelectVisit }) {
   )
 }
 
-function DayPanel({ date, visits, onClose, onSelectVisit }) {
+function DayPanel({ date, visits, onClose, onSelectVisit, onPrint }) {
+  const activeVisits = visits.filter((v) => v.status !== 'cancelado')
   return (
     <div className="card border-l-4 border-l-brand-700">
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-semibold text-slate-800">
           {format(date, "EEEE, d 'de' MMMM", { locale: pt })}
         </h3>
-        <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-        </button>
+        <div className="flex items-center gap-3">
+          {activeVisits.length > 0 && (
+            <button onClick={onPrint} className="text-brand-600 hover:text-brand-700 flex items-center gap-1 text-sm font-medium" title="Imprimir visitas do dia">
+              <PrintIcon /> Imprimir
+            </button>
+          )}
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+        </div>
       </div>
       {visits.length === 0 ? (
         <p className="text-sm text-slate-400">Sem visitas neste dia.</p>
@@ -235,3 +274,5 @@ function DayPanel({ date, visits, onClose, onSelectVisit }) {
 
 function ChevronLeftIcon()  { return <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg> }
 function ChevronRightIcon() { return <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg> }
+function PrintIcon() { return <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg> }
+function SheetIcon() { return <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg> }

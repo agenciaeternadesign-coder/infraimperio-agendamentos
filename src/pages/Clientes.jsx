@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useApp } from '../contexts/AppContext'
-import { WORK_TYPE_LABELS } from '../components/StatusBadge'
+import { workTypeLabel } from '../components/StatusBadge'
 import { formatDateShort } from '../utils/dateUtils'
 
 export default function Clientes() {
@@ -110,7 +110,7 @@ function ClientCard({ client, visitCount, onClick }) {
       {client.workType && (
         <div className="mt-3">
           <span className="text-xs px-2 py-1 bg-amber-50 text-amber-700 rounded-full font-medium">
-            {WORK_TYPE_LABELS[client.workType] ?? client.workType}
+            {workTypeLabel(client.workType, client.workTypeOther)}
           </span>
         </div>
       )}

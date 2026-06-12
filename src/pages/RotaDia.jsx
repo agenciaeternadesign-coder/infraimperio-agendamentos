@@ -9,7 +9,7 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 import { useApp } from '../contexts/AppContext'
 import { optimizeRoute, buildRouteWithTimes, generateGoogleMapsUrl } from '../utils/routeUtils'
-import StatusBadge, { WORK_TYPE_LABELS } from '../components/StatusBadge'
+import StatusBadge, { workTypeLabel } from '../components/StatusBadge'
 import VisitModal from '../components/VisitModal'
 import MapaRota from '../components/MapaRota'
 import { todayString, formatDate } from '../utils/dateUtils'
@@ -265,7 +265,7 @@ function SortableVisitCard({ visit, index, leg, onSelect }) {
           </div>
 
           <div className="flex items-center gap-3 mt-2 flex-wrap">
-            <span className="text-xs text-slate-400">{WORK_TYPE_LABELS[visit.workType] ?? visit.workType}</span>
+            <span className="text-xs text-slate-400">{workTypeLabel(visit.workType, visit.workTypeOther)}</span>
             {visit.observations && (
               <span className="text-xs text-slate-400 truncate max-w-xs">· {visit.observations}</span>
             )}

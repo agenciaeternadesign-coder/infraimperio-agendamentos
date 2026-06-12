@@ -3,7 +3,6 @@ import { storage } from '../utils/storage'
 import { supabase, isCloudEnabled } from '../utils/supabase'
 import { sampleClients, sampleVisits, defaultSettings, sampleFuncionarios, sampleAcoes } from '../data/sampleData'
 import { sendConfirmationEmail, sendReminderEmail } from '../utils/emailUtils'
-import { sendTwilioWhatsApp, buildConfirmationMessage, buildReminderMessage } from '../utils/whatsappUtils'
 import { daysUntilVisit, todayString } from '../utils/dateUtils'
 import { toExportFormat, autoSyncToFile } from '../utils/exportUtils'
 
@@ -80,6 +79,32 @@ async function dbSaveSettings(settings) {
   await dbSave('app_settings', { id: 'main', data: settings, updated_at: new Date().toISOString() })
 }
 
+// Migração única: empurra dados do localStorage para o Supabase quando o cloud
+// é ligado pela primeira vez e o Supabase ainda está vazio. Evita que dados
+// existentes "desapareçam" ao mudar de localStorage para online.
+const MIGRATION_KEY = 'infraimperio_cloud_migrated'
+
+async function migrateLocalToCloud(cloudVisits, cloudClients) {
+  if (localStorage.getItem(MIGRATION_KEY)) return { visits: cloudVisits, clients: cloudClients }
+  const localVisits  = storage.getVisits()
+  const localClients = storage.getClients()
+
+  let visits  = cloudVisits
+  let clients = cloudClients
+
+  if (cloudVisits.length === 0 && localVisits.length > 0) {
+    await Promise.all(localVisits.map(dbSaveVisit))
+    visits = localVisits
+  }
+  if (cloudClients.length === 0 && localClients.length > 0) {
+    await Promise.all(localClients.map(dbSaveClient))
+    clients = localClients
+  }
+
+  localStorage.setItem(MIGRATION_KEY, '1')
+  return { visits, clients }
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function AppProvider({ children }) {
@@ -98,7 +123,9 @@ export function AppProvider({ children }) {
       const neverInited = !localStorage.getItem(APP_INIT_KEY)
       if (isCloudEnabled) {
         try {
-          const { visits: v, clients: c, settings: s } = await dbLoadAll()
+          const { visits: cv, clients: cc, settings: s } = await dbLoadAll()
+          // Migra dados locais para o Supabase na 1ª vez que o cloud está ligado
+          const { visits: v, clients: c } = await migrateLocalToCloud(cv, cc)
           // Se nunca abriu antes E não há dados, usa exemplos para mostrar como funciona
           setVisits(v.length  ? v : (neverInited ? sampleVisits  : []))
           setClients(c.length ? c : (neverInited ? sampleClients : []))
@@ -179,20 +206,16 @@ export function AppProvider({ children }) {
   useEffect(() => { if (initialized) storage.saveFuncionarios(funcionarios) }, [funcionarios, initialized])
   useEffect(() => { if (initialized) storage.saveAcoes(acoes) }, [acoes, initialized])
 
-  // ── Auto-send pending email + WhatsApp reminders on load ───────────────────
+  // ── Auto-send pending email reminders on load ──────────────────────────────
+  // Os lembretes de WhatsApp são tratados pelo Make.com (cenário diário às 09:00
+  // que lê o Supabase e envia via templates aprovados). Aqui só tratamos email.
   useEffect(() => {
     if (!initialized) return
     const today = todayString()
-    const twilio   = settings.whatsapp?.twilio
-    const hasTwilio = !!(twilio?.accountSid && twilio?.authToken && twilio?.fromNumber)
     const updated = visits.map((v) => {
       if (v.status === 'cancelado' || v.status === 'realizado') return v
       const days = daysUntilVisit(v.date)
-      let copy = {
-        ...v,
-        emailsSent:    { ...v.emailsSent },
-        whatsappSent:  { ...v.whatsappSent },
-      }
+      let copy = { ...v, emailsSent: { ...v.emailsSent } }
       let changed = false
       const checks = [
         { key: 'reminderDay',   cond: v.date === today },
@@ -203,12 +226,6 @@ export function AppProvider({ children }) {
         if (cond && !copy.emailsSent?.[key]) {
           sendReminderEmail(copy, settings, key)
           copy.emailsSent[key] = true
-          changed = true
-        }
-        if (cond && hasTwilio && copy.clientPhone && !copy.whatsappSent?.[key]) {
-          const msg = buildReminderMessage(copy, settings.company, key)
-          sendTwilioWhatsApp(copy.clientPhone, msg, twilio)
-          copy.whatsappSent[key] = true
           changed = true
         }
       })
@@ -234,14 +251,9 @@ export function AppProvider({ children }) {
       const sent = await sendConfirmationEmail(newVisit, settings)
       if (sent) newVisit.emailsSent = { ...newVisit.emailsSent, confirmation: true }
     }
-    // ── Confirmação por WhatsApp (se Twilio configurado) ──
-    const twilio = settings.whatsapp?.twilio
-    if (!newVisit.whatsappSent.confirmation && newVisit.clientPhone &&
-        twilio?.accountSid && twilio?.authToken && twilio?.fromNumber) {
-      const msg = buildConfirmationMessage(newVisit, settings.company)
-      const result = await sendTwilioWhatsApp(newVisit.clientPhone, msg, twilio)
-      if (result.success) newVisit.whatsappSent = { ...newVisit.whatsappSent, confirmation: true }
-    }
+    // ── Confirmação por WhatsApp ──
+    // Tratada pelo Make.com: ao gravar no Supabase, o trigger dispara o webhook
+    // que envia a confirmação via template aprovado (no ato do agendamento).
     setVisits((prev) => [...prev, newVisit])
     if (isCloudEnabled) await dbSaveVisit(newVisit)
     return newVisit

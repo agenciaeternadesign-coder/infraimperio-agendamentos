@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useApp } from '../contexts/AppContext'
-import StatusBadge, { WORK_TYPE_LABELS } from './StatusBadge'
+import StatusBadge, { workTypeLabel } from './StatusBadge'
 import { formatDate } from '../utils/dateUtils'
 import {
   buildWhatsAppUrl, buildConfirmationMessage, buildReminderMessage, sendTwilioWhatsApp,
@@ -123,7 +123,7 @@ export default function VisitModal({ visit, onClose }) {
               {visit.address.postalCode && ` — ${visit.address.postalCode}`}
             </Row>
             <Row icon={<HammerIcon />} label="Tipo de Obra">
-              {WORK_TYPE_LABELS[visit.workType] ?? visit.workType}
+              {workTypeLabel(visit.workType, visit.workTypeOther)}
             </Row>
             {visit.observations && (
               <Row icon={<NoteIcon />} label="Observações">{visit.observations}</Row>

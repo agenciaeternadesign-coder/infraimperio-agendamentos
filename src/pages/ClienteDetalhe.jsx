@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useApp } from '../contexts/AppContext'
-import StatusBadge, { WORK_TYPE_LABELS } from '../components/StatusBadge'
+import StatusBadge, { workTypeLabel } from '../components/StatusBadge'
 import VisitModal from '../components/VisitModal'
 import { formatDate, formatDateShort } from '../utils/dateUtils'
 
@@ -25,6 +25,7 @@ const WORK_TYPES = [
   { value: 'serralharia', label: 'Serralharia' },
   { value: 'vidros', label: 'Vidros e Janelas' },
   { value: 'pladur', label: 'Obras em Pladur' },
+  { value: 'outro', label: 'Outro (especificar)' },
 ]
 
 export default function ClienteDetalhe() {
@@ -139,6 +140,12 @@ export default function ClienteDetalhe() {
                   {WORK_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
                 </select>
               </div>
+              {field('workType') === 'outro' && (
+                <div className="sm:col-span-2">
+                  <label className="label">Descrição do serviço</label>
+                  <input className="input" placeholder="Descreva o serviço" value={field('workTypeOther')} onChange={(e) => setField('workTypeOther', e.target.value)} />
+                </div>
+              )}
               <div className="sm:col-span-2 grid grid-cols-4 gap-2">
                 <div className="col-span-2">
                   <label className="label">Rua</label>
@@ -181,7 +188,7 @@ export default function ClienteDetalhe() {
                 {client.address.postalCode && ` — ${client.address.postalCode}`}
               </InfoRow>
               <InfoRow icon={<HammerIcon />} label="Tipo de Obra">
-                {WORK_TYPE_LABELS[client.workType] ?? client.workType}
+                {workTypeLabel(client.workType, client.workTypeOther)}
               </InfoRow>
               {client.notes && (
                 <div className="sm:col-span-2">
@@ -224,7 +231,7 @@ export default function ClienteDetalhe() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-slate-700">{v.address.street} {v.address.number}, {v.address.city}</p>
-                  <p className="text-xs text-slate-500">{WORK_TYPE_LABELS[v.workType] ?? v.workType}</p>
+                  <p className="text-xs text-slate-500">{workTypeLabel(v.workType, v.workTypeOther)}</p>
                   {v.observations && <p className="text-xs text-slate-400 truncate mt-0.5">{v.observations}</p>}
                 </div>
                 <StatusBadge status={v.status} size="xs" />

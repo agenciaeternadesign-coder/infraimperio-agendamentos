@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useApp } from '../contexts/AppContext'
-import StatusBadge, { WORK_TYPE_LABELS } from '../components/StatusBadge'
+import StatusBadge, { workTypeLabel } from '../components/StatusBadge'
 import VisitModal from '../components/VisitModal'
 import { formatDate, todayString, daysUntilVisit } from '../utils/dateUtils'
 
@@ -105,7 +105,7 @@ export default function Dashboard() {
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-slate-800 truncate">{v.clientName}</p>
                     <p className="text-xs text-slate-500 truncate">{v.address.street} {v.address.number}, {v.address.city}</p>
-                    <p className="text-xs text-slate-400">{WORK_TYPE_LABELS[v.workType] ?? v.workType}</p>
+                    <p className="text-xs text-slate-400">{workTypeLabel(v.workType, v.workTypeOther)}</p>
                   </div>
                   <StatusBadge status={v.status} size="xs" />
                 </button>
