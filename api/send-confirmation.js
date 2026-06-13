@@ -9,9 +9,9 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end()
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
 
-  const SID      = process.env.TWILIO_ACCOUNT_SID   || process.env.VITE_TWILIO_ACCOUNT_SID
-  const TOKEN    = process.env.TWILIO_AUTH_TOKEN     || process.env.VITE_TWILIO_AUTH_TOKEN
-  const FROM     = process.env.TWILIO_FROM_NUMBER    || process.env.VITE_TWILIO_FROM_NUMBER || '+15559628126'
+  const SID      = process.env.TWILIO_ACCOUNT_SID
+  const TOKEN    = process.env.TWILIO_AUTH_TOKEN
+  const FROM     = process.env.TWILIO_FROM_NUMBER || '+15559628126'
   const TEMPLATE = process.env.TWILIO_CONFIRM_TEMPLATE || 'HX406205197d504d5509b37d290c37ca0e'
 
   if (!SID || !TOKEN) return res.status(500).json({ success: false, error: 'Twilio não configurado no servidor' })

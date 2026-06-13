@@ -131,11 +131,13 @@ export const defaultSettings = {
   googleMaps: {
     apiKey: 'AIzaSyDZ0xj8-8447oTtyZyD-SGoctxUObplCnA',
   },
+  // As credenciais Twilio NÃO ficam no cliente (segurança). O envio é feito pela
+  // função serverless /api/send-confirmation, que lê as credenciais do servidor.
   whatsapp: {
     twilio: {
-      accountSid: import.meta.env.VITE_TWILIO_ACCOUNT_SID || '',
-      authToken:  import.meta.env.VITE_TWILIO_AUTH_TOKEN  || '',
-      fromNumber: import.meta.env.VITE_TWILIO_FROM_NUMBER || '',
+      accountSid: '',
+      authToken:  '',
+      fromNumber: '',
     },
   },
   branding: {
