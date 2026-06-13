@@ -3,6 +3,7 @@ import { storage } from '../utils/storage'
 import { supabase, isCloudEnabled } from '../utils/supabase'
 import { sampleClients, sampleVisits, defaultSettings, sampleFuncionarios, sampleAcoes } from '../data/sampleData'
 import { sendConfirmationEmail, sendReminderEmail } from '../utils/emailUtils'
+import { notifyConfirmationWebhook } from '../utils/whatsappUtils'
 import { daysUntilVisit, todayString } from '../utils/dateUtils'
 import { toExportFormat, autoSyncToFile } from '../utils/exportUtils'
 
@@ -251,11 +252,18 @@ export function AppProvider({ children }) {
       const sent = await sendConfirmationEmail(newVisit, settings)
       if (sent) newVisit.emailsSent = { ...newVisit.emailsSent, confirmation: true }
     }
-    // ── Confirmação por WhatsApp ──
-    // Tratada pelo Make.com: ao gravar no Supabase, o trigger dispara o webhook
-    // que envia a confirmação via template aprovado (no ato do agendamento).
     setVisits((prev) => [...prev, newVisit])
     if (isCloudEnabled) await dbSaveVisit(newVisit)
+    // ── Confirmação por WhatsApp ──
+    // A app chama o webhook do Make diretamente (sem trigger Supabase). O Make
+    // envia a confirmação via template aprovado, no ato do agendamento.
+    if (!newVisit.whatsappSent?.confirmation && newVisit.clientPhone) {
+      const r = await notifyConfirmationWebhook(newVisit)
+      if (r.success) {
+        newVisit.whatsappSent = { ...newVisit.whatsappSent, confirmation: true }
+        if (isCloudEnabled) await dbSaveVisit(newVisit)
+      }
+    }
     return newVisit
   }, [settings])
 

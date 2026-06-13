@@ -74,6 +74,24 @@ export function buildReminderMessage(visit, company, type) {
   ].join('\n')
 }
 
+// Envia a confirmação por WhatsApp através da função serverless (/api/send-confirmation),
+// que chama a Twilio do lado do servidor com um template aprovado. Em localhost a
+// rota /api não existe (vite), por isso falha em silêncio — só funciona em produção.
+export async function notifyConfirmationWebhook(visit) {
+  if (!visit?.clientPhone) return { success: false, error: 'sem telefone' }
+  try {
+    const r = await fetch('/api/send-confirmation', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ visit }),
+    })
+    const data = await r.json().catch(() => ({}))
+    return { success: r.ok && data.success !== false, ...data }
+  } catch (e) {
+    return { success: false, error: String(e) }
+  }
+}
+
 export async function sendTwilioWhatsApp(phone, body, twilio) {
   const { accountSid, authToken, fromNumber } = twilio ?? {}
   if (!accountSid || !authToken || !fromNumber) {
