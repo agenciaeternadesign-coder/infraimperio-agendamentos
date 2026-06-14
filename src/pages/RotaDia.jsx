@@ -9,7 +9,7 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 import { useApp } from '../contexts/AppContext'
 import { optimizeRoute, buildRouteWithTimes, generateGoogleMapsUrl } from '../utils/routeUtils'
-import StatusBadge, { workTypeLabel } from '../components/StatusBadge'
+import StatusBadge, { ConfirmBadge, workTypeLabel } from '../components/StatusBadge'
 import VisitModal from '../components/VisitModal'
 import MapaRota from '../components/MapaRota'
 import { todayString, formatDate } from '../utils/dateUtils'
@@ -261,6 +261,7 @@ function SortableVisitCard({ visit, index, leg, onSelect }) {
                 <span className="text-[10px] font-semibold text-amber-600 bg-amber-50 border border-amber-200 rounded px-1.5 py-0.5">sem hora marcada</span>
               )}
               <StatusBadge status={visit.status} size="xs" />
+              <ConfirmBadge status={visit.confirmStatus} size="xs" withIcon={false} />
             </div>
           </div>
 

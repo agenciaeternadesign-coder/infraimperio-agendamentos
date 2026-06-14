@@ -195,6 +195,27 @@ export function AppProvider({ children }) {
     return () => { supabase.removeChannel(channel) }
   }, [initialized])
 
+  // ── Fallback: polling de 15s ────────────────────────────────────────────────
+  // O Realtime só dispara se a tabela estiver na publicação supabase_realtime.
+  // Este polling garante que o estado (ex.: confirmStatus alterado pelo Make) se
+  // reflete na UI em ≤15s mesmo sem Realtime ativo. Só atualiza se algo mudou.
+  useEffect(() => {
+    if (!isCloudEnabled || !initialized) return
+    const id = setInterval(async () => {
+      try {
+        const { data, error } = await supabase.from('visits').select('data')
+        if (error || !data) return
+        const fresh = data.map((r) => r.data)
+        setVisits((prev) => {
+          const a = [...prev].sort((x, y) => (x.id > y.id ? 1 : -1))
+          const b = [...fresh].sort((x, y) => (x.id > y.id ? 1 : -1))
+          return JSON.stringify(a) === JSON.stringify(b) ? prev : fresh
+        })
+      } catch { /* rede offline — tenta no próximo ciclo */ }
+    }, 15000)
+    return () => clearInterval(id)
+  }, [initialized])
+
   // ── Persist to localStorage (offline fallback) ──────────────────────────────
   useEffect(() => {
     if (!initialized) return
@@ -245,6 +266,9 @@ export function AppProvider({ children }) {
       id: visitData.id ?? genId('v'),
       emailsSent:   visitData.emailsSent   ?? { confirmation: false, reminder3days: false, reminder1day: false, reminderDay: false },
       whatsappSent: visitData.whatsappSent ?? { confirmation: false, reminder3days: false, reminder1day: false, reminderDay: false },
+      // Estado da confirmação por WhatsApp — toda a visita nova fica "pendente"
+      // até o cliente responder (o Make atualiza para confirmado/remarcado/cancelado).
+      confirmStatus: visitData.confirmStatus ?? 'pendente',
       createdAt: visitData.createdAt ?? new Date().toISOString(),
     }
     // ── Confirmação por email ──
@@ -261,6 +285,7 @@ export function AppProvider({ children }) {
       const r = await notifyConfirmationWebhook(newVisit)
       if (r.success) {
         newVisit.whatsappSent = { ...newVisit.whatsappSent, confirmation: true }
+        if (r.sid) newVisit.message_sid = r.sid // SID devolvido pela Twilio
         if (isCloudEnabled) await dbSaveVisit(newVisit)
       }
     }

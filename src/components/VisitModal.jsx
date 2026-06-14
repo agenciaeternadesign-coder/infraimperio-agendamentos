@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useApp } from '../contexts/AppContext'
-import StatusBadge, { workTypeLabel } from './StatusBadge'
+import StatusBadge, { ConfirmBadge, workTypeLabel } from './StatusBadge'
 import { formatDate } from '../utils/dateUtils'
 import {
   buildWhatsAppUrl, buildConfirmationMessage, buildReminderMessage, sendTwilioWhatsApp,
@@ -92,7 +92,10 @@ export default function VisitModal({ visit, onClose }) {
         <div className="px-6 py-5 space-y-5">
           {/* Status + date/time */}
           <div className="space-y-3">
-            <StatusBadge status={visit.status} />
+            <div className="flex items-center gap-2 flex-wrap">
+              <StatusBadge status={visit.status} />
+              <ConfirmBadge status={visit.confirmStatus} />
+            </div>
             <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
               <p className="text-xs font-medium text-slate-500 mb-2">Data e hora da visita</p>
               <div className="flex items-end gap-2 flex-wrap">

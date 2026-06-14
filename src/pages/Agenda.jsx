@@ -6,7 +6,7 @@ import {
 } from 'date-fns'
 import { pt } from 'date-fns/locale'
 import { useApp } from '../contexts/AppContext'
-import StatusBadge from '../components/StatusBadge'
+import StatusBadge, { ConfirmBadge } from '../components/StatusBadge'
 import VisitModal from '../components/VisitModal'
 import { printVisitsSheet, downloadVisitsCsv } from '../utils/printUtils'
 
@@ -263,7 +263,10 @@ function DayPanel({ date, visits, onClose, onSelectVisit, onPrint }) {
                 <p className="font-medium text-slate-800 truncate">{v.clientName}</p>
                 <p className="text-xs text-slate-500 truncate">{v.address.street} {v.address.number}, {v.address.city}</p>
               </div>
-              <StatusBadge status={v.status} size="xs" />
+              <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                <StatusBadge status={v.status} size="xs" />
+                <ConfirmBadge status={v.confirmStatus} size="xs" withIcon={false} />
+              </div>
             </button>
           ))}
         </div>
