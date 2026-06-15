@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useApp } from '../contexts/AppContext'
-import StatusBadge, { ConfirmBadge, workTypeLabel } from './StatusBadge'
+import StatusBadge, { ConfirmBadge, CONFIRM_CONFIG, workTypeLabel } from './StatusBadge'
 import { formatDate } from '../utils/dateUtils'
 import {
   buildWhatsAppUrl, buildConfirmationMessage, buildReminderMessage, sendTwilioWhatsApp,
@@ -35,6 +35,10 @@ export default function VisitModal({ visit, onClose }) {
 
   function handleStatusChange(e) {
     updateVisit(visit.id, { status: e.target.value })
+  }
+
+  function handleConfirmStatusChange(e) {
+    updateVisit(visit.id, { confirmStatus: e.target.value })
   }
 
   function handleSaveDateTime() {
@@ -216,7 +220,8 @@ export default function VisitModal({ visit, onClose }) {
                 </div>
               ) : (
                 <p className="text-xs text-slate-400">
-                  Configure o Twilio nas Configurações para envio automático sem clicar.
+                  A confirmação é enviada automaticamente ao guardar o agendamento (via servidor).
+                  Os botões acima abrem o WhatsApp para envio manual, se precisar.
                 </p>
               )}
             </div>
@@ -257,13 +262,23 @@ export default function VisitModal({ visit, onClose }) {
           </div>
 
           {/* Change status */}
-          <div>
-            <label className="label">Alterar estado</label>
-            <select className="input" value={visit.status} onChange={handleStatusChange}>
-              {STATUS_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>{o.label}</option>
-              ))}
-            </select>
+          <div className="grid sm:grid-cols-2 gap-3">
+            <div>
+              <label className="label">Estado da agenda</label>
+              <select className="input" value={visit.status} onChange={handleStatusChange}>
+                {STATUS_OPTIONS.map((o) => (
+                  <option key={o.value} value={o.value}>{o.label}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="label">Confirmação WhatsApp</label>
+              <select className="input" value={visit.confirmStatus ?? 'pendente'} onChange={handleConfirmStatusChange}>
+                {Object.entries(CONFIRM_CONFIG).map(([value, { label }]) => (
+                  <option key={value} value={value}>{label}</option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
 

@@ -279,8 +279,8 @@ export function AppProvider({ children }) {
     setVisits((prev) => [...prev, newVisit])
     if (isCloudEnabled) await dbSaveVisit(newVisit)
     // ── Confirmação por WhatsApp ──
-    // A app chama o webhook do Make diretamente (sem trigger Supabase). O Make
-    // envia a confirmação via template aprovado, no ato do agendamento.
+    // A app chama a função serverless /api/send-confirmation, que envia via
+    // Twilio (template aprovado) do lado do servidor, no ato do agendamento.
     if (!newVisit.whatsappSent?.confirmation && newVisit.clientPhone) {
       const r = await notifyConfirmationWebhook(newVisit)
       if (r.success) {

@@ -15,14 +15,16 @@ export default function StatusBadge({ status, size = 'sm' }) {
   )
 }
 
-// Estado da confirmação por WhatsApp (independente do estado de agenda acima).
+// Estado da confirmação por WhatsApp (independente do estado da agenda acima).
 // Cores: pendente=cinza, confirmado=verde, remarcado=âmbar, cancelado=vermelho.
-const CONFIRM_CONFIG = {
+export const CONFIRM_CONFIG = {
   pendente:   { label: 'Pendente',   cls: 'bg-slate-100 text-slate-600' },
   confirmado: { label: 'Confirmado', cls: 'bg-green-100 text-green-700' },
   remarcado:  { label: 'Remarcado',  cls: 'bg-amber-100 text-amber-700' },
   cancelado:  { label: 'Cancelado',  cls: 'bg-red-100 text-red-600' },
 }
+
+export const CONFIRM_STATUSES = Object.keys(CONFIRM_CONFIG)
 
 export function ConfirmBadge({ status, size = 'sm', withIcon = true }) {
   const cfg = CONFIRM_CONFIG[status] ?? CONFIRM_CONFIG.pendente
