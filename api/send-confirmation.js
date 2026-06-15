@@ -1,6 +1,15 @@
-// Função serverless (Vercel) que envia a confirmação de WhatsApp via Twilio,
-// usando um template aprovado pela Meta. Corre no servidor — as credenciais
-// nunca chegam ao browser. A app chama POST /api/send-confirmation { visit }.
+// Função serverless (Vercel) que envia a confirmação de agendamento por SMS
+// via Twilio. Corre no servidor — as credenciais nunca chegam ao browser.
+// Usa um remetente alfanumérico ("Infraimp") em Portugal, por isso não precisa
+// de número dedicado, verificação Meta nem templates. A app chama
+// POST /api/send-confirmation { visit }.
+
+function formatDatePT(iso) {
+  // "2026-06-18" -> "18/06/2026"
+  if (!iso || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return iso || ''
+  const [y, m, d] = iso.split('-')
+  return `${d}/${m}/${y}`
+}
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
@@ -9,14 +18,13 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end()
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
 
-  const SID      = process.env.TWILIO_ACCOUNT_SID
-  const TOKEN    = process.env.TWILIO_AUTH_TOKEN
-  const FROM     = process.env.TWILIO_FROM_NUMBER || '+15559628126'
-  const TEMPLATE = process.env.TWILIO_CONFIRM_TEMPLATE || 'HX406205197d504d5509b37d290c37ca0e'
+  const SID   = process.env.TWILIO_ACCOUNT_SID
+  const TOKEN = process.env.TWILIO_AUTH_TOKEN
+  // Remetente alfanumérico (máx. 11 caracteres). Configurável por env.
+  const FROM  = process.env.TWILIO_SMS_SENDER || 'Infraimp'
 
   if (!SID || !TOKEN) return res.status(500).json({ success: false, error: 'Twilio não configurado no servidor' })
 
-  // Aceita { visit: {...} } ou o objeto da visita diretamente
   const body  = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {})
   const visit = body.visit || body.data || body
   if (!visit?.clientPhone) return res.status(400).json({ success: false, error: 'sem telefone' })
@@ -24,20 +32,13 @@ export default async function handler(req, res) {
   const phone  = '+' + String(visit.clientPhone).replace(/[^\d]/g, '')
   const addr   = visit.address || {}
   const morada = `${addr.street || ''} ${addr.number || ''}, ${addr.city || ''}`.replace(/\s+/g, ' ').trim()
+  const data   = formatDatePT(visit.date)
   const hora   = visit.time || 'a confirmar'
+  const nome   = (visit.clientName || '').split(' ')[0]
 
-  // URLSearchParams codifica corretamente o "+" (→ %2B) e o JSON das variáveis
-  const form = new URLSearchParams({
-    To: `whatsapp:${phone}`,
-    From: `whatsapp:${FROM}`,
-    ContentSid: TEMPLATE,
-    ContentVariables: JSON.stringify({
-      1: visit.clientName || '',
-      2: visit.date || '',
-      3: hora,
-      4: morada,
-    }),
-  })
+  const text = `Olá ${nome}! A sua visita de orçamento com a Infraimpério está confirmada para ${data} às ${hora} em ${morada}. Dúvidas: +351 212 345 678. Até breve!`
+
+  const form = new URLSearchParams({ To: phone, From: FROM, Body: text })
 
   try {
     const r = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${SID}/Messages.json`, {
@@ -48,9 +49,9 @@ export default async function handler(req, res) {
       },
       body: form.toString(),
     })
-    const data = await r.json()
-    if (r.ok) return res.status(200).json({ success: true, sid: data.sid, status: data.status })
-    return res.status(502).json({ success: false, error: data.message, code: data.code })
+    const out = await r.json()
+    if (r.ok) return res.status(200).json({ success: true, sid: out.sid, status: out.status })
+    return res.status(502).json({ success: false, error: out.message, code: out.code })
   } catch (e) {
     return res.status(500).json({ success: false, error: String(e) })
   }
