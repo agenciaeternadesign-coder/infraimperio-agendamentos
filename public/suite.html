@@ -3162,6 +3162,7 @@ function premLoad() {
 function premSave(d) { localStorage.setItem(PREM_KEY, JSON.stringify(d)); }
 
 function premInit() {
+  premSyncFromFolha(); // liga automaticamente os funcionários da Folha de Ponto
   var lbl = document.getElementById('prem-today-lbl');
   if (lbl) lbl.textContent = new Date().toLocaleDateString('pt-PT', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
   PREM_ACTIVE_DATE = new Date().toISOString().slice(0,10);
@@ -3358,10 +3359,16 @@ function premEditFunc(id) {
   premSave(d); premRenderEquipa(); premRenderRegistar();
 }
 
-function premImportFromFolha() {
-  var dadosPag = JSON.parse(localStorage.getItem('infraimperio_recibos_v1')||'{}');
-  var funcs = (dadosPag.funcionarios||[]).filter(function(f){ return f.ativo!==false; });
-  if (!funcs.length) { premToast('Nenhum funcionário na Folha de Ponto.', true); return; }
+// Sincroniza (silenciosamente) os funcionários da Folha de Ponto (Pagamentos)
+// para o store da Premiação/Equipa. Idempotente — só adiciona os que faltam,
+// por nome. Devolve o nº adicionado. Liga automaticamente as duas áreas.
+function premSyncFromFolha() {
+  // Fonte canónica: o estado em memória (Pagamentos); fallback para localStorage.
+  var fonte = (typeof estado !== 'undefined' && estado && estado.funcionarios)
+    ? estado.funcionarios
+    : (JSON.parse(localStorage.getItem('infraimperio_recibos_v1')||'{}').funcionarios || []);
+  var funcs = fonte.filter(function(f){ return f.ativo!==false; });
+  if (!funcs.length) return 0;
   var d = premLoad(); var count = 0;
   funcs.forEach(function(pf) {
     var existe = d.funcionarios.some(function(f){ return f.nome.toLowerCase()===pf.nome.toLowerCase(); });
@@ -3371,7 +3378,16 @@ function premImportFromFolha() {
       count++;
     }
   });
-  premSave(d); premRenderEquipa(); premRenderRegistar();
+  if (count) premSave(d);
+  return count;
+}
+
+function premImportFromFolha() {
+  var dadosPag = JSON.parse(localStorage.getItem('infraimperio_recibos_v1')||'{}');
+  var funcs = (dadosPag.funcionarios||[]).filter(function(f){ return f.ativo!==false; });
+  if (!funcs.length) { premToast('Nenhum funcionário na Folha de Ponto.', true); return; }
+  var count = premSyncFromFolha();
+  premRenderEquipa(); premRenderRegistar();
   premToast(count ? '✅ '+count+' funcionário'+(count!==1?'s':'')+' importado'+(count!==1?'s':'')+'!' : 'Todos já existem.', !count);
 }
 
@@ -3755,7 +3771,7 @@ var EQ_FICHA_ID = null;
 
 function eqLoad() { try { return JSON.parse(localStorage.getItem(VALES_KEY)||'[]'); } catch(e) { return []; } }
 function eqSave(v) { localStorage.setItem(VALES_KEY, JSON.stringify(v)); }
-function eqInit() { eqRenderGrid(); }
+function eqInit() { premSyncFromFolha(); eqRenderGrid(); }
 
 function eqRenderGrid() {
   var grid=document.getElementById('eq-grid'), empty=document.getElementById('eq-empty');
@@ -4605,8 +4621,8 @@ function exportarFolhaExcel() {
 // FUNCIONÁRIOS
 // =============================================================================
 function renderFuncionarios() {
-  if (!document.getElementById('func-tbody')) return;
   const tbody = document.getElementById('funcionarios-body');
+  if (!tbody) return;
   tbody.innerHTML = '';
   estado.funcionarios.forEach(f => {
     const tr = document.createElement('tr');
