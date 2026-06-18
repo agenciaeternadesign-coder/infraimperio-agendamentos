@@ -7120,14 +7120,12 @@ function rec_atualizar() {
   const assinWrap = document.getElementById('r-assinaturas');
   const blocoEsq = `
     <div class="recibo-assinatura">
-      <span>${cfg.assinEsq}</span><br><br><br>
-      __________________________
+      <span>${cfg.assinEsq}</span>
     </div>`;
   if (cfg.assinDir) {
     const blocoDir = `
       <div class="recibo-assinatura">
-        <span>${cfg.assinDir}</span><br><br><br>
-        __________________________
+        <span>${cfg.assinDir}</span>
       </div>`;
     assinWrap.classList.remove('unica');
     assinWrap.innerHTML = blocoEsq + blocoDir;

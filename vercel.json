@@ -1,6 +1,9 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
+  "crons": [
+    { "path": "/api/reminders", "schedule": "0 8 * * *" }
+  ],
   "rewrites": [
     { "source": "/((?!suite\\.html$).*)", "destination": "/index.html" }
   ],
