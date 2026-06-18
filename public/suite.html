@@ -3771,7 +3771,36 @@ var EQ_FICHA_ID = null;
 
 function eqLoad() { try { return JSON.parse(localStorage.getItem(VALES_KEY)||'[]'); } catch(e) { return []; } }
 function eqSave(v) { localStorage.setItem(VALES_KEY, JSON.stringify(v)); }
-function eqInit() { premSyncFromFolha(); eqRenderGrid(); }
+// Importa para a Equipa (inf_vales_v1) os recibos do tipo "vale" já emitidos
+// que ainda não estejam ligados. Dedup pelo número do recibo. Idempotente.
+function recBackfillValesEquipa() {
+  try {
+    var hist = JSON.parse(localStorage.getItem('recibo_historico_v1') || '[]');
+    var vales = JSON.parse(localStorage.getItem('inf_vales_v1') || '[]');
+    var prem = JSON.parse(localStorage.getItem('inf_prem_v2') || 'null') || { funcionarios: [] };
+    var changed = false;
+    hist.forEach(function(rc) {
+      if (rc.tipo !== 'vale' || !rc.numero) return;
+      if (vales.some(function(v){ return v.reciboNum === rc.numero; })) return;
+      var f = (prem.funcionarios || []).find(function(x){ return (x.nome||'').toLowerCase() === (rc.nome||'').toLowerCase(); });
+      vales.push({
+        id: 'v_bk_' + (rc.id || Date.now()) + Math.random().toString(36).slice(2,5),
+        funcId: f ? f.id : null,
+        funcNome: rc.nome || '',
+        data: rc.data || '',
+        valor: parseFloat(rc.valor) || 0,
+        descricao: 'Vale ' + rc.numero,
+        status: 'mes',
+        reciboNum: rc.numero,
+        criadoEm: rc.emitidoEm || new Date().toISOString()
+      });
+      changed = true;
+    });
+    if (changed) localStorage.setItem('inf_vales_v1', JSON.stringify(vales));
+  } catch(e) {}
+}
+
+function eqInit() { premSyncFromFolha(); recBackfillValesEquipa(); eqRenderGrid(); }
 
 function eqRenderGrid() {
   var grid=document.getElementById('eq-grid'), empty=document.getElementById('eq-empty');
@@ -7160,6 +7189,34 @@ function rec_registarNumero(numeroUsado) {
       emitidoEm: new Date().toISOString()
     });
     localStorage.setItem('recibo_historico_v1', JSON.stringify(historico.slice(0, 200)));
+
+    // ── Ligar Vale ao módulo Equipa (store inf_vales_v1) ──
+    // Quando o recibo é do tipo "vale", regista-o também na Equipa/Histórico de
+    // Vales, ligado ao funcionário por nome. Dedup pelo número do recibo.
+    if (rec_tipoAtual === 'vale') {
+      if (typeof premSyncFromFolha === 'function') premSyncFromFolha();
+      var _vales = JSON.parse(localStorage.getItem('inf_vales_v1') || '[]');
+      if (!_vales.some(function(v){ return v.reciboNum === numeroUsado; })) {
+        var _nome = document.getElementById('f-nome').value.trim();
+        var _prem = JSON.parse(localStorage.getItem('inf_prem_v2') || 'null') || { funcionarios: [] };
+        var _f = (_prem.funcionarios || []).find(function(x){ return (x.nome||'').toLowerCase() === _nome.toLowerCase(); });
+        var _descEl = document.getElementById('f-descricao');
+        var _descontarEl = document.getElementById('f-descontar');
+        _vales.push({
+          id: 'v_rec_' + Date.now(),
+          funcId: _f ? _f.id : null,
+          funcNome: _nome,
+          data: document.getElementById('f-data').value,
+          valor: parseFloat(document.getElementById('f-valor').value) || 0,
+          descricao: (_descEl && _descEl.value.trim()) ? _descEl.value.trim() : ('Vale ' + numeroUsado),
+          descontarEm: _descontarEl ? _descontarEl.value.trim() : '',
+          status: 'mes',
+          reciboNum: numeroUsado,
+          criadoEm: new Date().toISOString()
+        });
+        localStorage.setItem('inf_vales_v1', JSON.stringify(_vales));
+      }
+    }
   } catch(e) {}
 }
 
@@ -7286,6 +7343,7 @@ function suiteBackup() {
 var EQ_HV_FILTER = 'todos';
 
 function eqHistValesAbrir() {
+  if (typeof recBackfillValesEquipa === 'function') recBackfillValesEquipa();
   var ov = document.getElementById('eq-hist-vales-overlay');
   if (ov) ov.style.display = '';
   EQ_HV_FILTER = 'todos';
