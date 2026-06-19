@@ -35,8 +35,12 @@ export default async function handler(req, res) {
   const data   = formatDatePT(visit.date)
   const hora   = visit.time || 'a confirmar'
   const nome   = (visit.clientName || '').split(' ')[0]
+  const kind   = body.kind || 'confirmacao'
+  const contacto = 'Duvidas: ligue +351 214 098 779 ou WhatsApp https://wa.me/351936279926'
 
-  const text = `Ola ${nome}! A sua visita de orcamento com a Infraimperio esta confirmada para ${data} as ${hora} em ${morada}. Duvidas: ligue +351 212 345 678 ou WhatsApp https://wa.me/351936279926 . Ate breve!`
+  const text = kind === 'horario'
+    ? `Ola ${nome}! O horario da sua visita com a Infraimperio foi confirmado: ${data} as ${hora} em ${morada}. ${contacto} . Ate breve!`
+    : `Ola ${nome}! A sua visita de orcamento com a Infraimperio esta confirmada para ${data} as ${hora} em ${morada}. ${contacto} . Ate breve!`
 
   const form = new URLSearchParams({ To: phone, From: FROM, Body: text })
 
