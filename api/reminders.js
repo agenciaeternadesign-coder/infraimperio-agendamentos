@@ -52,7 +52,7 @@ export default async function handler(req, res) {
     const addr = v.address || {}
     const morada = `${addr.street || ''} ${addr.number || ''}, ${addr.city || ''}`.replace(/\s+/g, ' ').trim()
     const hora = v.time || 'a confirmar'
-    const text = `Olá ${nome}! Lembrete: a sua visita de orçamento com a Infraimpério é ${when} (${fmtDatePT(v.date)} às ${hora}) em ${morada}. Dúvidas: +351 212 345 678. Até breve!`
+    const text = `Ola ${nome}! Lembrete: a sua visita de orcamento com a Infraimperio e ${when} (${fmtDatePT(v.date)} as ${hora}) em ${morada}. Duvidas: ligue +351 212 345 678 ou WhatsApp https://wa.me/351936279926 . Ate breve!`
     const form = new URLSearchParams({
       To: '+' + String(v.clientPhone).replace(/[^\d]/g, ''),
       From: FROM,
