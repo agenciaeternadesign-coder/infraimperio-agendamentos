@@ -42,11 +42,11 @@ export default function VisitModal({ visit, onClose }) {
   }
 
   function handleSaveDateTime() {
-    if (editDate && editTime) {
-      updateVisit(visit.id, { date: editDate, time: editTime })
-      setSavedDT(true)
-      setTimeout(() => setSavedDT(false), 2000)
-    }
+    if (!editDate) return
+    // Guarda a data mesmo sem hora (visitas "sem horário" ajustam-se depois na Rota).
+    updateVisit(visit.id, { date: editDate, time: editTime || '' })
+    setSavedDT(true)
+    setTimeout(() => setSavedDT(false), 2000)
   }
 
   function handleDelete() {

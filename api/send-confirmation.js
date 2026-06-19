@@ -11,6 +11,14 @@ function formatDatePT(iso) {
   return `${d}/${m}/${y}`
 }
 
+// Normaliza para E.164. Números nacionais PT (9 dígitos) recebem o indicativo 351.
+function normalizePhone(raw) {
+  let d = String(raw || '').replace(/\D/g, '')
+  if (d.startsWith('00')) d = d.slice(2)
+  if (d.length === 9) d = '351' + d
+  return '+' + d
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
@@ -29,7 +37,7 @@ export default async function handler(req, res) {
   const visit = body.visit || body.data || body
   if (!visit?.clientPhone) return res.status(400).json({ success: false, error: 'sem telefone' })
 
-  const phone  = '+' + String(visit.clientPhone).replace(/[^\d]/g, '')
+  const phone  = normalizePhone(visit.clientPhone)
   const addr   = visit.address || {}
   const morada = `${addr.street || ''} ${addr.number || ''}, ${addr.city || ''}`.replace(/\s+/g, ' ').trim()
   const data   = formatDatePT(visit.date)

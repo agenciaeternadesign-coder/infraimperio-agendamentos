@@ -14,6 +14,14 @@ function dateStr(offsetDays) {
   return t.toISOString().slice(0, 10)
 }
 
+// Normaliza para E.164. Números nacionais PT (9 dígitos) recebem o indicativo 351.
+function normalizePhone(raw) {
+  let d = String(raw || '').replace(/\D/g, '')
+  if (d.startsWith('00')) d = d.slice(2)
+  if (d.length === 9) d = '351' + d
+  return '+' + d
+}
+
 export default async function handler(req, res) {
   const SUPA_URL = process.env.VITE_SUPABASE_URL
   const SUPA_KEY = process.env.SUPABASE_SERVICE_KEY || process.env.VITE_SUPABASE_ANON_KEY
@@ -54,7 +62,7 @@ export default async function handler(req, res) {
     const hora = v.time || 'a confirmar'
     const text = `Ola ${nome}! Lembrete: a sua visita de orcamento com a Infraimperio e ${when} (${fmtDatePT(v.date)} as ${hora}) em ${morada}. Duvidas: ligue +351 214 098 779 ou WhatsApp https://wa.me/351936279926 . Ate breve!`
     const form = new URLSearchParams({
-      To: '+' + String(v.clientPhone).replace(/[^\d]/g, ''),
+      To: normalizePhone(v.clientPhone),
       From: FROM,
       Body: text,
     })
