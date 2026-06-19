@@ -13,6 +13,7 @@ import StatusBadge, { ConfirmBadge, workTypeLabel } from '../components/StatusBa
 import VisitModal from '../components/VisitModal'
 import MapaRota from '../components/MapaRota'
 import { todayString, formatDate } from '../utils/dateUtils'
+import { notifyConfirmationWebhook } from '../utils/whatsappUtils'
 
 export default function RotaDia() {
   const { visits, settings, getVisitsByDate, updateVisit } = useApp()
@@ -57,11 +58,15 @@ export default function RotaDia() {
   }
 
   // Grava as horas calculadas pela rota em cada visita (define hora nas visitas sem horário)
+  // e avisa o cliente por SMS com o horário confirmado.
   async function handleApplyTimes() {
     setApplying(true)
     for (const v of orderedVisits) {
       if (v.scheduledTime && v.scheduledTime !== v.time) {
         await updateVisit(v.id, { time: v.scheduledTime })
+        if (v.clientPhone) {
+          notifyConfirmationWebhook({ ...v, time: v.scheduledTime }, 'horario')
+        }
       }
     }
     setApplying(false)

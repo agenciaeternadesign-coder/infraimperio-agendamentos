@@ -24,13 +24,13 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Variáveis de ambiente em falta' })
   }
 
-  const today = dateStr(0)
-  const in2 = dateStr(2)
+  const in3 = dateStr(3)
+  const in1 = dateStr(1)
   const headers = { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}` }
 
   let rows = []
   try {
-    const url = `${SUPA_URL}/rest/v1/visits?select=id,data&or=(data->>date.eq.${today},data->>date.eq.${in2})`
+    const url = `${SUPA_URL}/rest/v1/visits?select=id,data&or=(data->>date.eq.${in3},data->>date.eq.${in1})`
     const r = await fetch(url, { headers })
     rows = await r.json()
   } catch (e) {
@@ -43,8 +43,8 @@ export default async function handler(req, res) {
     if (!v.clientPhone || v.status === 'cancelado' || v.status === 'realizado') continue
 
     let key, when
-    if (v.date === today) { key = 'reminderDay'; when = 'hoje' }
-    else if (v.date === in2) { key = 'reminder2days'; when = 'daqui a 2 dias' }
+    if (v.date === in1) { key = 'reminder1day'; when = 'amanha' }
+    else if (v.date === in3) { key = 'reminder3days'; when = 'daqui a 3 dias' }
     else continue
     if (v.smsSent && v.smsSent[key]) continue // já enviado
 
@@ -86,5 +86,5 @@ export default async function handler(req, res) {
     results.push({ to: v.clientPhone, key, ok, sid, err })
   }
 
-  return res.status(200).json({ today, in2, enviados: results.filter(r => r.ok).length, results })
+  return res.status(200).json({ in1, in3, enviados: results.filter(r => r.ok).length, results })
 }
