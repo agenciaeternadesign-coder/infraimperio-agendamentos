@@ -115,7 +115,7 @@ export const defaultSettings = {
     number: '78',
     city: 'Barreiro',
     postalCode: '2830-000',
-    phone: '+351 212 345 678',
+    phone: '+351 214 098 779',
     email: 'geral@infraimperio.pt',
   },
   emailjs: {
