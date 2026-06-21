@@ -1055,12 +1055,12 @@ textarea.si-input { resize: vertical; min-height: 64px; }
   <button data-section="equipa" onclick="suiteShowSection('equipa', this)">👤 Equipa</button>
   <button data-section="recibos" onclick="suiteShowSection('recibos', this)">🧾 Recibos</button>
   <button data-section="agendamentos" onclick="suiteShowSection('agendamentos', this)">📅 Agendamentos</button>
-  <button data-section="lembretes" onclick="suiteShowSection('lembretes', this)">📌 Lembretes</button>
-  <button data-section="instrucoes" onclick="suiteShowSection('instrucoes', this)">📋 Instruções</button>
   <button data-section="premiacao" onclick="suiteShowSection('premiacao', this)">🏆 Premiação</button>
   <button data-section="orcamentos" onclick="suiteShowSection('orcamentos', this)">📄 Orçamentos</button>
   <button data-section="obras" onclick="suiteShowSection('obras', this)">🏗️ Obras</button>
   <button data-section="adiantamentos" onclick="suiteShowSection('adiantamentos', this)">💵 Adiantamentos</button>
+  <button data-section="lembretes" onclick="suiteShowSection('lembretes', this)">📌 Lembretes</button>
+  <button data-section="instrucoes" onclick="suiteShowSection('instrucoes', this)">📋 Instruções</button>
   <button data-section="personalizacao" onclick="suiteShowSection('personalizacao', this)">⚙️ Personalização</button>
 </nav>
 
@@ -3885,9 +3885,34 @@ function eqRenderFichaHeader() {
     '<div style="font-size:0.75rem;opacity:0.75;margin-top:2px">'+escHtml(f.funcao||'')+(f.obs?' · '+escHtml(f.obs):'')+'</div></div>';
 }
 
+// Agrega dados do funcionário a partir de TODOS os módulos (Pagamentos/Folha,
+// Recibos e Vales), ligando por nome. Centraliza tudo no perfil da Equipa.
+function eqAggregate(funcNome) {
+  var nome = (funcNome || '').toLowerCase();
+  var pag = {}; try { pag = JSON.parse(localStorage.getItem('infraimperio_recibos_v1') || '{}'); } catch(e){}
+  var ef = (pag.funcionarios || []).find(function(x){ return (x.nome||'').toLowerCase() === nome; });
+  var meses = 0;
+  if (ef) Object.values(pag.folhas || {}).forEach(function(folha){
+    if ((folha.registos||[]).some(function(r){ return r.funcionario_id === ef.id; })) meses++;
+  });
+  var recs = []; try { recs = JSON.parse(localStorage.getItem('recibo_historico_v1') || '[]'); } catch(e){}
+  recs = recs.filter(function(rc){ return (rc.nome||'').toLowerCase() === nome; });
+  var vales = []; try { vales = JSON.parse(localStorage.getItem('inf_vales_v1') || '[]'); } catch(e){}
+  vales = vales.filter(function(v){ return (v.funcNome||'').toLowerCase() === nome; });
+  return {
+    ef: ef || null,
+    meses: meses,
+    recsCount: recs.length,
+    totalRecibos: recs.reduce(function(s,rc){ return s + (parseFloat(rc.valor)||0); }, 0),
+    valesCount: vales.length,
+    valesTotal: vales.reduce(function(s,v){ return s + (parseFloat(v.valor)||0); }, 0),
+  };
+}
+
 function eqRenderGeral() {
   var d=premLoad(), f=d.funcionarios.find(function(x){ return x.id===EQ_FICHA_ID; });
   if (!f) return;
+  var agg=eqAggregate(f.nome);
   var vtot=eqLoad().filter(function(v){ return v.funcId===EQ_FICHA_ID&&v.status!=='pago'; })
     .reduce(function(s,v){ return s+(parseFloat(v.valor)||0); },0);
   var now=new Date(), month=now.getMonth(), year=now.getFullYear();
@@ -3935,6 +3960,16 @@ function eqRenderGeral() {
       '<div style="background:#ffedd5;border-radius:8px;padding:10px;display:flex;align-items:center;gap:8px"><span style="font-size:1.2rem">\u{1F511}</span><div><div style="font-weight:700;font-size:1rem;color:#c2410c">'+s.chave+'</div><div style="font-size:0.7rem;color:#c2410c">Chaves</div></div></div>' +
       '<div style="background:#d1fae5;border-radius:8px;padding:10px;display:flex;align-items:center;gap:8px"><span style="font-size:1.2rem">✅</span><div><div style="font-weight:700;font-size:1rem;color:#065f46">'+s.presenca+'</div><div style="font-size:0.7rem;color:#065f46">Presenças</div></div></div>' +
       '<div style="background:#fee2e2;border-radius:8px;padding:10px;display:flex;align-items:center;gap:8px"><span style="font-size:1.2rem">⚠️</span><div><div style="font-weight:700;font-size:1rem;color:#b91c1c">'+s.reclamacao+'</div><div style="font-size:0.7rem;color:#b91c1c">Reclamações</div></div></div>' +
+    '</div>' +
+    // ── Resumo geral: acumula dados de todos os módulos ──
+    '<div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;color:#6b7280;letter-spacing:0.08em;margin:4px 0 8px">Resumo geral (todos os módulos)</div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px">' +
+      '<div style="background:#f9fafb;border:1.5px solid #e5e7eb;border-radius:8px;padding:10px"><div style="font-size:0.68rem;color:#9ca3af;text-transform:uppercase">Tipo / Função</div><div style="font-weight:700;font-size:0.88rem;color:#1a1a2e">'+(agg.ef?escHtml((agg.ef.tipo||'—')+(agg.ef.funcao?' · '+agg.ef.funcao:'')):'—')+'</div></div>' +
+      '<div style="background:#f9fafb;border:1.5px solid #e5e7eb;border-radius:8px;padding:10px"><div style="font-size:0.68rem;color:#9ca3af;text-transform:uppercase">Diária / Salário</div><div style="font-weight:700;font-size:0.88rem;color:#1a1a2e">'+(agg.ef?((agg.ef.diaria?'€'+agg.ef.diaria:'')+(agg.ef.valor_fixo?(agg.ef.diaria?' · ':'')+'€'+agg.ef.valor_fixo:'')||'—'):'—')+'</div></div>' +
+      '<div style="background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:8px;padding:10px"><div style="font-size:0.68rem;color:#1e40af;text-transform:uppercase">Recibos emitidos</div><div style="font-weight:700;font-size:0.88rem;color:#1e40af">'+agg.recsCount+' · €'+agg.totalRecibos.toFixed(0)+'</div></div>' +
+      '<div style="background:#fef9c3;border:1.5px solid #fde68a;border-radius:8px;padding:10px"><div style="font-size:0.68rem;color:#92400e;text-transform:uppercase">Vales (histórico)</div><div style="font-weight:700;font-size:0.88rem;color:#92400e">'+agg.valesCount+' · €'+agg.valesTotal.toFixed(0)+'</div></div>' +
+      '<div style="background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:8px;padding:10px"><div style="font-size:0.68rem;color:#065f46;text-transform:uppercase">Meses na folha</div><div style="font-weight:700;font-size:0.88rem;color:#065f46">'+agg.meses+'</div></div>' +
+      '<div style="background:#faf5ff;border:1.5px solid #e9d5ff;border-radius:8px;padding:10px"><div style="font-size:0.68rem;color:#6b21a8;text-transform:uppercase">NIF</div><div style="font-weight:700;font-size:0.88rem;color:#6b21a8">'+(agg.ef&&agg.ef.nif?escHtml(agg.ef.nif):'—')+'</div></div>' +
     '</div>' +
     '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
       '<button onclick="eqFichaValesTab()" style="flex:1;background:#1a1a2e;color:#fff;border:none;border-radius:8px;padding:10px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit">\u{1F4B6} Gerir Vales</button>' +
