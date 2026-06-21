@@ -4486,7 +4486,6 @@ function renderFolha() {
     tr.innerHTML = `
       <td>
         <strong>${func.nome}</strong>
-        <span class="badge badge-${func.tipo}" style="margin-left:6px">${func.tipo}</span>
       </td>
       <td><input type="number" class="num" min="0" value="${reg.faltas||''}" onchange="atualizarReg(${idx},'faltas',this.value)"></td>
       <td><input type="number" class="num" min="0" value="${reg.dias_q1||''}" onchange="atualizarReg(${idx},'dias_q1',this.value)"></td>
@@ -5092,7 +5091,7 @@ function renderRecibos() {
           const c = calcularLinha(r, f);
           return `
             <tr>
-              <td><strong>${f.nome}</strong> <span class="badge badge-${f.tipo}">${f.tipo}</span></td>
+              <td><strong>${f.nome}</strong></td>
               <td class="num"><strong>${fmtEur(c.liquido)}</strong></td>
               <td>${r.forma_pagamento === 'numerario' ? 'Numerário' : r.forma_pagamento === 'misto' ? 'Misto' : 'Transferência'}</td>
               <td style="text-align:right">

@@ -44,11 +44,11 @@ export default async function handler(req, res) {
   const hora   = visit.time || 'a confirmar'
   const nome   = (visit.clientName || '').split(' ')[0]
   const kind   = body.kind || 'confirmacao'
-  const contacto = 'Duvidas: ligue +351 214 098 779 ou WhatsApp https://wa.me/351936279926'
+  const contacto = 'Para qualquer dúvida: 214 098 779 ou WhatsApp https://wa.me/351936279926. Até breve!'
 
   const text = kind === 'horario'
-    ? `Ola ${nome}! O horario da sua visita com a Infraimperio foi confirmado: ${data} as ${hora} em ${morada}. ${contacto} . Ate breve!`
-    : `Ola ${nome}! A sua visita de orcamento com a Infraimperio esta confirmada para ${data} as ${hora} em ${morada}. ${contacto} . Ate breve!`
+    ? `Olá, ${nome}! O horário da nossa visita para o orçamento foi confirmado para o dia ${data}, às ${hora}, em ${morada}. Teremos todo o gosto em ajudar.\n\n${contacto}`
+    : `Olá, ${nome}! Está confirmada a nossa visita para o orçamento, no dia ${data}, às ${hora}, em ${morada}. Teremos todo o gosto em ajudar.\n\n${contacto}`
 
   const form = new URLSearchParams({ To: phone, From: FROM, Body: text })
 
