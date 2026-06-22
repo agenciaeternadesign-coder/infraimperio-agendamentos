@@ -1999,6 +1999,7 @@ textarea.si-input { resize: vertical; min-height: 64px; }
         <h2 style="font-family:'Oswald',sans-serif;font-size:1.45rem;font-weight:700;color:#1a1a2e;margin:0">Stock de Materiais</h2>
         <div style="font-size:0.78rem;color:#9ca3af">Controlo de materiais de construção</div>
       </div>
+      <button onclick="stockHistGlobal()" style="background:#1a1a2e;color:#fff;border:none;border-radius:8px;padding:9px 14px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">📋 Movimentos</button>
       <button onclick="stockAbrirForm()" style="background:#d97706;color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">➕ Novo Material</button>
     </div>
     <div id="stock-summary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px"></div>
@@ -2023,12 +2024,28 @@ textarea.si-input { resize: vertical; min-height: 64px; }
   </div>
 </div>
 
+<div id="stock-hist-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9200;align-items:flex-start;justify-content:center;overflow-y:auto;padding:24px 16px">
+  <div style="background:#fff;width:100%;max-width:640px;border-radius:16px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,0.35);margin:auto">
+    <div style="background:linear-gradient(135deg,#1a1a2e,#2d1b69);padding:18px 20px;display:flex;align-items:center;justify-content:space-between">
+      <div style="font-family:'Oswald',sans-serif;font-size:1.2rem;font-weight:800;color:#fff">Movimentos de Stock</div>
+      <button onclick="stockHistFechar()" style="background:rgba(255,255,255,0.15);border:none;color:#fff;width:30px;height:30px;border-radius:7px;cursor:pointer;font-size:1rem">✕</button>
+    </div>
+    <div style="padding:12px 20px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <label style="font-size:0.78rem;font-weight:600;color:#6b7280">Filtrar por obra:</label>
+      <select id="stock-hist-obra" class="stock-inp" style="max-width:280px" onchange="stockHistRender()"></select>
+    </div>
+    <div id="stock-hist-list" style="padding:0 20px 24px;max-height:60vh;overflow-y:auto"></div>
+  </div>
+</div>
+
 <style>
 .stock-row{display:grid;grid-template-columns:1fr auto auto auto;gap:10px;align-items:center;background:#fff;border:1.5px solid #e5e7eb;border-radius:10px;padding:12px 14px;margin-bottom:8px}
 .stock-row.low{border-color:#fecaca;background:#fef2f2}
 .stock-inp{width:100%;border:1.5px solid #e5e7eb;border-radius:7px;padding:8px 10px;font-size:0.88rem;font-family:inherit;box-sizing:border-box}
 .stock-lbl{font-size:0.72rem;font-weight:600;color:#6b7280;display:block;margin-bottom:3px}
 .stock-qbtn{width:30px;height:30px;border:none;border-radius:7px;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0}
+.stock-mbtn{border:none;border-radius:7px;font-size:0.74rem;font-weight:700;cursor:pointer;font-family:inherit;padding:7px 9px;white-space:nowrap}
+@media(max-width:640px){.stock-row{grid-template-columns:1fr auto;row-gap:8px}.stock-mbtn{font-size:0.7rem;padding:6px 7px}}
 </style>
 
 <!-- =====================================================
@@ -3852,21 +3869,111 @@ function stockRender() {
     return '<div class="stock-row'+(isLow?' low':'')+'">' +
       '<div style="min-width:0"><div style="font-weight:700;color:#1a1a2e;font-size:0.95rem">'+escHtml(m.nome)+(isLow?' <span style="background:#fee2e2;color:#b91c1c;border-radius:20px;padding:1px 8px;font-size:0.66rem;font-weight:700">BAIXO</span>':'')+'</div>' +
         '<div style="font-size:0.74rem;color:#9ca3af">'+escHtml(m.categoria||'—')+(m.fornecedor?' · '+escHtml(m.fornecedor):'')+' · mín: '+min+' '+escHtml(m.unidade||'')+'</div></div>' +
-      '<div style="display:flex;align-items:center;gap:6px">' +
-        '<button class="stock-qbtn" style="background:#fee2e2;color:#b91c1c" onclick="stockAjustar('+qq+m.id+qq+',-1)">−</button>' +
-        '<div style="text-align:center;min-width:54px"><div style="font-family:\'Oswald\',sans-serif;font-size:1.15rem;font-weight:800;color:'+(isLow?'#b91c1c':'#1a1a2e')+'">'+qtd+'</div><div style="font-size:0.62rem;color:#9ca3af">'+escHtml(m.unidade||'un')+'</div></div>' +
-        '<button class="stock-qbtn" style="background:#d1fae5;color:#065f46" onclick="stockAjustar('+qq+m.id+qq+',1)">+</button>' +
+      '<div style="text-align:center;min-width:54px"><div style="font-family:\'Oswald\',sans-serif;font-size:1.15rem;font-weight:800;color:'+(isLow?'#b91c1c':'#1a1a2e')+'">'+qtd+'</div><div style="font-size:0.62rem;color:#9ca3af">'+escHtml(m.unidade||'un')+'</div></div>' +
+      '<div style="display:flex;gap:4px">' +
+        '<button class="stock-mbtn" style="background:#d1fae5;color:#065f46" onclick="stockAbrirMov('+qq+m.id+qq+','+qq+'entrada'+qq+')">↓ Entrada</button>' +
+        '<button class="stock-mbtn" style="background:#fef3c7;color:#92400e" onclick="stockAbrirMov('+qq+m.id+qq+','+qq+'saida'+qq+')">↑ Saída</button>' +
       '</div>' +
-      '<button class="stock-qbtn" style="background:#f3f4f6;color:#374151" onclick="stockAbrirForm('+qq+m.id+qq+')" title="Editar">✏️</button>' +
-      '<button class="stock-qbtn" style="background:#f3f4f6;color:#b91c1c" onclick="stockEliminar('+qq+m.id+qq+')" title="Eliminar">🗑️</button>' +
+      '<div style="display:flex;gap:4px">' +
+        '<button class="stock-qbtn" style="background:#f3f4f6;color:#374151" onclick="stockAbrirForm('+qq+m.id+qq+')" title="Editar">✏️</button>' +
+        '<button class="stock-qbtn" style="background:#f3f4f6;color:#b91c1c" onclick="stockEliminar('+qq+m.id+qq+')" title="Eliminar">🗑️</button>' +
+      '</div>' +
     '</div>';
   }).join('');
 }
 
-function stockAjustar(id, delta) {
+// Obras (ligadas ao separador Obras — store inf_obras_v1)
+function stockObras() { try { return JSON.parse(localStorage.getItem('inf_obras_v1')||'[]'); } catch(e) { return []; } }
+function stockObraLabel(o) { return ((o.numero?o.numero+' — ':'')+(o.clientName||o.nome||'Obra')); }
+
+// Abre o formulário de movimento (entrada ou saída). Na saída pede a obra.
+function stockAbrirMov(id, tipo) {
+  var m = stockLoad().find(function(x){ return x.id===id; }); if (!m) return;
+  var isSaida = tipo === 'saida';
+  document.getElementById('stock-modal-title').textContent = (isSaida?'Saída':'Entrada')+' — '+m.nome;
+  var today = new Date().toISOString().slice(0,10);
+  var obras = stockObras();
+  var obraSel = '';
+  if (isSaida) {
+    if (!obras.length) {
+      obraSel = '<div style="margin-bottom:10px"><label class="stock-lbl">Obra</label>' +
+        '<div style="font-size:0.8rem;color:#b91c1c;background:#fef2f2;border:1.5px solid #fecaca;border-radius:8px;padding:8px 10px">Ainda não há obras. Cria uma no separador <strong>Obras</strong>.</div></div>';
+    } else {
+      obraSel = '<div style="margin-bottom:10px"><label class="stock-lbl">Obra (para onde sai) *</label>' +
+        '<select id="stk-mov-obra" class="stock-inp"><option value="">— escolher obra —</option>' +
+        obras.map(function(o){ return '<option value="'+o.id+'">'+stockEscAttr(stockObraLabel(o))+'</option>'; }).join('') +
+        '</select></div>';
+    }
+  }
+  document.getElementById('stock-modal-body').innerHTML =
+    '<div style="background:#f9fafb;border:1.5px solid #e5e7eb;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:0.82rem;color:#374151">Em stock: <strong>'+(parseFloat(m.qtd)||0)+' '+escHtml(m.unidade||'un')+'</strong></div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">' +
+      '<div><label class="stock-lbl">Quantidade *</label><input id="stk-mov-qtd" type="number" step="0.01" min="0.01" class="stock-inp" placeholder="0"></div>' +
+      '<div><label class="stock-lbl">Data</label><input id="stk-mov-data" type="date" class="stock-inp" value="'+today+'"></div>' +
+    '</div>' +
+    obraSel +
+    '<div style="margin-bottom:16px"><label class="stock-lbl">Nota (opcional)</label><input id="stk-mov-nota" class="stock-inp" placeholder="Ex: receção de fornecedor / aplicado na obra"></div>' +
+    '<div style="display:flex;gap:8px">' +
+      '<button onclick="stockFecharForm()" style="flex:1;background:#f3f4f6;color:#374151;border:none;border-radius:8px;padding:10px;font-weight:700;cursor:pointer;font-family:inherit">Cancelar</button>' +
+      '<button onclick="stockGuardarMov('+qStr(id)+','+qStr(tipo)+')" style="flex:2;background:'+(isSaida?'#d97706':'#16a34a')+';color:#fff;border:none;border-radius:8px;padding:10px;font-weight:700;cursor:pointer;font-family:inherit">Registar '+(isSaida?'Saída':'Entrada')+'</button>' +
+    '</div>';
+  document.getElementById('stock-modal-overlay').style.display = 'flex';
+}
+
+function stockGuardarMov(id, tipo) {
   var items = stockLoad(), m = items.find(function(x){ return x.id===id; }); if (!m) return;
-  m.qtd = Math.max(0, (parseFloat(m.qtd)||0) + delta);
-  stockSave(items); stockRender();
+  var qtd = parseFloat(document.getElementById('stk-mov-qtd').value);
+  if (!qtd || qtd <= 0) { alert('Indique uma quantidade válida.'); return; }
+  var isSaida = tipo === 'saida';
+  var mov = { id:'mov_'+Date.now().toString(36)+Math.random().toString(36).slice(2,4), tipo:tipo, qtd:qtd, data:document.getElementById('stk-mov-data').value, nota:(document.getElementById('stk-mov-nota').value||'').trim(), ts:new Date().toISOString() };
+  if (isSaida) {
+    var sel = document.getElementById('stk-mov-obra');
+    if (sel) {
+      if (!sel.value) { alert('Escolha a obra para onde sai o material.'); return; }
+      var o = stockObras().find(function(x){ return x.id===sel.value; });
+      mov.obraId = sel.value; mov.obraNome = o ? stockObraLabel(o) : '';
+    }
+    if (qtd > (parseFloat(m.qtd)||0) && !confirm('A saída ('+qtd+') é maior que o stock atual ('+(parseFloat(m.qtd)||0)+'). Continuar?')) return;
+    m.qtd = Math.max(0, (parseFloat(m.qtd)||0) - qtd);
+  } else {
+    m.qtd = (parseFloat(m.qtd)||0) + qtd;
+  }
+  m.movimentos = m.movimentos || [];
+  m.movimentos.push(mov);
+  stockSave(items); stockFecharForm(); stockRender();
+  premToast('✅ '+(isSaida?'Saída':'Entrada')+' registada: '+qtd+' '+(m.unidade||'un'));
+}
+
+// Histórico global de movimentos (com filtro por obra) — saídas ligadas às obras
+function stockHistGlobal() {
+  var sel = document.getElementById('stock-hist-obra');
+  var obras = stockObras();
+  sel.innerHTML = '<option value="">Todas</option><option value="__entradas">Só entradas</option>' +
+    obras.map(function(o){ return '<option value="'+o.id+'">'+stockEscAttr(stockObraLabel(o))+'</option>'; }).join('');
+  stockHistRender();
+  document.getElementById('stock-hist-overlay').style.display = 'flex';
+}
+function stockHistFechar() { var ov=document.getElementById('stock-hist-overlay'); if (ov) ov.style.display='none'; }
+function stockHistRender() {
+  var filtro = (document.getElementById('stock-hist-obra')||{}).value || '';
+  var movs = [];
+  stockLoad().forEach(function(m){
+    (m.movimentos||[]).forEach(function(mv){ movs.push(Object.assign({ material:m.nome, unidade:m.unidade||'un' }, mv)); });
+  });
+  movs.sort(function(a,b){ return (b.ts||'').localeCompare(a.ts||''); });
+  if (filtro === '__entradas') movs = movs.filter(function(mv){ return mv.tipo==='entrada'; });
+  else if (filtro) movs = movs.filter(function(mv){ return mv.obraId===filtro; });
+  var el = document.getElementById('stock-hist-list');
+  if (!movs.length) { el.innerHTML='<div style="text-align:center;padding:32px;color:#9ca3af;font-size:0.88rem">Sem movimentos.</div>'; return; }
+  el.innerHTML = movs.map(function(mv){
+    var isS = mv.tipo==='saida';
+    var dt = mv.data ? new Date(mv.data+'T12:00').toLocaleDateString('pt-PT') : '—';
+    return '<div style="display:flex;align-items:center;gap:10px;border-bottom:1px solid #f3f4f6;padding:10px 0">' +
+      '<div style="width:34px;height:34px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1rem;background:'+(isS?'#fef3c7':'#d1fae5')+';color:'+(isS?'#92400e':'#065f46')+'">'+(isS?'↑':'↓')+'</div>' +
+      '<div style="flex:1;min-width:0"><div style="font-weight:700;font-size:0.9rem;color:#1a1a2e">'+escHtml(mv.material)+' · '+(isS?'-':'+')+mv.qtd+' '+escHtml(mv.unidade)+'</div>' +
+      '<div style="font-size:0.74rem;color:#9ca3af">'+dt+(isS&&mv.obraNome?' · Obra: '+escHtml(mv.obraNome):'')+(mv.nota?' · '+escHtml(mv.nota):'')+'</div></div>' +
+    '</div>';
+  }).join('');
 }
 
 function stockAbrirForm(id) {
