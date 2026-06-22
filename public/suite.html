@@ -1059,7 +1059,7 @@ textarea.si-input { resize: vertical; min-height: 64px; }
   <button data-section="orcamentos" onclick="suiteShowSection('orcamentos', this)">📄 Orçamentos</button>
   <button data-section="obras" onclick="suiteShowSection('obras', this)">🏗️ Obras</button>
   <button data-section="adiantamentos" onclick="suiteShowSection('adiantamentos', this)">💵 Adiantamentos</button>
-  <button data-section="lembretes" onclick="suiteShowSection('lembretes', this)">📌 Lembretes</button>
+  <button data-section="stock" onclick="suiteShowSection('stock', this)">📦 Stock</button>
   <button data-section="instrucoes" onclick="suiteShowSection('instrucoes', this)">📋 Instruções</button>
   <button data-section="personalizacao" onclick="suiteShowSection('personalizacao', this)">⚙️ Personalização</button>
 </nav>
@@ -1989,6 +1989,49 @@ textarea.si-input { resize: vertical; min-height: 64px; }
 </style>
 
 <!-- =====================================================
+     SECÇÃO: STOCK / MATERIAIS DE CONSTRUÇÃO
+     ===================================================== -->
+<div id="section-stock" class="suite-section">
+  <div style="padding:20px 24px 56px;max-width:1100px;margin:0 auto">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;flex-wrap:wrap">
+      <div style="width:48px;height:48px;border-radius:14px;background:#1a1a2e;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">📦</div>
+      <div style="flex:1;min-width:0">
+        <h2 style="font-family:'Oswald',sans-serif;font-size:1.45rem;font-weight:700;color:#1a1a2e;margin:0">Stock de Materiais</h2>
+        <div style="font-size:0.78rem;color:#9ca3af">Controlo de materiais de construção</div>
+      </div>
+      <button onclick="stockAbrirForm()" style="background:#d97706;color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">➕ Novo Material</button>
+    </div>
+    <div id="stock-summary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px"></div>
+    <div style="margin-bottom:14px">
+      <input type="text" id="stock-search" oninput="stockRender()" placeholder="Pesquisar material ou categoria..." style="width:100%;max-width:360px;border:1.5px solid #e5e7eb;border-radius:8px;padding:9px 12px;font-size:0.88rem;font-family:inherit;box-sizing:border-box">
+    </div>
+    <div id="stock-list"></div>
+    <div id="stock-empty" style="display:none;text-align:center;padding:56px 16px;color:#9ca3af">
+      <div style="font-size:2.5rem;margin-bottom:10px">📦</div>
+      <div>Sem materiais registados.<br>Clica em <strong>Novo Material</strong> para começar.</div>
+    </div>
+  </div>
+</div>
+
+<div id="stock-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9200;align-items:flex-start;justify-content:center;overflow-y:auto;padding:24px 16px">
+  <div style="background:#fff;width:100%;max-width:480px;border-radius:16px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,0.35);margin:auto">
+    <div style="background:linear-gradient(135deg,#1a1a2e,#2d1b69);padding:18px 20px;display:flex;align-items:center;justify-content:space-between">
+      <div id="stock-modal-title" style="font-family:'Oswald',sans-serif;font-size:1.2rem;font-weight:800;color:#fff">Novo Material</div>
+      <button onclick="stockFecharForm()" style="background:rgba(255,255,255,0.15);border:none;color:#fff;width:30px;height:30px;border-radius:7px;cursor:pointer;font-size:1rem">✕</button>
+    </div>
+    <div style="padding:20px" id="stock-modal-body"></div>
+  </div>
+</div>
+
+<style>
+.stock-row{display:grid;grid-template-columns:1fr auto auto auto;gap:10px;align-items:center;background:#fff;border:1.5px solid #e5e7eb;border-radius:10px;padding:12px 14px;margin-bottom:8px}
+.stock-row.low{border-color:#fecaca;background:#fef2f2}
+.stock-inp{width:100%;border:1.5px solid #e5e7eb;border-radius:7px;padding:8px 10px;font-size:0.88rem;font-family:inherit;box-sizing:border-box}
+.stock-lbl{font-size:0.72rem;font-weight:600;color:#6b7280;display:block;margin-bottom:3px}
+.stock-qbtn{width:30px;height:30px;border:none;border-radius:7px;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0}
+</style>
+
+<!-- =====================================================
      SECÇÃO: INSTRUÇÕES (bloco de notas)
      ===================================================== -->
 <div id="section-instrucoes" class="suite-section">
@@ -2758,6 +2801,10 @@ function suiteShowSection(id, btn) {
   // Init equipa
   if (id === 'equipa') {
     eqInit();
+  }
+  // Init stock de materiais
+  if (id === 'stock') {
+    stockInit();
   }
   // Init orçamentos
   if (id === 'orcamentos') {
@@ -3768,6 +3815,109 @@ function premToast(msg, warn) {
 // ============================================================
 var VALES_KEY = 'inf_vales_v1';
 var EQ_FICHA_ID = null;
+
+// =============================================================================
+// STOCK DE MATERIAIS DE CONSTRUÇÃO
+// =============================================================================
+var STOCK_KEY = 'inf_stock_v1';
+var STOCK_UNITS = ['un','saco','kg','m','m²','m³','L','cx','palete','rolo'];
+function stockLoad() { try { return JSON.parse(localStorage.getItem(STOCK_KEY)||'[]'); } catch(e) { return []; } }
+function stockSave(v) { localStorage.setItem(STOCK_KEY, JSON.stringify(v)); }
+function stockInit() { stockRender(); }
+function stockEscAttr(s) { return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+
+function stockCard(label, val, color) {
+  return '<div style="background:#fff;border:1.5px solid #e5e7eb;border-radius:12px;padding:14px;text-align:center">' +
+    '<div style="font-family:\'Oswald\',sans-serif;font-size:1.6rem;font-weight:800;color:'+color+'">'+val+'</div>' +
+    '<div style="font-size:0.66rem;color:#9ca3af;text-transform:uppercase;font-weight:600;margin-top:2px">'+label+'</div></div>';
+}
+
+function stockRender() {
+  var list = document.getElementById('stock-list'); if (!list) return;
+  var empty = document.getElementById('stock-empty');
+  var items = stockLoad();
+  var q = ((document.getElementById('stock-search')||{}).value||'').toLowerCase();
+  var low = items.filter(function(m){ return (parseFloat(m.qtd)||0) <= (parseFloat(m.minimo)||0); });
+  var sum = document.getElementById('stock-summary');
+  if (sum) sum.innerHTML = stockCard('Materiais', items.length, '#1a1a2e') + stockCard('Em falta', low.length, low.length?'#b91c1c':'#16a34a');
+
+  var filtered = items.filter(function(m){ return !q || (m.nome||'').toLowerCase().indexOf(q)>=0 || (m.categoria||'').toLowerCase().indexOf(q)>=0; });
+  if (!items.length) { list.innerHTML=''; if (empty) empty.style.display=''; return; }
+  if (empty) empty.style.display='none';
+  if (!filtered.length) { list.innerHTML='<div style="text-align:center;padding:32px;color:#9ca3af;font-size:0.88rem">Nada encontrado.</div>'; return; }
+  filtered.sort(function(a,b){ return (a.nome||'').localeCompare(b.nome||'','pt'); });
+  var qq = '\x27';
+  list.innerHTML = filtered.map(function(m) {
+    var qtd = parseFloat(m.qtd)||0, min = parseFloat(m.minimo)||0, isLow = qtd<=min;
+    return '<div class="stock-row'+(isLow?' low':'')+'">' +
+      '<div style="min-width:0"><div style="font-weight:700;color:#1a1a2e;font-size:0.95rem">'+escHtml(m.nome)+(isLow?' <span style="background:#fee2e2;color:#b91c1c;border-radius:20px;padding:1px 8px;font-size:0.66rem;font-weight:700">BAIXO</span>':'')+'</div>' +
+        '<div style="font-size:0.74rem;color:#9ca3af">'+escHtml(m.categoria||'—')+(m.fornecedor?' · '+escHtml(m.fornecedor):'')+' · mín: '+min+' '+escHtml(m.unidade||'')+'</div></div>' +
+      '<div style="display:flex;align-items:center;gap:6px">' +
+        '<button class="stock-qbtn" style="background:#fee2e2;color:#b91c1c" onclick="stockAjustar('+qq+m.id+qq+',-1)">−</button>' +
+        '<div style="text-align:center;min-width:54px"><div style="font-family:\'Oswald\',sans-serif;font-size:1.15rem;font-weight:800;color:'+(isLow?'#b91c1c':'#1a1a2e')+'">'+qtd+'</div><div style="font-size:0.62rem;color:#9ca3af">'+escHtml(m.unidade||'un')+'</div></div>' +
+        '<button class="stock-qbtn" style="background:#d1fae5;color:#065f46" onclick="stockAjustar('+qq+m.id+qq+',1)">+</button>' +
+      '</div>' +
+      '<button class="stock-qbtn" style="background:#f3f4f6;color:#374151" onclick="stockAbrirForm('+qq+m.id+qq+')" title="Editar">✏️</button>' +
+      '<button class="stock-qbtn" style="background:#f3f4f6;color:#b91c1c" onclick="stockEliminar('+qq+m.id+qq+')" title="Eliminar">🗑️</button>' +
+    '</div>';
+  }).join('');
+}
+
+function stockAjustar(id, delta) {
+  var items = stockLoad(), m = items.find(function(x){ return x.id===id; }); if (!m) return;
+  m.qtd = Math.max(0, (parseFloat(m.qtd)||0) + delta);
+  stockSave(items); stockRender();
+}
+
+function stockAbrirForm(id) {
+  var m = id ? stockLoad().find(function(x){ return x.id===id; }) : { id:'', nome:'', categoria:'', unidade:'un', qtd:0, minimo:0, fornecedor:'', notas:'' };
+  if (!m) return;
+  document.getElementById('stock-modal-title').textContent = id ? 'Editar Material' : 'Novo Material';
+  var unitOpts = STOCK_UNITS.map(function(u){ return '<option value="'+u+'"'+(m.unidade===u?' selected':'')+'>'+u+'</option>'; }).join('');
+  document.getElementById('stock-modal-body').innerHTML =
+    '<div style="margin-bottom:10px"><label class="stock-lbl">Nome do material *</label><input id="stk-nome" class="stock-inp" value="'+stockEscAttr(m.nome)+'" placeholder="Ex: Cimento 25kg"></div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">' +
+      '<div><label class="stock-lbl">Categoria</label><input id="stk-cat" class="stock-inp" value="'+stockEscAttr(m.categoria)+'" placeholder="Ex: Cimentos"></div>' +
+      '<div><label class="stock-lbl">Unidade</label><select id="stk-un" class="stock-inp">'+unitOpts+'</select></div>' +
+    '</div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">' +
+      '<div><label class="stock-lbl">Quantidade atual</label><input id="stk-qtd" type="number" step="0.01" min="0" class="stock-inp" value="'+(m.qtd||0)+'"></div>' +
+      '<div><label class="stock-lbl">Stock mínimo</label><input id="stk-min" type="number" step="0.01" min="0" class="stock-inp" value="'+(m.minimo||0)+'"></div>' +
+    '</div>' +
+    '<div style="margin-bottom:10px"><label class="stock-lbl">Fornecedor (opcional)</label><input id="stk-forn" class="stock-inp" value="'+stockEscAttr(m.fornecedor)+'" placeholder="Ex: Leroy Merlin"></div>' +
+    '<div style="margin-bottom:16px"><label class="stock-lbl">Notas (opcional)</label><input id="stk-notas" class="stock-inp" value="'+stockEscAttr(m.notas)+'"></div>' +
+    '<div style="display:flex;gap:8px">' +
+      '<button onclick="stockFecharForm()" style="flex:1;background:#f3f4f6;color:#374151;border:none;border-radius:8px;padding:10px;font-weight:700;cursor:pointer;font-family:inherit">Cancelar</button>' +
+      '<button onclick="stockGuardar('+(id?(qStr(id)):'')+')" style="flex:2;background:#d97706;color:#fff;border:none;border-radius:8px;padding:10px;font-weight:700;cursor:pointer;font-family:inherit">Guardar</button>' +
+    '</div>';
+  document.getElementById('stock-modal-overlay').style.display = 'flex';
+}
+function qStr(s){ return '\x27'+s+'\x27'; }
+function stockFecharForm() { var ov = document.getElementById('stock-modal-overlay'); if (ov) ov.style.display='none'; }
+
+function stockGuardar(id) {
+  var nome = (document.getElementById('stk-nome').value||'').trim();
+  if (!nome) { alert('O nome do material é obrigatório.'); return; }
+  var dados = {
+    nome: nome,
+    categoria: (document.getElementById('stk-cat').value||'').trim(),
+    unidade: document.getElementById('stk-un').value,
+    qtd: parseFloat(document.getElementById('stk-qtd').value)||0,
+    minimo: parseFloat(document.getElementById('stk-min').value)||0,
+    fornecedor: (document.getElementById('stk-forn').value||'').trim(),
+    notas: (document.getElementById('stk-notas').value||'').trim()
+  };
+  var items = stockLoad();
+  if (id) { Object.assign(items.find(function(x){ return x.id===id; }), dados); }
+  else { items.push(Object.assign({ id:'stk_'+Date.now().toString(36)+Math.random().toString(36).slice(2,5) }, dados)); }
+  stockSave(items); stockFecharForm(); stockRender();
+}
+
+function stockEliminar(id) {
+  if (!confirm('Eliminar este material?')) return;
+  stockSave(stockLoad().filter(function(x){ return x.id!==id; }));
+  stockRender();
+}
 
 function eqLoad() { try { return JSON.parse(localStorage.getItem(VALES_KEY)||'[]'); } catch(e) { return []; } }
 function eqSave(v) { localStorage.setItem(VALES_KEY, JSON.stringify(v)); }
