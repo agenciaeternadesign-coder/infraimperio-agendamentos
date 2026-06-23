@@ -2837,11 +2837,20 @@ textarea.si-input { resize: vertical; min-height: 64px; }
         return;
       }
       var changed = false;
+      var remoteKeys = new Set();
       (r.data || []).forEach(function (row) {
         if (!row.key || !row.value) return;
+        remoteKeys.add(row.key);
         var local = localStorage.getItem(row.key);
         if (local !== row.value) {
           try { localStorage.setItem(row.key, row.value); changed = true; } catch (e) {}
+        }
+      });
+      // Subir dados locais que ainda não estão na cloud (primeira sincronização)
+      SYNC_KEYS.forEach(function (key) {
+        if (!remoteKeys.has(key)) {
+          var local = localStorage.getItem(key);
+          if (local) window._suiteDbPush(key, local);
         }
       });
       if (statusEl) { statusEl.textContent = '☁ sincronizado'; statusEl.style.color = '#2f9e44'; }
