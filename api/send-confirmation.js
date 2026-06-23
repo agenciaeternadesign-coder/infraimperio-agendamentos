@@ -44,7 +44,11 @@ export default async function handler(req, res) {
   const hora   = visit.time || 'a confirmar'
   const nome   = (visit.clientName || '').split(' ')[0]
   const kind   = body.kind || 'confirmacao'
-  const contacto = 'Para qualquer dúvida: 214 098 779 ou WhatsApp https://wa.me/351936279926. Até breve!'
+  // Empresa config — pode vir no body (white-label) ou usa fallback de env/default
+  const empresa     = body.empresa || {}
+  const telContacto = empresa.tel      || process.env.EMPRESA_TEL      || '214 098 779'
+  const waNumero    = empresa.whatsapp || process.env.EMPRESA_WHATSAPP || '351936279926'
+  const contacto    = `Para qualquer dúvida: ${telContacto} ou WhatsApp https://wa.me/${waNumero}. Até breve!`
 
   const text = kind === 'horario'
     ? `Olá, ${nome}! O horário da nossa visita para o orçamento foi confirmado para o dia ${data}, às ${hora}, em ${morada}. Teremos todo o gosto em ajudar.\n\n${contacto}`

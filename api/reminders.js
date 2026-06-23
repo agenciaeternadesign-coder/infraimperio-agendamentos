@@ -36,6 +36,22 @@ export default async function handler(req, res) {
   const in1 = dateStr(1)
   const headers = { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}` }
 
+  // Ler config da empresa do Supabase (suite_kv) para white-label
+  let empresa = {}
+  try {
+    const kvUrl = `${SUPA_URL}/rest/v1/suite_kv?key=eq.infraimperio_recibos_v1&select=value`
+    const kvRes = await fetch(kvUrl, { headers })
+    const kvData = await kvRes.json()
+    if (Array.isArray(kvData) && kvData[0]?.value) {
+      const parsed = JSON.parse(kvData[0].value)
+      empresa = parsed.empresa || {}
+    }
+  } catch (e) { /* usa defaults */ }
+
+  const empNome     = empresa.nome      || process.env.EMPRESA_NOME      || 'Infraimperio'
+  const empTel      = empresa.tel       || process.env.EMPRESA_TEL       || '214 098 779'
+  const empWa       = empresa.whatsapp  || process.env.EMPRESA_WHATSAPP  || '351936279926'
+
   let rows = []
   try {
     const url = `${SUPA_URL}/rest/v1/visits?select=id,data&or=(data->>date.eq.${in3},data->>date.eq.${in1})`
@@ -60,7 +76,7 @@ export default async function handler(req, res) {
     const addr = v.address || {}
     const morada = `${addr.street || ''} ${addr.number || ''}, ${addr.city || ''}`.replace(/\s+/g, ' ').trim()
     const hora = v.time || 'a confirmar'
-    const text = `Ola ${nome}! Lembrete: a sua visita de orcamento com a Infraimperio e ${when} (${fmtDatePT(v.date)} as ${hora}) em ${morada}. Duvidas: ligue +351 214 098 779 ou WhatsApp https://wa.me/351936279926 . Ate breve!`
+    const text = `Ola ${nome}! Lembrete: a sua visita de orcamento com a ${empNome} e ${when} (${fmtDatePT(v.date)} as ${hora}) em ${morada}. Duvidas: ligue +351 ${empTel} ou WhatsApp https://wa.me/${empWa} . Ate breve!`
     const form = new URLSearchParams({
       To: normalizePhone(v.clientPhone),
       From: FROM,
