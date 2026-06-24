@@ -72,13 +72,18 @@ export default async function handler(req, res) {
     else continue
     if (v.smsSent && v.smsSent[key]) continue // já enviado
 
+    const TITULOS = new Set(['sr', 'sra', 'dr', 'dra', 'prof', 'eng'])
     const nomeRaw = (v.clientName || v.name || '').trim()
-    const nome    = nomeRaw.split(' ')[0]
+    const palavras = nomeRaw.split(/\s+/).filter(Boolean)
+    const nome    = palavras.find(p => !TITULOS.has(p.toLowerCase().replace(/\.$/, ''))) || ''
     const addr    = v.address || {}
-    const morada  = `${addr.street || ''} ${addr.number || ''}, ${addr.city || ''}`.replace(/\s+/g, ' ').trim()
-    const hora    = v.time || 'a confirmar'
-    const saudacao = nome ? `Ola ${nome}! ` : ''
-    const text = `${saudacao}Lembrete: a sua visita de orcamento esta marcada para ${when} (${fmtDatePT(v.date)} as ${hora}) em ${morada}. Teremos todo o gosto em ajuda-lo. Duvidas: ${empTel} ou WhatsApp https://wa.me/${empWa} . Ate breve!`
+    const moradaParts = [addr.street, addr.number, addr.city].filter(Boolean)
+    const morada  = moradaParts.length ? moradaParts.join(' ').replace(/\s+/g, ' ').trim() : ''
+    const hora    = v.time || ''
+    const saudacao  = nome   ? `Ola ${nome}! ` : ''
+    const horaTexto = hora   ? ` as ${hora}` : ''
+    const moradaTexto = morada ? `, na ${morada}` : ''
+    const text = `${saudacao}Lembrete: a sua visita de orcamento esta marcada para ${when} (${fmtDatePT(v.date)}${horaTexto})${moradaTexto}. Teremos todo o gosto em ajuda-lo. Duvidas: ${empTel} ou WhatsApp https://wa.me/${empWa}. Ate breve!`
     const form = new URLSearchParams({
       To: normalizePhone(v.clientPhone),
       From: FROM,
