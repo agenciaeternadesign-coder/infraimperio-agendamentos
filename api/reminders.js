@@ -72,10 +72,12 @@ export default async function handler(req, res) {
     else continue
     if (v.smsSent && v.smsSent[key]) continue // já enviado
 
-    const TITULOS = new Set(['sr', 'sra', 'dr', 'dra', 'prof', 'eng'])
-    const nomeRaw = (v.clientName || v.name || '').trim()
+    const TITULOS_MAP = { 'sr.': 'Sr.', 'sra.': 'Sra.', 'dr.': 'Dr.', 'dra.': 'Dra.', 'prof.': 'Prof.', 'eng.': 'Eng.' }
+    const nomeRaw  = (v.clientName || v.name || '').trim()
     const palavras = nomeRaw.split(/\s+/).filter(Boolean)
-    const nome    = palavras.find(p => !TITULOS.has(p.toLowerCase().replace(/\.$/, ''))) || ''
+    const p0lower  = (palavras[0] || '').toLowerCase()
+    const tratamento   = TITULOS_MAP[p0lower] || ''
+    const primeiroNome = tratamento ? (palavras[1] || '') : (palavras[0] || '')
     const addr    = v.address || {}
     const moradaPartes = [
       [addr.street, addr.number].filter(Boolean).join(' '),
@@ -84,11 +86,29 @@ export default async function handler(req, res) {
       addr.postalCode,
     ].filter(Boolean)
     const morada  = moradaPartes.length ? moradaPartes.join(', ').replace(/\s+/g, ' ').trim() : ''
-    const hora    = v.time || ''
-    const saudacao  = nome   ? `Ola ${nome}! ` : ''
-    const horaTexto = hora   ? ` as ${hora}` : ''
-    const moradaTexto = morada ? `, na ${morada}` : ''
-    const text = `${saudacao}Lembrete: a sua visita de orcamento esta marcada para ${when} (${fmtDatePT(v.date)}${horaTexto})${moradaTexto}. Teremos todo o gosto em ajuda-lo. Duvidas: ${empTel} ou WhatsApp https://wa.me/${empWa}. Ate breve!`
+    const hora    = v.time    || ''
+    const horaFim = v.timeEnd || ''
+    const WORK_LABELS = {
+      telhados: 'Telhados e Coberturas', claraboias: 'Claraboias', canalizacao: 'Canalizacao',
+      carpintaria: 'Carpintaria', eletricidade: 'Eletricidade', estores: 'Estores e Persianas',
+      isolamento: 'Isolamento', manutencao: 'Manutencao', montagens: 'Montagens',
+      coluna_agua: 'Coluna de Agua de Predios', obras_construcao: 'Obras e Construcao',
+      pavimentos: 'Pavimentos', pintura: 'Pintura', piscinas: 'Piscinas',
+      reabilitacao: 'Reabilitacao', remodelacoes: 'Remodelacoes', serralharia: 'Serralharia',
+      vidros: 'Vidros e Janelas', pladur: 'Obras em Pladur',
+    }
+    const tipoObra = (v.workType === 'outro' && v.workTypeOther?.trim())
+      ? v.workTypeOther.trim()
+      : (WORK_LABELS[v.workType] || v.workType || '')
+    const saudacao    = tratamento && primeiroNome ? `${tratamento} ${primeiroNome}! `
+                      : primeiroNome               ? `${primeiroNome}! `
+                      : ''
+    const tipoTexto   = tipoObra ? `, para - ${tipoObra},` : ','
+    const horaTexto   = hora && horaFim ? `, entre as ${hora} e as ${horaFim},`
+                      : hora            ? `, a partir das ${hora},`
+                      : ''
+    const moradaTexto = morada ? ` na ${morada}.` : '.'
+    const text = `${saudacao}Lembrete: a sua visita de orcamento${tipoTexto} esta marcada para ${when} (${fmtDatePT(v.date)}${horaTexto})${moradaTexto}\nTeremos todo gosto em ajudar. Para qualquer esclarecimento adicional podera contactar-nos atraves do numero ${empTel} ou do whatsapp https://wa.me/${empWa}\nAte breve!`
     const form = new URLSearchParams({
       To: normalizePhone(v.clientPhone),
       From: FROM,

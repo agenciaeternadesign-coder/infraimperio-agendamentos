@@ -30,9 +30,10 @@ export default function VisitModal({ visit, onClose }) {
 
   const [twilioResult, setTwilioResult]   = useState(null)
   const [sendingTwilio, setSendingTwilio] = useState(false)
-  const [editDate, setEditDate] = useState(visit.date)
-  const [editTime, setEditTime] = useState(visit.time)
-  const [savedDT,  setSavedDT]  = useState(false)
+  const [editDate,    setEditDate]    = useState(visit.date)
+  const [editTime,    setEditTime]    = useState(visit.time)
+  const [editTimeEnd, setEditTimeEnd] = useState(visit.timeEnd || '')
+  const [savedDT,     setSavedDT]     = useState(false)
   const [smsDTStatus, setSmsDTStatus] = useState(null) // null | 'sending' | 'ok' | 'err'
 
   function handleStatusChange(e) {
@@ -45,8 +46,8 @@ export default function VisitModal({ visit, onClose }) {
 
   async function handleSaveDateTime() {
     if (!editDate) return
-    const updatedVisit = { ...visit, date: editDate, time: editTime || '' }
-    updateVisit(visit.id, { date: editDate, time: editTime || '' })
+    const updatedVisit = { ...visit, date: editDate, time: editTime || '', timeEnd: editTimeEnd || '' }
+    updateVisit(visit.id, { date: editDate, time: editTime || '', timeEnd: editTimeEnd || '' })
     setSavedDT(true)
     setTimeout(() => setSavedDT(false), 2000)
     // Envia SMS de remarcação ao cliente se tiver telemóvel
@@ -117,8 +118,12 @@ export default function VisitModal({ visit, onClose }) {
                   <input type="date" className="input text-sm" value={editDate} onChange={(e) => setEditDate(e.target.value)} />
                 </div>
                 <div className="w-28">
-                  <label className="block text-xs font-medium text-slate-600 mb-1">Hora</label>
+                  <label className="block text-xs font-medium text-slate-600 mb-1">Hora início</label>
                   <input type="time" className="input text-sm" value={editTime} onChange={(e) => setEditTime(e.target.value)} />
+                </div>
+                <div className="w-28">
+                  <label className="block text-xs font-medium text-slate-600 mb-1">Hora fim</label>
+                  <input type="time" className="input text-sm" value={editTimeEnd} onChange={(e) => setEditTimeEnd(e.target.value)} />
                 </div>
                 <button
                   onClick={handleSaveDateTime}

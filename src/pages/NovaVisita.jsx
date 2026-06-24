@@ -11,7 +11,7 @@ const WORK_TYPES = [
 ]
 
 const EMPTY_CLIENT = { salutation: '', name: '', phone: '', email: '', address: { street: '', number: '', floor: '', city: '', postalCode: '' }, workType: 'telhados', workTypeOther: '', notes: '' }
-const EMPTY_VISIT  = { date: todayString(), time: '09:00', address: { street: '', number: '', floor: '', city: '', postalCode: '' }, workType: 'telhados', workTypeOther: '', observations: '', status: 'agendado' }
+const EMPTY_VISIT  = { date: todayString(), time: '09:00', timeEnd: '', address: { street: '', number: '', floor: '', city: '', postalCode: '' }, workType: 'telhados', workTypeOther: '', observations: '', status: 'agendado' }
 
 export default function NovaVisita() {
   const { clients, addVisit, addClient, findDuplicateClient, getClientVisits } = useApp()
@@ -296,7 +296,7 @@ export default function NovaVisita() {
               <input className="input" type="date" value={visitForm.date} onChange={(e) => handleVisitChange('date', e.target.value)} required min={todayString()} />
             </div>
             <div>
-              <label className="label">Hora {noTime ? '' : '*'}</label>
+              <label className="label">Hora de início {noTime ? '' : '*'}</label>
               <input className="input" type="time" value={visitForm.time} onChange={(e) => handleVisitChange('time', e.target.value)} required={!noTime} disabled={noTime} />
               <label className="flex items-center gap-2 mt-2 text-xs text-slate-600 cursor-pointer select-none">
                 <input
@@ -307,6 +307,11 @@ export default function NovaVisita() {
                 />
                 Sem horário definido (ajustar depois na Rota do Dia)
               </label>
+            </div>
+            <div>
+              <label className="label">Hora de fim</label>
+              <input className="input" type="time" value={visitForm.timeEnd || ''} onChange={(e) => handleVisitChange('timeEnd', e.target.value)} disabled={noTime} />
+              <p className="mt-2 text-xs text-slate-400">Opcional — aparece no SMS ao cliente</p>
             </div>
             <div className="sm:col-span-2">
               <label className="label">Tipo de Obra</label>

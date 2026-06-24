@@ -39,6 +39,7 @@ export default async function handler(req, res) {
 
   const phone  = normalizePhone(visit.clientPhone)
   const addr   = visit.address || {}
+
   // Morada completa — rua + número + andar + cidade + código postal
   const moradaPartes = [
     [addr.street, addr.number].filter(Boolean).join(' '),
@@ -47,30 +48,57 @@ export default async function handler(req, res) {
     addr.postalCode,
   ].filter(Boolean)
   const morada = moradaPartes.length ? moradaPartes.join(', ').replace(/\s+/g, ' ').trim() : ''
-  const data   = formatDatePT(visit.date)
-  const hora   = visit.time || ''
-  // Nome — ignora títulos de cortesia na 1ª palavra
-  const TITULOS = new Set(['sr', 'sra', 'dr', 'dra', 'prof', 'eng'])
-  const nomeRaw = (visit.clientName || visit.name || '').trim()
+
+  const data    = formatDatePT(visit.date)
+  const hora    = visit.time    || ''
+  const horaFim = visit.timeEnd || ''
+
+  // Tratamento + primeiro nome a partir de clientName (ex: "Sra. Maria Silva")
+  const TITULOS_MAP = { 'sr.': 'Sr.', 'sra.': 'Sra.', 'dr.': 'Dr.', 'dra.': 'Dra.', 'prof.': 'Prof.', 'eng.': 'Eng.' }
+  const nomeRaw  = (visit.clientName || visit.name || '').trim()
   const palavras = nomeRaw.split(/\s+/).filter(Boolean)
-  const primeiroNome = palavras.find(p => !TITULOS.has(p.toLowerCase().replace(/\.$/, ''))) || ''
-  const kind   = body.kind || 'confirmacao'
+  const p0lower  = (palavras[0] || '').toLowerCase()
+  const tratamento   = TITULOS_MAP[p0lower] || ''
+  const primeiroNome = tratamento ? (palavras[1] || '') : (palavras[0] || '')
+
+  // Tipo de obra
+  const WORK_LABELS = {
+    telhados: 'Telhados e Coberturas', claraboias: 'Claraboias', canalizacao: 'Canalizacao',
+    carpintaria: 'Carpintaria', eletricidade: 'Eletricidade', estores: 'Estores e Persianas',
+    isolamento: 'Isolamento', manutencao: 'Manutencao', montagens: 'Montagens',
+    coluna_agua: 'Coluna de Agua de Predios', obras_construcao: 'Obras e Construcao',
+    pavimentos: 'Pavimentos', pintura: 'Pintura', piscinas: 'Piscinas',
+    reabilitacao: 'Reabilitacao', remodelacoes: 'Remodelacoes', serralharia: 'Serralharia',
+    vidros: 'Vidros e Janelas', pladur: 'Obras em Pladur',
+    remodelacao: 'Remodelacoes', construcao: 'Obras e Construcao', instalacoes: 'Instalacoes',
+  }
+  const tipoObra = (visit.workType === 'outro' && visit.workTypeOther?.trim())
+    ? visit.workTypeOther.trim()
+    : (WORK_LABELS[visit.workType] || visit.workType || '')
+
+  const kind = body.kind || 'confirmacao'
+
   // Empresa config — pode vir no body (white-label) ou usa fallback de env/default
   const empresa     = body.empresa || {}
   const telContacto = empresa.tel      || process.env.EMPRESA_TEL      || '214 098 779'
   const waNumero    = empresa.whatsapp || process.env.EMPRESA_WHATSAPP || '351936279926'
-  const contacto    = `Duvidas: ${telContacto} ou WhatsApp https://wa.me/${waNumero}. Ate breve!`
 
-  // Partes opcionais da mensagem
-  const saudacao    = primeiroNome ? `Ola ${primeiroNome}! ` : ''
-  const horaTexto   = hora   ? `, as ${hora}` : ''
-  const moradaTexto = morada ? `, na ${morada}` : ''
+  // Partes opcionais
+  const saudacao    = tratamento && primeiroNome ? `${tratamento} ${primeiroNome}! `
+                    : primeiroNome               ? `${primeiroNome}! `
+                    : ''
+  const tipoTexto   = tipoObra ? `, para - ${tipoObra},` : ','
+  const horaTexto   = hora && horaFim ? `, entre as ${hora} e as ${horaFim},`
+                    : hora            ? `, a partir das ${hora},`
+                    : ''
+  const moradaTexto = morada ? ` na ${morada}.` : '.'
+  const contacto    = `Para qualquer esclarecimento adicional podera contactar-nos atraves do numero ${telContacto} ou do whatsapp https://wa.me/${waNumero}`
 
   let text
   if (kind === 'remarcacao') {
-    text = `${saudacao}A sua visita de orcamento foi reagendada para o dia ${data}${horaTexto}${moradaTexto}. Teremos todo o gosto em ajuda-lo.\n\n${contacto}`
+    text = `${saudacao}A sua visita de orcamento${tipoTexto} foi reagendada para o dia ${data}${horaTexto}${moradaTexto}\nTeremos todo gosto em ajudar. ${contacto}\nAte breve!`
   } else {
-    text = `${saudacao}Esta confirmada a visita para orcamento no dia ${data}${horaTexto}${moradaTexto}. Teremos todo o gosto em ajuda-lo.\n\n${contacto}`
+    text = `${saudacao}Esta confirmada a visita para orcamento${tipoTexto} no dia ${data}${horaTexto}${moradaTexto}\nTeremos todo gosto em ajudar. ${contacto}\nAte breve!`
   }
 
   const form = new URLSearchParams({ To: phone, From: FROM, Body: text })
