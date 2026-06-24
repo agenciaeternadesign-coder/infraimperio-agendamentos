@@ -59,7 +59,7 @@ export default async function handler(req, res) {
   // Partes opcionais da mensagem
   const saudacao    = primeiroNome ? `Ola ${primeiroNome}! ` : ''
   const horaTexto   = hora   ? `, as ${hora}` : ''
-  const moradaTexto = morada ? `, em ${morada}` : ''
+  const moradaTexto = morada ? `, na ${morada}` : ''
 
   const text = `${saudacao}Esta confirmada a visita para orcamento no dia ${data}${horaTexto}${moradaTexto}. Teremos todo o gosto em ajuda-lo.\n\n${contacto}`
 
