@@ -39,9 +39,14 @@ export default async function handler(req, res) {
 
   const phone  = normalizePhone(visit.clientPhone)
   const addr   = visit.address || {}
-  // Morada — omite partes vazias
-  const moradaParts = [addr.street, addr.number, addr.city].filter(Boolean)
-  const morada = moradaParts.length ? moradaParts.join(' ').replace(/\s+/g, ' ').trim() : ''
+  // Morada completa — rua + número + andar + cidade + código postal
+  const moradaPartes = [
+    [addr.street, addr.number].filter(Boolean).join(' '),
+    addr.floor,
+    addr.city,
+    addr.postalCode,
+  ].filter(Boolean)
+  const morada = moradaPartes.length ? moradaPartes.join(', ').replace(/\s+/g, ' ').trim() : ''
   const data   = formatDatePT(visit.date)
   const hora   = visit.time || ''
   // Nome — ignora títulos de cortesia na 1ª palavra
@@ -61,7 +66,12 @@ export default async function handler(req, res) {
   const horaTexto   = hora   ? `, as ${hora}` : ''
   const moradaTexto = morada ? `, na ${morada}` : ''
 
-  const text = `${saudacao}Esta confirmada a visita para orcamento no dia ${data}${horaTexto}${moradaTexto}. Teremos todo o gosto em ajuda-lo.\n\n${contacto}`
+  let text
+  if (kind === 'remarcacao') {
+    text = `${saudacao}A sua visita de orcamento foi reagendada para o dia ${data}${horaTexto}${moradaTexto}. Teremos todo o gosto em ajuda-lo.\n\n${contacto}`
+  } else {
+    text = `${saudacao}Esta confirmada a visita para orcamento no dia ${data}${horaTexto}${moradaTexto}. Teremos todo o gosto em ajuda-lo.\n\n${contacto}`
+  }
 
   const form = new URLSearchParams({ To: phone, From: FROM, Body: text })
 

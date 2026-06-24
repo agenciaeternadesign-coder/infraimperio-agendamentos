@@ -5,6 +5,7 @@ import StatusBadge, { ConfirmBadge, CONFIRM_CONFIG, workTypeLabel } from './Stat
 import { formatDate } from '../utils/dateUtils'
 import {
   buildWhatsAppUrl, buildConfirmationMessage, buildReminderMessage, sendTwilioWhatsApp,
+  notifyConfirmationWebhook,
 } from '../utils/whatsappUtils'
 
 const STATUS_OPTIONS = [
@@ -32,6 +33,7 @@ export default function VisitModal({ visit, onClose }) {
   const [editDate, setEditDate] = useState(visit.date)
   const [editTime, setEditTime] = useState(visit.time)
   const [savedDT,  setSavedDT]  = useState(false)
+  const [smsDTStatus, setSmsDTStatus] = useState(null) // null | 'sending' | 'ok' | 'err'
 
   function handleStatusChange(e) {
     updateVisit(visit.id, { status: e.target.value })
@@ -41,12 +43,19 @@ export default function VisitModal({ visit, onClose }) {
     updateVisit(visit.id, { confirmStatus: e.target.value })
   }
 
-  function handleSaveDateTime() {
+  async function handleSaveDateTime() {
     if (!editDate) return
-    // Guarda a data mesmo sem hora (visitas "sem horário" ajustam-se depois na Rota).
+    const updatedVisit = { ...visit, date: editDate, time: editTime || '' }
     updateVisit(visit.id, { date: editDate, time: editTime || '' })
     setSavedDT(true)
     setTimeout(() => setSavedDT(false), 2000)
+    // Envia SMS de remarcação ao cliente se tiver telemóvel
+    if (visit.clientPhone) {
+      setSmsDTStatus('sending')
+      const r = await notifyConfirmationWebhook(updatedVisit, 'remarcacao')
+      setSmsDTStatus(r.success ? 'ok' : 'err')
+      setTimeout(() => setSmsDTStatus(null), 4000)
+    }
   }
 
   function handleDelete() {
@@ -114,11 +123,18 @@ export default function VisitModal({ visit, onClose }) {
                 <button
                   onClick={handleSaveDateTime}
                   className="btn-primary text-sm whitespace-nowrap"
+                  disabled={smsDTStatus === 'sending'}
                 >
-                  {savedDT ? '✓ Guardado' : 'Guardar'}
+                  {savedDT ? '✓ Guardado' : smsDTStatus === 'sending' ? 'A enviar SMS…' : 'Guardar'}
                 </button>
               </div>
             </div>
+            {smsDTStatus === 'ok' && (
+              <p className="text-xs text-green-600 mt-1">✓ SMS de remarcação enviado ao cliente.</p>
+            )}
+            {smsDTStatus === 'err' && (
+              <p className="text-xs text-red-500 mt-1">✗ Não foi possível enviar o SMS. Verifique o número.</p>
+            )}
           </div>
 
           {/* Info rows */}

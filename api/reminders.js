@@ -77,8 +77,13 @@ export default async function handler(req, res) {
     const palavras = nomeRaw.split(/\s+/).filter(Boolean)
     const nome    = palavras.find(p => !TITULOS.has(p.toLowerCase().replace(/\.$/, ''))) || ''
     const addr    = v.address || {}
-    const moradaParts = [addr.street, addr.number, addr.city].filter(Boolean)
-    const morada  = moradaParts.length ? moradaParts.join(' ').replace(/\s+/g, ' ').trim() : ''
+    const moradaPartes = [
+      [addr.street, addr.number].filter(Boolean).join(' '),
+      addr.floor,
+      addr.city,
+      addr.postalCode,
+    ].filter(Boolean)
+    const morada  = moradaPartes.length ? moradaPartes.join(', ').replace(/\s+/g, ' ').trim() : ''
     const hora    = v.time || ''
     const saudacao  = nome   ? `Ola ${nome}! ` : ''
     const horaTexto = hora   ? ` as ${hora}` : ''
