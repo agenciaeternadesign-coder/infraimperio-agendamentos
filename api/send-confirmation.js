@@ -42,17 +42,20 @@ export default async function handler(req, res) {
   const morada = `${addr.street || ''} ${addr.number || ''}, ${addr.city || ''}`.replace(/\s+/g, ' ').trim()
   const data   = formatDatePT(visit.date)
   const hora   = visit.time || 'a confirmar'
-  const nome   = (visit.clientName || '').split(' ')[0]
+  const nomeRaw = (visit.clientName || visit.name || '').trim()
+  const nome    = nomeRaw.split(' ')[0]   // primeiro nome
   const kind   = body.kind || 'confirmacao'
   // Empresa config — pode vir no body (white-label) ou usa fallback de env/default
   const empresa     = body.empresa || {}
   const telContacto = empresa.tel      || process.env.EMPRESA_TEL      || '214 098 779'
   const waNumero    = empresa.whatsapp || process.env.EMPRESA_WHATSAPP || '351936279926'
-  const contacto    = `Para qualquer dúvida: ${telContacto} ou WhatsApp https://wa.me/${waNumero}. Até breve!`
+  const contacto    = `Duvidas: ${telContacto} ou WhatsApp https://wa.me/${waNumero}. Ate breve!`
+  // Saudação só aparece se o nome existe
+  const saudacao = nome ? `Ola ${nome}! ` : ''
 
   const text = kind === 'horario'
-    ? `Olá, ${nome}! O horário da nossa visita para o orçamento foi confirmado para o dia ${data}, às ${hora}, em ${morada}. Teremos todo o gosto em ajudar.\n\n${contacto}`
-    : `Olá, ${nome}! Está confirmada a nossa visita para o orçamento, no dia ${data}, às ${hora}, em ${morada}. Teremos todo o gosto em ajudar.\n\n${contacto}`
+    ? `${saudacao}Esta confirmada a visita para orcamento no dia ${data}, as ${hora}, em ${morada}. Teremos todo o gosto em ajuda-lo.\n\n${contacto}`
+    : `${saudacao}Esta confirmada a visita para orcamento no dia ${data}, as ${hora}, em ${morada}. Teremos todo o gosto em ajuda-lo.\n\n${contacto}`
 
   const form = new URLSearchParams({ To: phone, From: FROM, Body: text })
 

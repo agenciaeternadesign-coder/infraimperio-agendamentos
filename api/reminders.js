@@ -72,11 +72,13 @@ export default async function handler(req, res) {
     else continue
     if (v.smsSent && v.smsSent[key]) continue // já enviado
 
-    const nome = (v.clientName || '').split(' ')[0]
-    const addr = v.address || {}
-    const morada = `${addr.street || ''} ${addr.number || ''}, ${addr.city || ''}`.replace(/\s+/g, ' ').trim()
-    const hora = v.time || 'a confirmar'
-    const text = `Ola ${nome}! Lembrete: a sua visita de orcamento com a ${empNome} e ${when} (${fmtDatePT(v.date)} as ${hora}) em ${morada}. Duvidas: ligue +351 ${empTel} ou WhatsApp https://wa.me/${empWa} . Ate breve!`
+    const nomeRaw = (v.clientName || v.name || '').trim()
+    const nome    = nomeRaw.split(' ')[0]
+    const addr    = v.address || {}
+    const morada  = `${addr.street || ''} ${addr.number || ''}, ${addr.city || ''}`.replace(/\s+/g, ' ').trim()
+    const hora    = v.time || 'a confirmar'
+    const saudacao = nome ? `Ola ${nome}! ` : ''
+    const text = `${saudacao}Lembrete: a sua visita de orcamento esta marcada para ${when} (${fmtDatePT(v.date)} as ${hora}) em ${morada}. Teremos todo o gosto em ajuda-lo. Duvidas: ${empTel} ou WhatsApp https://wa.me/${empWa} . Ate breve!`
     const form = new URLSearchParams({
       To: normalizePhone(v.clientPhone),
       From: FROM,
