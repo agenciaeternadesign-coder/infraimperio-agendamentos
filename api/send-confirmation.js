@@ -39,23 +39,29 @@ export default async function handler(req, res) {
 
   const phone  = normalizePhone(visit.clientPhone)
   const addr   = visit.address || {}
-  const morada = `${addr.street || ''} ${addr.number || ''}, ${addr.city || ''}`.replace(/\s+/g, ' ').trim()
+  // Morada — omite partes vazias
+  const moradaParts = [addr.street, addr.number, addr.city].filter(Boolean)
+  const morada = moradaParts.length ? moradaParts.join(' ').replace(/\s+/g, ' ').trim() : ''
   const data   = formatDatePT(visit.date)
-  const hora   = visit.time || 'a confirmar'
+  const hora   = visit.time || ''
+  // Nome — ignora títulos de cortesia na 1ª palavra
+  const TITULOS = new Set(['sr', 'sra', 'dr', 'dra', 'prof', 'eng'])
   const nomeRaw = (visit.clientName || visit.name || '').trim()
-  const nome    = nomeRaw.split(' ')[0]   // primeiro nome
+  const palavras = nomeRaw.split(/\s+/).filter(Boolean)
+  const primeiroNome = palavras.find(p => !TITULOS.has(p.toLowerCase().replace(/\.$/, ''))) || ''
   const kind   = body.kind || 'confirmacao'
   // Empresa config — pode vir no body (white-label) ou usa fallback de env/default
   const empresa     = body.empresa || {}
   const telContacto = empresa.tel      || process.env.EMPRESA_TEL      || '214 098 779'
   const waNumero    = empresa.whatsapp || process.env.EMPRESA_WHATSAPP || '351936279926'
   const contacto    = `Duvidas: ${telContacto} ou WhatsApp https://wa.me/${waNumero}. Ate breve!`
-  // Saudação só aparece se o nome existe
-  const saudacao = nome ? `Ola ${nome}! ` : ''
 
-  const text = kind === 'horario'
-    ? `${saudacao}Esta confirmada a visita para orcamento no dia ${data}, as ${hora}, em ${morada}. Teremos todo o gosto em ajuda-lo.\n\n${contacto}`
-    : `${saudacao}Esta confirmada a visita para orcamento no dia ${data}, as ${hora}, em ${morada}. Teremos todo o gosto em ajuda-lo.\n\n${contacto}`
+  // Partes opcionais da mensagem
+  const saudacao    = primeiroNome ? `Ola ${primeiroNome}! ` : ''
+  const horaTexto   = hora   ? `, as ${hora}` : ''
+  const moradaTexto = morada ? `, em ${morada}` : ''
+
+  const text = `${saudacao}Esta confirmada a visita para orcamento no dia ${data}${horaTexto}${moradaTexto}. Teremos todo o gosto em ajuda-lo.\n\n${contacto}`
 
   const form = new URLSearchParams({ To: phone, From: FROM, Body: text })
 
