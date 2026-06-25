@@ -83,26 +83,30 @@ export default async function handler(req, res) {
   const telContacto = empresa.tel      || process.env.EMPRESA_TEL      || '214 098 779'
   const waNumero    = empresa.whatsapp || process.env.EMPRESA_WHATSAPP || '351936279926'
 
-  // Saudação com vírgula (não ponto de exclamação)
-  const temNome     = !!(tratamento && primeiroNome) || !!primeiroNome
-  const saudacao    = tratamento && primeiroNome ? `${tratamento} ${primeiroNome}, `
-                    : primeiroNome               ? `${primeiroNome}, `
-                    : ''
-  const tipoTexto   = tipoObra ? ` para - ${tipoObra},` : ''
-  const horaTexto   = hora && horaFim ? `, entre as ${hora} e as ${horaFim}`
-                    : hora            ? `, a partir das ${hora}`
-                    : ''
-  const moradaTexto = morada ? `, na ${morada}.` : '.'
-  const contacto    = `Para qualquer esclarecimento adicional poderá contactar-nos atraves do numero ${telContacto} ou do whatsapp https://wa.me/${waNumero}.`
+  // Saudação com vírgula
+  const temNome  = !!(tratamento && primeiroNome) || !!primeiroNome
+  const saudacao = tratamento && primeiroNome ? `${tratamento} ${primeiroNome}, `
+                 : primeiroNome               ? `${primeiroNome}, `
+                 : ''
 
-  // Quando há saudação a frase continua em minúscula; sem saudação começa em maiúscula
+  // Monta as partes do detalhe sem pontuação final — junta com vírgula + ponto único no fim
+  const partes = []
+  if (tipoObra)        partes.push(`para - ${tipoObra}`)
+  if (hora && horaFim) partes.push(`entre as ${hora} e as ${horaFim}`)
+  else if (hora)       partes.push(`a partir das ${hora}`)
+  if (morada)          partes.push(`na ${morada}`)
+
+  const contacto = `Para qualquer esclarecimento adicional poderá contactar-nos atraves do numero ${telContacto} ou do whatsapp https://wa.me/${waNumero}.`
+
   let text
   if (kind === 'remarcacao') {
-    const inicio = temNome ? 'a sua visita' : 'A sua visita'
-    text = `${saudacao}${inicio} de orçamento,${tipoTexto} foi reagendada para o dia ${data}${horaTexto}${moradaTexto}\nTeremos todo o gosto em ajudar. ${contacto}\nAte breve!`
+    const inicio  = temNome ? 'a sua visita' : 'A sua visita'
+    const detalhe = [`foi reagendada para o dia ${data}`, ...partes].join(', ') + '.'
+    text = `${saudacao}${inicio} de orçamento, ${detalhe}\nTeremos todo o gosto em ajudar. ${contacto}\nAte breve!`
   } else {
-    const inicio = temNome ? 'esta confirmada' : 'Esta confirmada'
-    text = `${saudacao}${inicio} a visita para orçamento,${tipoTexto} no dia ${data}${horaTexto}${moradaTexto}\nTeremos todo o gosto em ajudar. ${contacto}\nAte breve!`
+    const inicio  = temNome ? 'esta confirmada' : 'Esta confirmada'
+    const detalhe = [`no dia ${data}`, ...partes].join(', ') + '.'
+    text = `${saudacao}${inicio} a visita para orçamento, ${detalhe}\nTeremos todo o gosto em ajudar. ${contacto}\nAte breve!`
   }
 
   const form = new URLSearchParams({ To: phone, From: FROM, Body: text })

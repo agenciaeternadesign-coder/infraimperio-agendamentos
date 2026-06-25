@@ -104,13 +104,15 @@ export default async function handler(req, res) {
     const saudacao    = tratamento && primeiroNome ? `${tratamento} ${primeiroNome}, `
                       : primeiroNome               ? `${primeiroNome}, `
                       : ''
-    const tipoTexto   = tipoObra ? ` para - ${tipoObra},` : ''
-    const horaTexto   = hora && horaFim ? `, entre as ${hora} e as ${horaFim}`
-                      : hora            ? `, a partir das ${hora}`
-                      : ''
-    const moradaTexto = morada ? `, na ${morada}.` : '.'
-    const inicio      = temNome ? 'lembrete: a sua visita de orçamento,' : 'Lembrete: a sua visita de orçamento,'
-    const text = `${saudacao}${inicio}${tipoTexto} esta marcada para ${when} (${fmtDatePT(v.date)}${horaTexto})${moradaTexto}\nTeremos todo o gosto em ajudar. Para qualquer esclarecimento adicional poderá contactar-nos atraves do numero ${empTel} ou do whatsapp https://wa.me/${empWa}.\nAte breve!`
+    const partes = []
+    if (tipoObra)        partes.push(`para - ${tipoObra}`)
+    if (hora && horaFim) partes.push(`entre as ${hora} e as ${horaFim}`)
+    else if (hora)       partes.push(`a partir das ${hora}`)
+    if (morada)          partes.push(`na ${morada}`)
+
+    const inicio  = temNome ? 'lembrete: a sua visita de orçamento' : 'Lembrete: a sua visita de orçamento'
+    const detalhe = [`marcada para ${when} (${fmtDatePT(v.date)})`, ...partes].join(', ') + '.'
+    const text = `${saudacao}${inicio}, ${detalhe}\nTeremos todo o gosto em ajudar. Para qualquer esclarecimento adicional poderá contactar-nos atraves do numero ${empTel} ou do whatsapp https://wa.me/${empWa}.\nAte breve!`
     const form = new URLSearchParams({
       To: normalizePhone(v.clientPhone),
       From: FROM,
