@@ -83,22 +83,26 @@ export default async function handler(req, res) {
   const telContacto = empresa.tel      || process.env.EMPRESA_TEL      || '214 098 779'
   const waNumero    = empresa.whatsapp || process.env.EMPRESA_WHATSAPP || '351936279926'
 
-  // Partes opcionais
-  const saudacao    = tratamento && primeiroNome ? `${tratamento} ${primeiroNome}! `
-                    : primeiroNome               ? `${primeiroNome}! `
+  // Saudação com vírgula (não ponto de exclamação)
+  const temNome     = !!(tratamento && primeiroNome) || !!primeiroNome
+  const saudacao    = tratamento && primeiroNome ? `${tratamento} ${primeiroNome}, `
+                    : primeiroNome               ? `${primeiroNome}, `
                     : ''
-  const tipoTexto   = tipoObra ? `, para - ${tipoObra},` : ','
+  const tipoTexto   = tipoObra ? ` para - ${tipoObra},` : ''
   const horaTexto   = hora && horaFim ? `, entre as ${hora} e as ${horaFim},`
                     : hora            ? `, a partir das ${hora},`
                     : ''
   const moradaTexto = morada ? ` na ${morada}.` : '.'
   const contacto    = `Para qualquer esclarecimento adicional podera contactar-nos atraves do numero ${telContacto} ou do whatsapp https://wa.me/${waNumero}`
 
+  // Quando há saudação a frase continua em minúscula; sem saudação começa em maiúscula
   let text
   if (kind === 'remarcacao') {
-    text = `${saudacao}A sua visita de orcamento${tipoTexto} foi reagendada para o dia ${data}${horaTexto}${moradaTexto}\nTeremos todo gosto em ajudar. ${contacto}\nAte breve!`
+    const inicio = temNome ? 'a sua visita' : 'A sua visita'
+    text = `${saudacao}${inicio} de orcamento,${tipoTexto} foi reagendada para o dia ${data}${horaTexto}${moradaTexto}\nTeremos todo o gosto em ajudar. ${contacto}\nAte breve!`
   } else {
-    text = `${saudacao}Esta confirmada a visita para orcamento${tipoTexto} no dia ${data}${horaTexto}${moradaTexto}\nTeremos todo gosto em ajudar. ${contacto}\nAte breve!`
+    const inicio = temNome ? 'esta confirmada' : 'Esta confirmada'
+    text = `${saudacao}${inicio} a visita para orcamento,${tipoTexto} no dia ${data}${horaTexto}${moradaTexto}\nTeremos todo o gosto em ajudar. ${contacto}\nAte breve!`
   }
 
   const form = new URLSearchParams({ To: phone, From: FROM, Body: text })
