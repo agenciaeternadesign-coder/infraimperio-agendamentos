@@ -89,11 +89,11 @@ export default async function handler(req, res) {
                     : primeiroNome               ? `${primeiroNome}, `
                     : ''
   const tipoTexto   = tipoObra ? ` para - ${tipoObra},` : ''
-  const horaTexto   = hora && horaFim ? `, entre as ${hora} e as ${horaFim},`
-                    : hora            ? `, a partir das ${hora},`
+  const horaTexto   = hora && horaFim ? `, entre as ${hora} e as ${horaFim}`
+                    : hora            ? `, a partir das ${hora}`
                     : ''
-  const moradaTexto = morada ? ` na ${morada}.` : '.'
-  const contacto    = `Para qualquer esclarecimento adicional podera contactar-nos atraves do numero ${telContacto} ou do whatsapp https://wa.me/${waNumero}`
+  const moradaTexto = morada ? `, na ${morada}.` : '.'
+  const contacto    = `Para qualquer esclarecimento adicional podera contactar-nos atraves do numero ${telContacto} ou do whatsapp https://wa.me/${waNumero}.`
 
   // Quando há saudação a frase continua em minúscula; sem saudação começa em maiúscula
   let text
