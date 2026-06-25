@@ -110,7 +110,7 @@ export default async function handler(req, res) {
                       : ''
     const moradaTexto = morada ? `, na ${morada}.` : '.'
     const inicio      = temNome ? 'lembrete: a sua visita de orçamento,' : 'Lembrete: a sua visita de orçamento,'
-    const text = `${saudacao}${inicio}${tipoTexto} esta marcada para ${when} (${fmtDatePT(v.date)}${horaTexto})${moradaTexto}\nTeremos todo o gosto em ajudar. Para qualquer esclarecimento adicional podera contactar-nos atraves do numero ${empTel} ou do whatsapp https://wa.me/${empWa}.\nAte breve!`
+    const text = `${saudacao}${inicio}${tipoTexto} esta marcada para ${when} (${fmtDatePT(v.date)}${horaTexto})${moradaTexto}\nTeremos todo o gosto em ajudar. Para qualquer esclarecimento adicional poderá contactar-nos atraves do numero ${empTel} ou do whatsapp https://wa.me/${empWa}.\nAte breve!`
     const form = new URLSearchParams({
       To: normalizePhone(v.clientPhone),
       From: FROM,
