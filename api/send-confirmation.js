@@ -99,10 +99,10 @@ export default async function handler(req, res) {
   let text
   if (kind === 'remarcacao') {
     const inicio = temNome ? 'a sua visita' : 'A sua visita'
-    text = `${saudacao}${inicio} de orcamento,${tipoTexto} foi reagendada para o dia ${data}${horaTexto}${moradaTexto}\nTeremos todo o gosto em ajudar. ${contacto}\nAte breve!`
+    text = `${saudacao}${inicio} de orçamento,${tipoTexto} foi reagendada para o dia ${data}${horaTexto}${moradaTexto}\nTeremos todo o gosto em ajudar. ${contacto}\nAte breve!`
   } else {
     const inicio = temNome ? 'esta confirmada' : 'Esta confirmada'
-    text = `${saudacao}${inicio} a visita para orcamento,${tipoTexto} no dia ${data}${horaTexto}${moradaTexto}\nTeremos todo o gosto em ajudar. ${contacto}\nAte breve!`
+    text = `${saudacao}${inicio} a visita para orçamento,${tipoTexto} no dia ${data}${horaTexto}${moradaTexto}\nTeremos todo o gosto em ajudar. ${contacto}\nAte breve!`
   }
 
   const form = new URLSearchParams({ To: phone, From: FROM, Body: text })
