@@ -1769,29 +1769,7 @@ textarea.si-input { resize: vertical; min-height: 64px; }
 
       <label id="lbl-nome">Nome do cliente *</label>
       <input type="text" id="f-nome" placeholder="Ex: João Silva" autocomplete="off">
-      <datalist id="lista-funcionarios">
-        <option value="Alayane"></option>
-        <option value="Alexandre"></option>
-        <option value="André"></option>
-        <option value="César"></option>
-        <option value="Domingos"></option>
-        <option value="Elvis"></option>
-        <option value="Igor"></option>
-        <option value="Jaqueline"></option>
-        <option value="Jardel"></option>
-        <option value="José Eletricista"></option>
-        <option value="Manuel"></option>
-        <option value="Mateus"></option>
-        <option value="Milton"></option>
-        <option value="Paulo"></option>
-        <option value="Rapel"></option>
-        <option value="Reginaldo"></option>
-        <option value="Rildomar"></option>
-        <option value="Roberto"></option>
-        <option value="Valdo"></option>
-        <option value="Vanessa"></option>
-        <option value="Wanderson"></option>
-      </datalist>
+      <datalist id="lista-funcionarios"></datalist>
 
       <div class="row-2">
         <div>
@@ -4624,6 +4602,13 @@ function _clienteAtualizarHeader() {
     if (tEl) tEl.textContent = nome ? 'Suite de Gestão — ' + (setor || nome) : 'Suite de Gestão';
     if (fEl && nome) fEl.innerHTML = nome + ' &copy; ' + new Date().getFullYear() + ' &mdash; Suite de Gestão Interna';
     if (nomeSimples) document.title = nomeSimples + ' — Suite';
+    const dl = document.getElementById('lista-funcionarios');
+    if (dl && Array.isArray(estado.funcionarios)) {
+      dl.innerHTML = estado.funcionarios
+        .filter(f => f.ativo !== false)
+        .map(f => `<option value="${f.nome.replace(/"/g,'&quot;')}"></option>`)
+        .join('');
+    }
   } catch(e) {}
 }
 
@@ -8851,7 +8836,7 @@ function obraAddDiaryEntry() {
   var o=all.find(function(x){ return x.id===OBRA_EDIT_ID; });
   if(!o) return;
   if(!o.diary) o.diary=[];
-  o.diary.push({date:new Date().toISOString(),text:text,author:'Alayane'});
+  o.diary.push({date:new Date().toISOString(),text:text,author:(estado.empresa&&estado.empresa.nome)||''});
   obraSave(all);
   document.getElementById('obra-diary-input').value='';
   obraRenderDiary(o.diary);
