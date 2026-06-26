@@ -4713,7 +4713,7 @@ function calcularLinha(reg, func) {
   if (editouSemSab) {
     valorSemSab = parseNum(semSabManual);
   } else if (func.tipo === 'mensalista' || func.tipo === 'prestador') {
-    valorSemSab = parseNum(reg.valor_fixo);
+    valorSemSab = parseNum(func.valor_fixo);
   } else {
     valorSemSab = dias * diaria;
   }

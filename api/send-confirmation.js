@@ -104,9 +104,8 @@ export default async function handler(req, res) {
     const detalhe = [`foi reagendada para o dia ${data}`, ...partes].join(', ') + '.'
     text = `${saudacao}${inicio} de orçamento, ${detalhe}\nTeremos todo o gosto em ajudar. ${contacto}\nAte breve!`
   } else {
-    const inicio  = temNome ? 'esta confirmada' : 'Esta confirmada'
     const detalhe = [`no dia ${data}`, ...partes].join(', ') + '.'
-    text = `${saudacao}${inicio} a visita para orçamento, ${detalhe}\nTeremos todo o gosto em ajudar. ${contacto}\nAte breve!`
+    text = `${saudacao}Confirmamos a sua visita de orçamento, ${detalhe}\nTeremos todo o gosto em ajudar. ${contacto}\nAte breve!`
   }
 
   const form = new URLSearchParams({ To: phone, From: FROM, Body: text })

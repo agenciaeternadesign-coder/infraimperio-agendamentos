@@ -1244,6 +1244,7 @@ textarea.si-input { resize: vertical; min-height: 64px; }
           </div>
         </div>
         <div class="toolbar">
+          <button class="btn btn-outline" onclick="sincronizarValesFolha()" title="Preenche automaticamente a coluna Vales com os vales pendentes de cada colaborador neste mês">🔄 Sincronizar Vales</button>
           <button class="btn btn-outline" onclick="exportarFolhaExcel()">📥 Exportar (CSV)</button>
           <button class="btn" onclick="guardarFolha()">💾 Guardar mês</button>
         </div>
@@ -1384,6 +1385,7 @@ textarea.si-input { resize: vertical; min-height: 64px; }
         <div><label>Capital Social</label><input type="text" id="emp-capital"></div>
         <div><label>CRC</label><input type="text" id="emp-crc"></div>
         <div><label>Matrícula</label><input type="text" id="emp-matricula"></div>
+        <div class="full"><label>URL dos Agendamentos <span style="font-weight:400;color:#9ca3af">(deixe vazio para usar o domínio actual)</span></label><input type="text" id="emp-agendamentos_url" placeholder="https://suaempresa.vercel.app/#/agenda"></div>
       </div>
       <div style="padding:0 20px 16px">
         <button class="btn" onclick="guardarEmpresa()">💾 Guardar Dados da Empresa</button>
@@ -1919,7 +1921,7 @@ textarea.si-input { resize: vertical; min-height: 64px; }
      ===================================================== -->
 <div id="section-agendamentos" class="suite-section" style="height:calc(100vh - 96px);">
   <iframe
-    src="https://infraimperio-agendamentos.vercel.app/#/agenda"
+    src="about:blank" data-agenda-url="configurar"
     style="width:100%;height:100%;border:none;display:block;"
     title="Agendamentos"
   ></iframe>
@@ -2897,6 +2899,15 @@ function suiteShowSection(id, btn) {
   _sec.classList.add('suite-visible');
   btn.classList.add('suite-active');
 
+  // Agendamentos: carrega iframe com URL configurado (lazy)
+  if (id === 'agendamentos' && !window._agendamentosInited) {
+    window._agendamentosInited = true;
+    var _agIframe = document.querySelector('#section-agendamentos iframe');
+    if (_agIframe) {
+      var _agUrl = (estado.empresa && estado.empresa.agendamentos_url) || (window.location.origin + '/#/agenda');
+      _agIframe.src = _agUrl;
+    }
+  }
   // Init monitor when first shown
   if (id === 'monitor' && !window._monitorInited) {
     window._monitorInited = true;
@@ -4547,7 +4558,8 @@ const EMPRESA_DEFAULT = {
   nipc: "",
   capital: "",
   crc: "",
-  matricula: ""
+  matricula: "",
+  agendamentos_url: ""
 };
 
 const CONFIG_DEFAULT = {
@@ -4733,7 +4745,7 @@ function calcularLinha(reg, func) {
   if (editouSemSab) {
     valorSemSab = parseNum(semSabManual);
   } else if (func.tipo === 'mensalista' || func.tipo === 'prestador') {
-    valorSemSab = parseNum(reg.valor_fixo);
+    valorSemSab = parseNum(func.valor_fixo);
   } else {
     valorSemSab = dias * diaria;
   }
@@ -5011,7 +5023,66 @@ function guardarFolha() {
   const folha = obterFolha(estado.mes_atual, estado.ano_atual);
   folha.data_guardado = new Date().toISOString();
   gravar();
-  alert('✓ Folha de ' + MESES[estado.mes_atual-1] + ' ' + estado.ano_atual + ' guardada com sucesso.');
+
+  // Verificar se existem vales pendentes sincronizados neste mês
+  const mesStr = chaveMes(estado.mes_atual, estado.ano_atual); // e.g. "2026-06"
+  const funcIds = new Set(folha.registos.map(r => r.funcionario_id));
+  const valesPendentes = eqLoad().filter(function(v) {
+    return v.status !== 'pago' && v.data && v.data.slice(0, 7) === mesStr && funcIds.has(v.funcId);
+  });
+
+  if (valesPendentes.length > 0) {
+    const total = valesPendentes.reduce(function(s, v) { return s + (parseFloat(v.valor) || 0); }, 0);
+    const confirmMsg = 'Folha guardada.\n\nExistem ' + valesPendentes.length + ' vale(s) pendente(s) de ' +
+      MESES[estado.mes_atual - 1] + ' no valor total de ' + total.toFixed(2) + ' €.\n\nMarcar como liquidados?';
+    if (confirm(confirmMsg)) {
+      const todosVales = eqLoad();
+      const ids = new Set(valesPendentes.map(function(v) { return v.id; }));
+      todosVales.forEach(function(v) { if (ids.has(v.id)) v.status = 'pago'; });
+      eqSave(todosVales);
+    }
+  } else {
+    alert('✓ Folha de ' + MESES[estado.mes_atual - 1] + ' ' + estado.ano_atual + ' guardada com sucesso.');
+  }
+}
+
+function sincronizarValesFolha() {
+  const mes = estado.mes_atual;
+  const ano = estado.ano_atual;
+  const mesStr = chaveMes(mes, ano); // e.g. "2026-06"
+
+  const valesPendentes = eqLoad().filter(function(v) {
+    return v.status !== 'pago' && v.data && v.data.slice(0, 7) === mesStr;
+  });
+
+  if (valesPendentes.length === 0) {
+    alert('Não existem vales pendentes em ' + MESES[mes - 1] + ' ' + ano + '.');
+    return;
+  }
+
+  // Agrupar por funcId → soma dos valores
+  const somasPorFunc = {};
+  valesPendentes.forEach(function(v) {
+    somasPorFunc[v.funcId] = (somasPorFunc[v.funcId] || 0) + (parseFloat(v.valor) || 0);
+  });
+
+  const folha = obterFolha(mes, ano);
+  let atualizados = 0;
+  folha.registos.forEach(function(reg) {
+    if (somasPorFunc[reg.funcionario_id] !== undefined) {
+      reg.vales = somasPorFunc[reg.funcionario_id];
+      atualizados++;
+    }
+  });
+
+  if (atualizados === 0) {
+    alert('Nenhum colaborador da folha tem vales pendentes em ' + MESES[mes - 1] + ' ' + ano + '.\n\n(Confirme que o funcionário nos vales corresponde ao da folha.)');
+    return;
+  }
+
+  gravar();
+  renderFolha();
+  alert('✓ ' + valesPendentes.length + ' vale(s) sincronizados para ' + atualizados + ' colaborador(es).\n\nReveja os valores e clique "Guardar mês" para finalizar.');
 }
 
 function duplicarMesAnterior() {
@@ -5682,7 +5753,7 @@ function apagarMes(chave) {
 // =============================================================================
 function renderDefinicoes() {
   document.getElementById('def-forma-pagamento').value = estado.config.forma_pagamento_default;
-  ['nome','setor','morada','cp','pais','email','tel','whatsapp','sms_sender','nipc','capital','crc','matricula'].forEach(k => {
+  ['nome','setor','morada','cp','pais','email','tel','whatsapp','sms_sender','nipc','capital','crc','matricula','agendamentos_url'].forEach(k => {
     const el = document.getElementById('emp-' + k);
     if (el) el.value = estado.empresa[k] || '';
   });
@@ -5695,7 +5766,7 @@ function guardarDefinicoes() {
 }
 
 function guardarEmpresa() {
-  ['nome','setor','morada','cp','pais','email','tel','whatsapp','sms_sender','nipc','capital','crc','matricula'].forEach(k => {
+  ['nome','setor','morada','cp','pais','email','tel','whatsapp','sms_sender','nipc','capital','crc','matricula','agendamentos_url'].forEach(k => {
     const el = document.getElementById('emp-' + k);
     if (el) estado.empresa[k] = el.value.trim();
   });
@@ -7075,7 +7146,7 @@ async function genReport() {
       body:JSON.stringify({
         model:'claude-opus-4-5',
         max_tokens:700,
-        messages:[{role:'user',content:`És um assistente de gestão para uma empresa de obras e remodelações chamada Infraimpério. Com base nos dados abaixo, cria um relatório mensal de produtividade profissional e motivador em português europeu (PT-PT).
+        messages:[{role:'user',content:`És um assistente de gestão para uma empresa chamada ${(estado.empresa&&estado.empresa.nome)||'a empresa'}. Com base nos dados abaixo, cria um relatório mensal de produtividade profissional e motivador em português europeu (PT-PT).
 
 Mês: ${MONTHS[month]} ${year}
 Dados de produtividade (fotos enviadas do WhatsApp como prova de trabalho):
@@ -7112,7 +7183,8 @@ function exportData() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'infraimperio-dados-' + new Date().toISOString().split('T')[0] + '.json';
+  const _nomeEmp = (estado&&estado.empresa&&estado.empresa.nome ? estado.empresa.nome.toLowerCase().replace(/\s+/g,'-') : 'dados');
+  a.download = _nomeEmp + '-' + new Date().toISOString().split('T')[0] + '.json';
   a.click();
   URL.revokeObjectURL(url);
   toast('Dados exportados ✓');
@@ -7347,7 +7419,7 @@ const REC_TIPOS = {
   },
   prestador: {
     titulo: 'RECIBO DE PAGAMENTO',
-    descricao: 'Recibo emitido a um prestador externo que recebeu pagamento da Infraimpério.',
+    descricao: 'Recibo emitido a um prestador externo que recebeu pagamento d' + ((estado&&estado.empresa&&estado.empresa.nome)?'a '+estado.empresa.nome:'a empresa') + '.',
     lblNome: 'Nome do prestador *',
     placeholderNome: 'Ex: Maria Santos',
     lblDescricao: 'Serviço prestado *',
@@ -8471,7 +8543,7 @@ function orcImprimir() {
   // ── PAGE 1: Orçamento ───────────────────────────────────────────────────────
   var PAGE1 = '<div class="orc-page">' +
     // Logo (page 1 only)
-    (logoSrc ? '<div style="text-align:center;margin-bottom:14px"><img src="'+logoSrc+'" style="height:64px;width:auto" alt="Infraimperio"></div>' : '') +
+    (logoSrc ? '<div style="text-align:center;margin-bottom:14px"><img src="'+logoSrc+'" style="height:64px;width:auto" alt="'+escHtml((_empOrc.nome)||'')+'"></div>' : '') +
     HDR_BAR +
     CLIENT_BLOCK +
     '<p class="orc-atendendo">Atendendo \xe0 sua solicita\xe7\xe3o segue o Or\xe7amento</p>' +
@@ -8510,7 +8582,7 @@ function orcImprimir() {
       '<p style="margin:18px 0 3px">Qualquer outro assunto estamos ao seu dispor!</p>' +
       '<p style="margin:3px 0">Atentamente,</p>' +
       '<p style="margin:3px 0;font-weight:bold">T\xe9cnico Manuel Santos</p>' +
-      '<p style="margin:3px 0">Escrit\xf3rio: 214 098 779 / 935 595 391</p>' +
+      (_empOrc.tel ? '<p style="margin:3px 0">Escrit\xf3rio: '+escHtml(_empOrc.tel)+'</p>' : '') +
     '</div>' +
     FOOTER +
   '</div>';
