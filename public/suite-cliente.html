@@ -5871,15 +5871,8 @@ function save() {
   localStorage.setItem('inf_registos', JSON.stringify(registos));
   localStorage.setItem('inf_carros',   JSON.stringify(carros));
 }
-function saveKey() {
-  const k = document.getElementById('apiKey').value.trim();
-  if (k) { localStorage.setItem('inf_apikey', k); toast('Chave guardada ✓'); }
-}
-
 // ── INIT ──────────────────────────────────────────────────────
 function mon_init() {
-  const k = localStorage.getItem('inf_apikey');
-  if (k) document.getElementById('apiKey').value = k;
 
   // ── AUTO-MIGRAÇÃO do ficheiro antigo (inf2_* → inf_*) ──
   const oldCollabs  = localStorage.getItem('inf2_colabs');
