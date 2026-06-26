@@ -27,7 +27,6 @@ export default async function handler(req, res) {
   const SUPA_KEY = process.env.SUPABASE_SERVICE_KEY || process.env.VITE_SUPABASE_ANON_KEY
   const SID = process.env.TWILIO_ACCOUNT_SID
   const TOKEN = process.env.TWILIO_AUTH_TOKEN
-  const FROM = process.env.TWILIO_SMS_SENDER || 'Infraimp'
   if (!SUPA_URL || !SUPA_KEY || !SID || !TOKEN) {
     return res.status(500).json({ error: 'Variáveis de ambiente em falta' })
   }
@@ -48,9 +47,10 @@ export default async function handler(req, res) {
     }
   } catch (e) { /* usa defaults */ }
 
-  const empNome     = empresa.nome      || process.env.EMPRESA_NOME      || 'Infraimperio'
-  const empTel      = empresa.tel       || process.env.EMPRESA_TEL       || '214 098 779'
-  const empWa       = empresa.whatsapp  || process.env.EMPRESA_WHATSAPP  || '351936279926'
+  const FROM    = empresa.sms_sender   || process.env.TWILIO_SMS_SENDER  || 'Infraimp'
+  const empNome = empresa.nome         || process.env.EMPRESA_NOME       || 'Infraimperio'
+  const empTel  = empresa.tel          || process.env.EMPRESA_TEL        || '214 098 779'
+  const empWa   = empresa.whatsapp     || process.env.EMPRESA_WHATSAPP   || '351936279926'
 
   let rows = []
   try {

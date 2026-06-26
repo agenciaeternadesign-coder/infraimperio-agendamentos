@@ -28,14 +28,35 @@ export default async function handler(req, res) {
 
   const SID   = process.env.TWILIO_ACCOUNT_SID
   const TOKEN = process.env.TWILIO_AUTH_TOKEN
-  // Remetente alfanumérico (máx. 11 caracteres). Configurável por env.
-  const FROM  = process.env.TWILIO_SMS_SENDER || 'Infraimp'
+  const SUPA_URL = process.env.VITE_SUPABASE_URL
+  const SUPA_KEY = process.env.SUPABASE_SERVICE_KEY || process.env.VITE_SUPABASE_ANON_KEY
 
   if (!SID || !TOKEN) return res.status(500).json({ success: false, error: 'Twilio não configurado no servidor' })
 
   const body  = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {})
   const visit = body.visit || body.data || body
   if (!visit?.clientPhone) return res.status(400).json({ success: false, error: 'sem telefone' })
+
+  // Ler config da empresa do Supabase (suite_kv) — permite white-label sem alterar env vars
+  let empresaKv = {}
+  if (SUPA_URL && SUPA_KEY) {
+    try {
+      const kvRes = await fetch(
+        `${SUPA_URL}/rest/v1/suite_kv?key=eq.infraimperio_recibos_v1&select=value`,
+        { headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}` } }
+      )
+      const kvData = await kvRes.json()
+      if (Array.isArray(kvData) && kvData[0]?.value) {
+        empresaKv = JSON.parse(kvData[0].value).empresa || {}
+      }
+    } catch (e) { /* usa defaults */ }
+  }
+
+  // body.empresa tem prioridade (chamadas directas com dados já resolvidos)
+  const empresa     = { ...empresaKv, ...(body.empresa || {}) }
+  const FROM        = empresa.sms_sender || process.env.TWILIO_SMS_SENDER || 'Infraimp'
+  const telContacto = empresa.tel        || process.env.EMPRESA_TEL       || '214 098 779'
+  const waNumero    = empresa.whatsapp   || process.env.EMPRESA_WHATSAPP  || '351936279926'
 
   const phone  = normalizePhone(visit.clientPhone)
   const addr   = visit.address || {}
@@ -77,11 +98,6 @@ export default async function handler(req, res) {
     : (WORK_LABELS[visit.workType] || visit.workType || '')
 
   const kind = body.kind || 'confirmacao'
-
-  // Empresa config — pode vir no body (white-label) ou usa fallback de env/default
-  const empresa     = body.empresa || {}
-  const telContacto = empresa.tel      || process.env.EMPRESA_TEL      || '214 098 779'
-  const waNumero    = empresa.whatsapp || process.env.EMPRESA_WHATSAPP || '351936279926'
 
   // Saudação com vírgula
   const temNome  = !!(tratamento && primeiroNome) || !!primeiroNome
