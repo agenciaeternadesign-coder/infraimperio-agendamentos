@@ -8571,14 +8571,12 @@ function orcImprimir() {
     '<div style="line-height:1.8;font-size:10.5pt">' +
       '<p style="margin:4px 0"><strong>Seguro:</strong> Empresa e colaboradores com seguros, conforme o anexo enviado</p>' +
       '<p style="margin:4px 0"><strong>Alvar\xe1:</strong> Empresa com certificado, com alvar\xe1 (conforme o anexo enviado)</p>' +
-      '<p style="margin:4px 0"><strong>Empresa certificada:</strong> Segue em anexo o certificado da Deco Pro Teste + o certificado TOP ' + escHtml(o.certYear||'2025') + '</p>' +
       '<p style="margin:4px 0"><strong>Eletricidade:</strong> Fornecimento de eletricidade e \xe1gua para realiza\xe7\xe3o dos servi\xe7os \xe9 fornecido pelo cliente.</p>' +
       '<p style="margin:4px 0"><strong>Garantia da Obra:</strong> ' + escHtml(o.warranty||'3 anos de garantia para todos os servi\xe7os') + '</p>' +
       '<p style="margin:4px 0"><strong>Validade do or\xe7amento:</strong> Tr\xeas meses (' + validRange + ')</p>' +
       '<p style="margin:4px 0"><strong>Prazo para iniciar:</strong> ' + escHtml(o.prazoIniciar||'10 dias \xfateis ap\xf3s contrata\xe7\xe3o do servi\xe7o') + '</p>' +
       '<p style="margin:4px 0"><strong>Prazo para t\xe9rmino:</strong> ' + escHtml(o.prazoTermino||'4 a 8 dias \xfateis') + '</p>' +
       '<p style="margin:16px 0 4px"><strong>NOTA IMPORTANTE:</strong> Este or\xe7amento poder\xe1 sofrer altera\xe7\xf5es caso, no in\xedcio da obra, sejam verificadas situa\xe7\xf5es que n\xe3o estavam vis\xedveis durante a visita de or\xe7amenta\xe7\xe3o (paredes molhadas, estruturas com danos ocultos, materiais em mau estado, etc.). O cliente ser\xe1 sempre informado antes de qualquer custo adicional.</p>' +
-      '<p style="margin:4px 0"><strong>NOTA:</strong> Hor\xe1rio de atendimento — Segunda a sexta das 08h00 \xe0s 20h00. S\xe1bados das 09h00 \xe0s 14h00.</p>' +
       '<p style="margin:18px 0 3px">Qualquer outro assunto estamos ao seu dispor!</p>' +
       '<p style="margin:3px 0">Atentamente,</p>' +
       (_empOrc.tel ? '<p style="margin:3px 0">Escrit\xf3rio: '+escHtml(_empOrc.tel)+'</p>' : '') +
