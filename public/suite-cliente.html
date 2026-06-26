@@ -1712,15 +1712,10 @@ textarea.si-input { resize: vertical; min-height: 64px; }
           </div>
           <div class="card">
             <div class="card-head">
-              <div class="card-title"><div class="dot"></div> API Anthropic</div>
+              <div class="card-title"><div class="dot"></div> Relatório IA</div>
             </div>
             <div class="card-body">
-              <div class="api-note">🔑 A tua chave API fica guardada localmente no browser, nunca é enviada para servidores externos.</div>
-              <div class="form-group">
-                <div class="form-label">Chave API</div>
-                <input type="password" id="apiKey" placeholder="sk-ant-api03-...">
-              </div>
-              <button class="btn btn-ghost btn-full btn-sm" onclick="saveKey()">Guardar chave</button>
+              <div class="api-note">🤖 O relatório é gerado automaticamente pelo servidor. Não é necessária configuração adicional.</div>
             </div>
           </div>
         </div>
@@ -7100,8 +7095,6 @@ function renderRanking() {
 
 // ── AI REPORT ─────────────────────────────────────────────────
 async function genReport() {
-  const apiKey = localStorage.getItem('inf_apikey') || '';
-  if (!apiKey) { toast('Insere a chave API primeiro ✕', true); return; }
   const month = parseInt(document.getElementById('repMonth').value);
   const year  = parseInt(document.getElementById('repYear').value);
   const counts = {};
@@ -7116,7 +7109,7 @@ async function genReport() {
         cats.forEach(ct => {
           if (counts[cId].cats[ct] !== undefined) {
             counts[cId].cats[ct]++;
-            counts[cId].count++; // total = sum of all categories
+            counts[cId].count++;
           }
         });
         obraList.forEach(oId => {
@@ -7140,31 +7133,19 @@ async function genReport() {
   const box = document.getElementById('aiBox');
   box.innerHTML = '<div class="ai-empty">A gerar relatório...</div>';
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01'},
-      body:JSON.stringify({
-        model:'claude-opus-4-5',
-        max_tokens:700,
-        messages:[{role:'user',content:`És um assistente de gestão para uma empresa chamada ${(estado.empresa&&estado.empresa.nome)||'a empresa'}. Com base nos dados abaixo, cria um relatório mensal de produtividade profissional e motivador em português europeu (PT-PT).
-
-Mês: ${MONTHS[month]} ${year}
-Dados de produtividade (fotos enviadas do WhatsApp como prova de trabalho):
-${resumo || 'Sem registos neste mês.'}
-
-O relatório deve incluir:
-1. Avaliação geral da produtividade do mês
-2. Destaque para os colaboradores com mais registos (com reconhecimento genuíno)  
-3. Obras com maior atividade
-4. Sugestão de prémio/bónus para o colaborador com melhor desempenho
-5. Mensagem motivadora para o próximo mês
-
-Tom: profissional, direto e motivador. Escreve em parágrafos. Máximo 300 palavras.`}]
+    const res = await fetch('/api/ai-report', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        resumo,
+        month,
+        year,
+        empNome: (estado.empresa && estado.empresa.nome) || ''
       })
     });
     const data = await res.json();
-    if (data.error) { box.innerHTML = `<div class="ai-empty" style="color:red">Erro: ${data.error.message}</div>`; return; }
-    box.textContent = data.content?.[0]?.text || '';
+    if (data.error) { box.innerHTML = `<div class="ai-empty" style="color:red">Erro: ${data.error}</div>`; return; }
+    box.textContent = data.text || '';
   } catch(e) {
     box.innerHTML = `<div class="ai-empty" style="color:red">Erro: ${e.message}</div>`;
   }
