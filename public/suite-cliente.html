@@ -1386,6 +1386,7 @@ textarea.si-input { resize: vertical; min-height: 64px; }
         <div><label>CRC</label><input type="text" id="emp-crc"></div>
         <div><label>Matrícula</label><input type="text" id="emp-matricula"></div>
         <div class="full"><label>URL dos Agendamentos <span style="font-weight:400;color:#9ca3af">(deixe vazio para usar o domínio actual)</span></label><input type="text" id="emp-agendamentos_url" placeholder="https://suaempresa.vercel.app/#/agenda"></div>
+        <div class="full" style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="emp-pdf_clausulas_construcao" style="width:16px;height:16px;cursor:pointer"><label for="emp-pdf_clausulas_construcao" style="margin:0;cursor:pointer">Incluir cláusulas de construção no PDF de orçamentos <span style="font-weight:400;color:#9ca3af">(Seguro, Alvará, Nota sobre imprevistos)</span></label></div>
       </div>
       <div style="padding:0 20px 16px">
         <button class="btn" onclick="guardarEmpresa()">💾 Guardar Dados da Empresa</button>
@@ -4554,7 +4555,8 @@ const EMPRESA_DEFAULT = {
   capital: "",
   crc: "",
   matricula: "",
-  agendamentos_url: ""
+  agendamentos_url: "",
+  pdf_clausulas_construcao: false
 };
 
 const CONFIG_DEFAULT = {
@@ -5752,6 +5754,8 @@ function renderDefinicoes() {
     const el = document.getElementById('emp-' + k);
     if (el) el.value = estado.empresa[k] || '';
   });
+  const elCl = document.getElementById('emp-pdf_clausulas_construcao');
+  if (elCl) elCl.checked = !!estado.empresa.pdf_clausulas_construcao;
 }
 
 function guardarDefinicoes() {
@@ -5765,6 +5769,8 @@ function guardarEmpresa() {
     const el = document.getElementById('emp-' + k);
     if (el) estado.empresa[k] = el.value.trim();
   });
+  const elCl = document.getElementById('emp-pdf_clausulas_construcao');
+  if (elCl) estado.empresa.pdf_clausulas_construcao = elCl.checked;
   gravar();
   _clienteAtualizarHeader();
   alert('✓ Dados da empresa guardados.');
@@ -8543,14 +8549,14 @@ function orcImprimir() {
     HDR_BAR +
     CLIENT_BLOCK +
     '<div style="line-height:1.8;font-size:10.5pt">' +
-      '<p style="margin:4px 0"><strong>Seguro:</strong> Empresa e colaboradores com seguros, conforme o anexo enviado</p>' +
-      '<p style="margin:4px 0"><strong>Alvar\xe1:</strong> Empresa com certificado, com alvar\xe1 (conforme o anexo enviado)</p>' +
+      (_empOrc.pdf_clausulas_construcao ? '<p style="margin:4px 0"><strong>Seguro:</strong> Empresa e colaboradores com seguros, conforme o anexo enviado</p>' : '') +
+      (_empOrc.pdf_clausulas_construcao ? '<p style="margin:4px 0"><strong>Alvar\xe1:</strong> Empresa com certificado, com alvar\xe1 (conforme o anexo enviado)</p>' : '') +
       '<p style="margin:4px 0"><strong>Eletricidade:</strong> Fornecimento de eletricidade e \xe1gua para realiza\xe7\xe3o dos servi\xe7os \xe9 fornecido pelo cliente.</p>' +
       '<p style="margin:4px 0"><strong>Garantia da Obra:</strong> ' + escHtml(o.warranty||'3 anos de garantia para todos os servi\xe7os') + '</p>' +
       '<p style="margin:4px 0"><strong>Validade do or\xe7amento:</strong> Tr\xeas meses (' + validRange + ')</p>' +
       '<p style="margin:4px 0"><strong>Prazo para iniciar:</strong> ' + escHtml(o.prazoIniciar||'10 dias \xfateis ap\xf3s contrata\xe7\xe3o do servi\xe7o') + '</p>' +
       '<p style="margin:4px 0"><strong>Prazo para t\xe9rmino:</strong> ' + escHtml(o.prazoTermino||'4 a 8 dias \xfateis') + '</p>' +
-      '<p style="margin:16px 0 4px"><strong>NOTA IMPORTANTE:</strong> Este or\xe7amento poder\xe1 sofrer altera\xe7\xf5es caso, no in\xedcio da obra, sejam verificadas situa\xe7\xf5es que n\xe3o estavam vis\xedveis durante a visita de or\xe7amenta\xe7\xe3o (paredes molhadas, estruturas com danos ocultos, materiais em mau estado, etc.). O cliente ser\xe1 sempre informado antes de qualquer custo adicional.</p>' +
+      (_empOrc.pdf_clausulas_construcao ? '<p style="margin:16px 0 4px"><strong>NOTA IMPORTANTE:</strong> Este or\xe7amento poder\xe1 sofrer altera\xe7\xf5es caso, no in\xedcio da obra, sejam verificadas situa\xe7\xf5es que n\xe3o estavam vis\xedveis durante a visita de or\xe7amenta\xe7\xe3o (paredes molhadas, estruturas com danos ocultos, materiais em mau estado, etc.). O cliente ser\xe1 sempre informado antes de qualquer custo adicional.</p>' : '') +
       '<p style="margin:18px 0 3px">Qualquer outro assunto estamos ao seu dispor!</p>' +
       '<p style="margin:3px 0">Atentamente,</p>' +
       (_empOrc.tel ? '<p style="margin:3px 0">Escrit\xf3rio: '+escHtml(_empOrc.tel)+'</p>' : '') +
