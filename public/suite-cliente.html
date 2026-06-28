@@ -1376,6 +1376,7 @@ textarea.si-input { resize: vertical; min-height: 64px; }
         <div class="full"><label>Setor <span style="font-weight:400;color:#9ca3af">(aparece no cabeçalho)</span></label><input type="text" id="emp-setor" placeholder="Ex: Obras & Remodelações"></div>
         <div class="full"><label>Morada</label><input type="text" id="emp-morada"></div>
         <div><label>Código Postal</label><input type="text" id="emp-cp"></div>
+        <div><label>Cidade</label><input type="text" id="emp-cidade" placeholder="Ex: Lisboa"></div>
         <div><label>País</label><input type="text" id="emp-pais"></div>
         <div><label>Email</label><input type="email" id="emp-email"></div>
         <div><label>Telefone</label><input type="text" id="emp-tel"></div>
@@ -4534,7 +4535,8 @@ const EMPRESA_DEFAULT = {
   crc: "",
   matricula: "",
   agendamentos_url: "",
-  pdf_clausulas_construcao: false
+  pdf_clausulas_construcao: false,
+  cidade: ""
 };
 
 const CONFIG_DEFAULT = {
@@ -5650,7 +5652,7 @@ function emitirRecibo(funcId) {
           dando plena e total quitação do mesmo.
         </div>
 
-        <div class="recibo-data">Barreiro, ${dataHoje}</div>
+        <div class="recibo-data">${emp.cidade ? emp.cidade + ', ' : ''}${dataHoje}</div>
 
         <div class="recibo-assinaturas">
           <div class="recibo-assinatura">O Funcionário<br><br><br>__________________________<br>(${func.nome})</div>
@@ -5739,7 +5741,7 @@ function apagarMes(chave) {
 // =============================================================================
 function renderDefinicoes() {
   document.getElementById('def-forma-pagamento').value = estado.config.forma_pagamento_default;
-  ['nome','setor','morada','cp','pais','email','tel','whatsapp','sms_sender','nipc','capital','crc','matricula','agendamentos_url'].forEach(k => {
+  ['nome','setor','morada','cp','cidade','pais','email','tel','whatsapp','sms_sender','nipc','capital','crc','matricula','agendamentos_url'].forEach(k => {
     const el = document.getElementById('emp-' + k);
     if (el) el.value = estado.empresa[k] || '';
   });
@@ -5754,7 +5756,7 @@ function guardarDefinicoes() {
 }
 
 function guardarEmpresa() {
-  ['nome','setor','morada','cp','pais','email','tel','whatsapp','sms_sender','nipc','capital','crc','matricula','agendamentos_url'].forEach(k => {
+  ['nome','setor','morada','cp','cidade','pais','email','tel','whatsapp','sms_sender','nipc','capital','crc','matricula','agendamentos_url'].forEach(k => {
     const el = document.getElementById('emp-' + k);
     if (el) estado.empresa[k] = el.value.trim();
   });
@@ -8158,7 +8160,7 @@ function orcNovoAbrir() {
   var today = new Date().toISOString().split('T')[0];
   document.getElementById('orc-f-numero').value = orcNextNum();
   document.getElementById('orc-f-date').value = today;
-  document.getElementById('orc-f-city').value = 'Barreiro';
+  document.getElementById('orc-f-city').value = (estado.empresa&&estado.empresa.cidade)||'';
   document.getElementById('orc-f-salutation').value = '';
   document.getElementById('orc-f-clientName').value = '';
   document.getElementById('orc-f-clientAddress').value = '';
@@ -8193,7 +8195,7 @@ function orcAbrirDetalhe(id) {
   document.getElementById('orc-form-titulo').textContent = 'Editar Orçamento';
   document.getElementById('orc-f-numero').value = o.numero||'';
   document.getElementById('orc-f-date').value = o.date||'';
-  document.getElementById('orc-f-city').value = o.city||'Barreiro';
+  document.getElementById('orc-f-city').value = o.city||(estado.empresa&&estado.empresa.cidade)||'';
   document.getElementById('orc-f-salutation').value = o.clientSalutation||'';
   document.getElementById('orc-f-clientName').value = o.clientName||'';
   document.getElementById('orc-f-clientAddress').value = o.clientAddress||'';
@@ -8352,7 +8354,7 @@ function orcGuardar() {
     id: ORC_EDIT_ID || ('orc_' + Date.now()),
     numero: document.getElementById('orc-f-numero').value.trim() || orcNextNum(),
     date: document.getElementById('orc-f-date').value,
-    city: document.getElementById('orc-f-city').value.trim() || 'Barreiro',
+    city: document.getElementById('orc-f-city').value.trim() || (estado.empresa&&estado.empresa.cidade) || '',
     clientSalutation: document.getElementById('orc-f-salutation').value,
     clientName: cn,
     clientAddress: document.getElementById('orc-f-clientAddress').value.trim(),
@@ -8399,7 +8401,7 @@ function orcImprimir() {
   var year    = o.date ? new Date(o.date+'T12:00:00').getFullYear() : '';
   var orcRef  = 'Or\xe7.' + num + (mon ? '/' + mon + '.' + year : '');
   var dateLong = orcDateLong(o.date);
-  var city    = o.city || 'Barreiro';
+  var city    = o.city || (typeof estado!=='undefined'&&estado.empresa&&estado.empresa.cidade) || '';
   var sal     = o.clientSalutation ? o.clientSalutation + ' ' : '';
   var clientFull = sal + escHtml(o.clientName||'');
   var services = o.services || [];
