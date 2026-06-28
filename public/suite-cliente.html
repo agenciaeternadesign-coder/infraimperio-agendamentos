@@ -1071,9 +1071,9 @@ textarea.si-input { resize: vertical; min-height: 64px; }
      ===================================================== -->
 <div id="section-home" class="suite-section suite-visible">
   <div class="home-hero">
-    <img id="home-suite-logo" class="home-logo-img" src="" alt="Infraêmpério" style="display:none">
-    <p class="home-greeting">Bem-vinda de volta</p>
-    <h1>Bem&#x2011;vinda, <span>Alayane!</span> &#x1F44B;</h1>
+    <img id="home-suite-logo" class="home-logo-img" src="" alt="" style="display:none">
+    <p class="home-greeting">Bem-vindo de volta</p>
+    <h1>Olá, <span id="home-empresa-saudacao">bem-vindo!</span> &#x1F44B;</h1>
     <p class="tagline" id="home-tagline">Suite de Gestão</p>
     <span class="home-date-badge" id="home-date-badge">&#x1F4C5; <span id="home-date-txt"></span></span>
   </div>
@@ -4602,6 +4602,10 @@ function _clienteAtualizarHeader() {
     if (tEl) tEl.textContent = nome ? 'Suite de Gestão — ' + (setor || nome) : 'Suite de Gestão';
     if (fEl && nome) fEl.innerHTML = nome + ' &copy; ' + new Date().getFullYear() + ' &mdash; Suite de Gestão Interna';
     if (nomeSimples) document.title = nomeSimples + ' — Suite';
+    const sEl2 = document.getElementById('home-empresa-saudacao');
+    if (sEl2) sEl2.textContent = nomeSimples ? nomeSimples + '!' : 'bem-vindo!';
+    const logoEl = document.getElementById('home-suite-logo');
+    if (logoEl) logoEl.alt = nome || '';
     const dl = document.getElementById('lista-funcionarios');
     if (dl && Array.isArray(estado.funcionarios)) {
       dl.innerHTML = estado.funcionarios
