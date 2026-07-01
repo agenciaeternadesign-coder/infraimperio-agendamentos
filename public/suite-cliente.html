@@ -1062,7 +1062,7 @@ textarea.si-input { resize: vertical; min-height: 64px; }
   <button data-section="obras" onclick="suiteShowSection('obras', this)">🏗️ Obras</button>
   <button data-section="adiantamentos" onclick="suiteShowSection('adiantamentos', this)">💵 Adiantamentos</button>
   <button data-section="stock" onclick="suiteShowSection('stock', this)">📦 Stock</button>
-  <button data-section="instrucoes" onclick="suiteShowSection('instrucoes', this)">📋 Instruções</button>
+  <button data-section="folha-ponto" onclick="suiteShowSection('folha-ponto', this)">📅 Folha de Ponto</button>
   <button data-section="personalizacao" onclick="suiteShowSection('personalizacao', this)">⚙️ Personalização</button>
 </nav>
 
@@ -1109,10 +1109,10 @@ textarea.si-input { resize: vertical; min-height: 64px; }
       <div class="hc-desc">Notas e tarefas do dia para não esquecer nada importante durante o trabalho.</div>
       <span class="hc-arrow">Abrir →</span>
     </div>
-    <div class="home-card" style="--card-color:#0d7377" onclick="suiteGoTo('instrucoes')">
-      <span class="hc-icon">📋</span>
-      <div class="hc-title">Instruções</div>
-      <div class="hc-desc">Bloco de notas interno da empresa. Regras, procedimentos e informações importantes da equipa.</div>
+    <div class="home-card" style="--card-color:#2e7d32" onclick="suiteGoTo('folha-ponto')">
+      <span class="hc-icon">📅</span>
+      <div class="hc-title">Folha de Ponto</div>
+      <div class="hc-desc">Registo mensal de presenças e faltas por colaborador. Gera folha para impressão.</div>
       <span class="hc-arrow">Abrir →</span>
     </div>
     <div class="home-card" style="--card-color:#d97706" onclick="suiteGoTo('premiacao')">
@@ -2027,71 +2027,64 @@ textarea.si-input { resize: vertical; min-height: 64px; }
 </style>
 
 <!-- =====================================================
-     SECÇÃO: INSTRUÇÕES (bloco de notas)
+     SECÇÃO: FOLHA DE PONTO
      ===================================================== -->
-<div id="section-instrucoes" class="suite-section">
-  <div style="padding:32px 24px 60px;max-width:900px;margin:0 auto">
+<div id="section-folha-ponto" class="suite-section">
+  <div style="padding:24px 20px 60px;max-width:1200px;margin:0 auto">
 
     <!-- Header -->
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap">
       <div style="display:flex;align-items:center;gap:14px">
-        <div style="width:52px;height:52px;border-radius:14px;background:#e6f7f7;border:2px solid #0d7377;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">📋</div>
+        <div style="width:52px;height:52px;border-radius:14px;background:#e8f5e9;border:2px solid #2e7d32;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">📅</div>
         <div>
-          <h2 style="font-family:'Oswald',sans-serif;font-size:1.5rem;font-weight:700;color:#1a1a2e;margin:0 0 2px">Instruções</h2>
-          <div style="font-size:12px;color:#6b7280">Bloco de notas interno da empresa</div>
+          <h2 style="font-family:'Oswald',sans-serif;font-size:1.5rem;font-weight:700;color:#1a1a2e;margin:0 0 2px">Folha de Ponto</h2>
+          <div style="font-size:12px;color:#6b7280">Registo mensal de presenças e faltas</div>
         </div>
       </div>
-      <div style="display:flex;align-items:center;gap:10px">
-        <span id="instr-save-status" style="font-size:12px;color:#9ca3af;transition:color 0.3s"></span>
-        <button onclick="instrClearAll()" style="background:none;border:1.5px solid #e5e7eb;border-radius:8px;padding:6px 12px;font-size:12px;color:#9ca3af;cursor:pointer;font-family:inherit;transition:all 0.15s" onmouseover="this.style.borderColor='#ef4444';this.style.color='#ef4444'" onmouseout="this.style.borderColor='#e5e7eb';this.style.color='#9ca3af'">🗑 Limpar tudo</button>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <button onclick="fpPrevMonth()" class="fp-nav-btn">&#8249;</button>
+        <span id="fp-month-label" style="font-weight:700;font-size:1rem;min-width:160px;text-align:center;color:#1a1a2e"></span>
+        <button onclick="fpNextMonth()" class="fp-nav-btn">&#8250;</button>
+        <button onclick="fpPrint()" style="background:#2e7d32;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:background 0.15s" onmouseover="this.style.background='#1b5e20'" onmouseout="this.style.background='#2e7d32'">&#128424; Imprimir</button>
       </div>
     </div>
 
-    <!-- Tabs (pages of notes) -->
-    <div style="display:flex;gap:6px;margin-bottom:0;align-items:flex-end" id="instr-tabs-row">
-      <!-- rendered by JS -->
+    <!-- Legend bar -->
+    <div style="background:#f9fafb;border:1.5px solid #e5e7eb;border-radius:10px;padding:10px 16px;margin-bottom:20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;font-size:0.82rem;color:#374151">
+      <strong>Legenda:</strong>
+      <span>Vazio = presente</span>
+      <span id="fp-leg-f" style="background:#fee2e2;color:#b91c1c;padding:2px 8px;border-radius:5px;font-weight:700">F = Falta</span>
+      <span id="fp-leg-c2" style="background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:5px;font-weight:700"></span>
+      <button onclick="fpEditCodes()" style="margin-left:auto;background:none;border:1.5px solid #d1d5db;border-radius:7px;padding:4px 10px;font-size:11px;color:#6b7280;cursor:pointer;font-family:inherit;transition:all 0.15s" onmouseover="this.style.borderColor='#2e7d32';this.style.color='#2e7d32'" onmouseout="this.style.borderColor='#d1d5db';this.style.color='#6b7280'">&#9999; Editar c&#243;digos</button>
     </div>
 
-    <!-- Notepad area -->
-    <div style="background:#fff;border:1.5px solid #cce8e9;border-radius:0 12px 12px 12px;box-shadow:0 4px 20px rgba(13,115,119,0.08);overflow:hidden">
-      <!-- Toolbar -->
-      <div style="display:flex;align-items:center;gap:4px;padding:10px 14px;border-bottom:1px solid #e5e7eb;background:#f8fffe;flex-wrap:wrap">
-        <button onclick="instrFormat('bold')"        class="instr-fmt-btn" title="Negrito (Ctrl+B)"><strong>B</strong></button>
-        <button onclick="instrFormat('italic')"      class="instr-fmt-btn" title="Itálico (Ctrl+I)"><em>I</em></button>
-        <button onclick="instrFormat('underline')"   class="instr-fmt-btn" title="Sublinhado (Ctrl+U)"><u>U</u></button>
-        <div style="width:1px;height:20px;background:#e5e7eb;margin:0 4px"></div>
-        <button onclick="instrFormat('insertUnorderedList')" class="instr-fmt-btn" title="Lista">☰</button>
-        <button onclick="instrFormat('insertOrderedList')"   class="instr-fmt-btn" title="Lista numerada">1.</button>
-        <div style="width:1px;height:20px;background:#e5e7eb;margin:0 4px"></div>
-        <button onclick="instrAddPage()"  style="background:#e6f7f7;color:#0d7377;border:1.5px solid #0d7377;border-radius:7px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s" onmouseover="this.style.background='#0d7377';this.style.color='#fff'" onmouseout="this.style.background='#e6f7f7';this.style.color='#0d7377'">+ Nova página</button>
-        <button onclick="instrDeletePage()" id="instr-del-page-btn" style="background:none;border:1.5px solid #e5e7eb;border-radius:7px;padding:4px 10px;font-size:12px;color:#9ca3af;cursor:pointer;font-family:inherit;transition:all 0.15s" onmouseover="this.style.borderColor='#ef4444';this.style.color='#ef4444'" onmouseout="this.style.borderColor='#e5e7eb';this.style.color='#9ca3af'">🗑 Apagar página</button>
-      </div>
-      <!-- Editable area -->
-      <div id="instr-editor"
-        contenteditable="true"
-        spellcheck="true"
-        style="min-height:480px;padding:28px 32px;font-size:0.95rem;line-height:1.9;color:#1a1a2e;outline:none;font-family:'Roboto',sans-serif;background-image:repeating-linear-gradient(transparent,transparent 29px,#e5f7f7 29px,#e5f7f7 30px);background-size:100% 30px;padding-top:28px"
-        oninput="instrOnInput()"
-      ></div>
+    <!-- No employees message -->
+    <div id="fp-no-func" style="display:none;text-align:center;padding:56px 16px;color:#9ca3af">
+      <div style="font-size:2.5rem;margin-bottom:10px">&#128119;</div>
+      <div style="font-size:0.9rem">Nenhum funcion&#225;rio ativo.<br>Adiciona funcion&#225;rios no separador <strong>Pagamentos</strong>.</div>
     </div>
 
-    <div style="text-align:right;margin-top:8px;font-size:11px;color:#cbd5e0">Guardado automaticamente no browser</div>
+    <!-- Tables rendered by JS -->
+    <div id="fp-table-1" style="overflow-x:auto;margin-bottom:24px"></div>
+    <div id="fp-table-2" style="overflow-x:auto"></div>
+
   </div>
 </div>
 
 <style>
-.instr-fmt-btn {
-  background:none;border:1.5px solid #e5e7eb;border-radius:7px;padding:4px 10px;
-  font-size:13px;cursor:pointer;color:#374151;font-family:inherit;transition:all 0.15s
-}
-.instr-fmt-btn:hover { background:#f0fdfd;border-color:#0d7377;color:#0d7377 }
-.instr-page-tab {
-  background:#f3f4f6;color:#6b7280;border:1.5px solid #e5e7eb;border-bottom:none;
-  border-radius:8px 8px 0 0;padding:7px 16px;font-size:0.83rem;font-weight:600;
-  cursor:pointer;font-family:inherit;transition:all 0.15s;margin-bottom:-1px
-}
-.instr-page-tab.active { background:#fff;color:#0d7377;border-color:#cce8e9;border-bottom:1.5px solid #fff;z-index:1;position:relative }
-.instr-page-tab:hover:not(.active) { background:#e6f7f7;color:#0d7377;border-color:#0d7377 }
+.fp-nav-btn { background:#f3f4f6;border:1.5px solid #e5e7eb;border-radius:8px;padding:6px 14px;font-size:16px;cursor:pointer;font-weight:700;color:#374151;transition:all 0.15s;font-family:inherit }
+.fp-nav-btn:hover { background:#e8f5e9;border-color:#2e7d32;color:#2e7d32 }
+.fp-table { border-collapse:collapse;width:100%;font-size:0.8rem }
+.fp-table th { background:#1a1a2e;color:#fff;padding:5px 6px;text-align:center;font-weight:700;white-space:nowrap }
+.fp-table th.fp-th-nome { text-align:left;min-width:120px;padding-left:10px }
+.fp-table td { border:1px solid #e5e7eb;padding:0;text-align:center;vertical-align:middle }
+.fp-table td.fp-td-nome { padding:7px 10px;text-align:left;font-weight:600;color:#1a1a2e;background:#fafafa;white-space:nowrap }
+.fp-table tr:hover td.fp-td-nome { background:#f0fdf4 }
+.fp-cell { width:36px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:700;font-size:0.75rem;user-select:none;transition:filter 0.1s }
+.fp-cell:hover { filter:brightness(0.88) }
+.fp-cell[data-v=""] { background:#fff;color:transparent }
+.fp-cell[data-v="F"] { background:#fee2e2;color:#b91c1c }
+.fp-dow { font-size:0.65rem;font-weight:400;color:rgba(255,255,255,0.65) }
 </style>
 
 <!-- =====================================================
@@ -2775,7 +2768,8 @@ textarea.si-input { resize: vertical; min-height: 64px; }
     'inf_adiantamentos_v1',
     'inf_funcionarios',
     'inf_lembretes',
-    'inf_instrucoes_pages',
+    'inf_folha_ponto_v1',
+    'inf_fp_codes_v1',
   ];
   var SYNC_SET = new Set(SYNC_KEYS);
 
@@ -2897,9 +2891,9 @@ function suiteShowSection(id, btn) {
   if (id === 'lembretes') {
     lembRender();
   }
-  // Init instruções when first shown
-  if (id === 'instrucoes') {
-    instrRender();
+  // Init folha de ponto when first shown
+  if (id === 'folha-ponto') {
+    fpRender();
   }
   // Init premiação
   if (id === 'premiacao') {
@@ -3201,97 +3195,177 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 
 // ============================================================
-// INSTRUÇÕES (bloco de notas)
+// FOLHA DE PONTO
 // ============================================================
-var _instrPages   = JSON.parse(localStorage.getItem('inf_instrucoes_pages') || 'null') ||
-                   [{ id: '1', title: 'Geral', html: '' }];
-var _instrCurrent = 0;
-var _instrSaveTimer = null;
+var FP_KEY        = 'inf_folha_ponto_v1';
+var FP_CODES_KEY  = 'inf_fp_codes_v1';
+var FP_MONTHS_PT  = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+var FP_DOWS_PT    = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 
-function instrSave() {
-  localStorage.setItem('inf_instrucoes_pages', JSON.stringify(_instrPages));
-  var st = document.getElementById('instr-save-status');
-  if (st) { st.textContent = '✓ Guardado'; st.style.color = '#059669'; clearTimeout(st._t); st._t = setTimeout(function(){ st.textContent = ''; }, 2000); }
+var _fpData  = JSON.parse(localStorage.getItem(FP_KEY) || '{}');
+var _fpCodes = JSON.parse(localStorage.getItem(FP_CODES_KEY) || 'null') || { code2: 'J', label2: 'Obras Josué' };
+var _fpYear  = new Date().getFullYear();
+var _fpMonth = new Date().getMonth();
+
+function fpSave() {
+  localStorage.setItem(FP_KEY, JSON.stringify(_fpData));
+  localStorage.setItem(FP_CODES_KEY, JSON.stringify(_fpCodes));
 }
 
-function instrOnInput() {
-  var editor = document.getElementById('instr-editor');
-  if (!editor) return;
-  _instrPages[_instrCurrent].html = editor.innerHTML;
-  var st = document.getElementById('instr-save-status');
-  if (st) { st.textContent = 'A guardar…'; st.style.color = '#9ca3af'; }
-  clearTimeout(_instrSaveTimer);
-  _instrSaveTimer = setTimeout(instrSave, 700);
+function fpMonthKey() {
+  return _fpYear + '-' + String(_fpMonth + 1).padStart(2, '0');
 }
 
-function instrFormat(cmd) {
-  document.getElementById('instr-editor')?.focus();
-  document.execCommand(cmd, false, null);
-}
-
-function instrRenderTabs() {
-  var row = document.getElementById('instr-tabs-row');
-  if (!row) return;
-  row.innerHTML = _instrPages.map(function(p, i) {
-    return '<button class="instr-page-tab'+(i===_instrCurrent?' active':'')+'" onclick="instrSwitchPage('+i+')">'+escHtml(p.title)+'</button>';
-  }).join('');
-}
-
-function instrSwitchPage(i) {
-  // Save current before switching
-  var editor = document.getElementById('instr-editor');
-  if (editor) _instrPages[_instrCurrent].html = editor.innerHTML;
-  instrSave();
-  _instrCurrent = i;
-  instrRender();
-}
-
-function instrRender() {
-  instrRenderTabs();
-  var editor = document.getElementById('instr-editor');
-  if (editor) {
-    editor.innerHTML = _instrPages[_instrCurrent].html || '';
-    // Move cursor to end
-    var range = document.createRange();
-    var sel   = window.getSelection();
-    range.selectNodeContents(editor);
-    range.collapse(false);
-    sel.removeAllRanges();
-    sel.addRange(range);
+function fpWorkingDays(year, month) {
+  var days = [], total = new Date(year, month + 1, 0).getDate();
+  for (var d = 1; d <= total; d++) {
+    var dow = new Date(year, month, d).getDay();
+    if (dow !== 0 && dow !== 6) days.push(d);
   }
-  var delBtn = document.getElementById('instr-del-page-btn');
-  if (delBtn) delBtn.style.display = _instrPages.length > 1 ? 'inline-block' : 'none';
+  return days;
 }
 
-function instrAddPage() {
-  // Save current first
-  var editor = document.getElementById('instr-editor');
-  if (editor) _instrPages[_instrCurrent].html = editor.innerHTML;
-  instrSave();
-  var title = prompt('Nome da nova página:', 'Nova página ' + (_instrPages.length + 1));
-  if (!title) return;
-  _instrPages.push({ id: Date.now().toString(36), title: title.trim() || 'Página', html: '' });
-  _instrCurrent = _instrPages.length - 1;
-  instrSave();
-  instrRender();
+function fpGetFuncs() {
+  if (typeof estado !== 'undefined' && estado && estado.funcionarios) {
+    return estado.funcionarios.filter(function(f) { return f.ativo !== false; });
+  }
+  return [];
 }
 
-function instrDeletePage() {
-  if (_instrPages.length <= 1) return;
-  var pageName = _instrPages[_instrCurrent].title;
-  if (!confirm('Apagar a página "' + pageName + '"? Esta ação não pode ser desfeita.')) return;
-  _instrPages.splice(_instrCurrent, 1);
-  _instrCurrent = Math.min(_instrCurrent, _instrPages.length - 1);
-  instrSave();
-  instrRender();
+function fpGetCell(funcId, day) {
+  var mk = fpMonthKey();
+  return (_fpData[mk] && _fpData[mk][funcId] && _fpData[mk][funcId][day]) || '';
 }
 
-function instrClearAll() {
-  if (!confirm('Limpar todo o conteúdo de todas as páginas? Esta ação não pode ser desfeita.')) return;
-  _instrPages = [{ id: '1', title: 'Geral', html: '' }];
-  _instrCurrent = 0;
-  instrSave();
-  instrRender();
+function fpSetCell(funcId, day, val) {
+  var mk = fpMonthKey();
+  if (!_fpData[mk]) _fpData[mk] = {};
+  if (!_fpData[mk][funcId]) _fpData[mk][funcId] = {};
+  _fpData[mk][funcId][day] = val;
+  fpSave();
+}
+
+function fpCellClick(funcId, day) {
+  var cur    = fpGetCell(funcId, day);
+  var states = _fpCodes.code2 ? ['', 'F', _fpCodes.code2] : ['', 'F'];
+  var idx    = states.indexOf(cur);
+  var next   = states[(idx + 1) % states.length];
+  fpSetCell(funcId, day, next);
+  var cell = document.getElementById('fpc_' + funcId + '_' + day);
+  if (cell) { cell.dataset.v = next; cell.textContent = next; cell.style.background = next === 'F' ? '#fee2e2' : next ? '#fef3c7' : '#fff'; cell.style.color = next === 'F' ? '#b91c1c' : next ? '#92400e' : 'transparent'; }
+}
+
+function fpRenderTable(days, containerId) {
+  var funcs = fpGetFuncs();
+  var cont  = document.getElementById(containerId);
+  if (!cont || !funcs.length) { if (cont) cont.innerHTML = ''; return; }
+  var h = '<table class="fp-table"><thead><tr><th class="fp-th-nome">Colaborador</th>';
+  days.forEach(function(d) {
+    h += '<th><div>' + String(d).padStart(2,'0') + '</div><div class="fp-dow">' + FP_DOWS_PT[new Date(_fpYear, _fpMonth, d).getDay()] + '</div></th>';
+  });
+  h += '</tr></thead><tbody>';
+  funcs.forEach(function(f) {
+    h += '<tr><td class="fp-td-nome">' + escHtml(f.nome) + '</td>';
+    days.forEach(function(d) {
+      var val  = fpGetCell(f.id, d);
+      var bg   = val === 'F' ? '#fee2e2' : val ? '#fef3c7' : '#fff';
+      var col  = val === 'F' ? '#b91c1c' : val ? '#92400e' : 'transparent';
+      var fid  = f.id.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+      h += '<td><div class="fp-cell" id="fpc_' + escHtml(f.id) + '_' + d + '" data-v="' + escHtml(val) + '" style="background:' + bg + ';color:' + col + '" onclick="fpCellClick(\'' + fid + '\',' + d + ')">' + escHtml(val) + '</div></td>';
+    });
+    h += '</tr>';
+  });
+  h += '</tbody></table>';
+  cont.innerHTML = h;
+}
+
+function fpRender() {
+  var funcs    = fpGetFuncs();
+  var noFuncEl = document.getElementById('fp-no-func');
+  var t1El     = document.getElementById('fp-table-1');
+  var t2El     = document.getElementById('fp-table-2');
+  if (noFuncEl) noFuncEl.style.display = funcs.length ? 'none' : 'block';
+  if (t1El)     t1El.style.display     = funcs.length ? '' : 'none';
+  if (t2El)     t2El.style.display     = funcs.length ? '' : 'none';
+  var lbl = document.getElementById('fp-month-label');
+  if (lbl) lbl.textContent = FP_MONTHS_PT[_fpMonth] + ' ' + _fpYear;
+  var legC2 = document.getElementById('fp-leg-c2');
+  if (legC2) { if (_fpCodes.code2) { legC2.style.display = ''; legC2.textContent = _fpCodes.code2 + ' = ' + (_fpCodes.label2 || _fpCodes.code2); } else { legC2.style.display = 'none'; } }
+  var allDays = fpWorkingDays(_fpYear, _fpMonth);
+  fpRenderTable(allDays.filter(function(d){ return d <= 16; }), 'fp-table-1');
+  fpRenderTable(allDays.filter(function(d){ return d > 16; }),  'fp-table-2');
+}
+
+function fpPrevMonth() {
+  if (--_fpMonth < 0) { _fpMonth = 11; _fpYear--; }
+  fpRender();
+}
+
+function fpNextMonth() {
+  if (++_fpMonth > 11) { _fpMonth = 0; _fpYear++; }
+  fpRender();
+}
+
+function fpEditCodes() {
+  var c2 = prompt('Código extra (ex: J, H…) — deixe vazio para desativar:', _fpCodes.code2 || '');
+  if (c2 === null) return;
+  c2 = c2.trim().slice(0, 3).toUpperCase();
+  var label2 = '';
+  if (c2) { label2 = prompt('Descrição do código "' + c2 + '":', _fpCodes.label2 || c2) || c2; }
+  _fpCodes.code2 = c2; _fpCodes.label2 = (label2 || '').trim();
+  fpSave(); fpRender();
+}
+
+function fpPrint() {
+  var funcs = fpGetFuncs();
+  if (!funcs.length) { alert('Sem funcionários para imprimir.'); return; }
+  var empNome  = (typeof estado !== 'undefined' && estado && estado.empresa && estado.empresa.nome) || 'A Empresa';
+  var mesLabel = FP_MONTHS_PT[_fpMonth] + ' ' + _fpYear;
+  var lastDay  = new Date(_fpYear, _fpMonth + 1, 0).getDate();
+  var allDays  = fpWorkingDays(_fpYear, _fpMonth);
+  var half1    = allDays.filter(function(d){ return d <= 16; });
+  var half2    = allDays.filter(function(d){ return d > 16; });
+  function buildTbl(days) {
+    var t = '<table><thead><tr><th class="nc">Colab.</th>';
+    days.forEach(function(d){ t += '<th>' + String(d).padStart(2,'0') + '</th>'; });
+    t += '</tr><tr><th></th>';
+    days.forEach(function(d){ t += '<th class="dow">' + FP_DOWS_PT[new Date(_fpYear,_fpMonth,d).getDay()] + '</th>'; });
+    t += '</tr></thead><tbody>';
+    funcs.forEach(function(f) {
+      t += '<tr><td class="nc">' + escHtml(f.nome) + '</td>';
+      days.forEach(function(d) {
+        var v = fpGetCell(f.id, d);
+        var cls = v === 'F' ? ' class="cf"' : (v === (_fpCodes.code2||'\x00') ? ' class="cc"' : '');
+        t += '<td' + cls + '>' + escHtml(v) + '</td>';
+      });
+      t += '</tr>';
+    });
+    return t + '</tbody></table>';
+  }
+  var legItems = ['F – Faltas'];
+  if (_fpCodes.code2) legItems.push(_fpCodes.code2 + ' – ' + (_fpCodes.label2 || _fpCodes.code2));
+  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Folha de Ponto – ' + mesLabel + '</title><style>'
+    + 'body{font-family:Calibri,Arial,sans-serif;font-size:10.5pt;margin:12mm 10mm}'
+    + '.hdr{text-align:right;margin-bottom:10px}.hdr .cn{font-weight:bold;font-size:13pt}.hdr .per{font-size:10.5pt}'
+    + 'table{border-collapse:collapse;width:100%;margin-bottom:18px;font-size:8.5pt}'
+    + 'th{background:#1a1a2e;color:#fff;padding:4px 5px;text-align:center;border:1px solid #444}'
+    + 'th.nc{text-align:left;min-width:80px;padding-left:6px}'
+    + 'td{border:1px solid #ccc;padding:3px 5px;text-align:center;height:20px;min-width:24px}'
+    + 'td.nc{text-align:left;font-weight:600;background:#f8f8f8;padding-left:6px}'
+    + '.dow{font-size:6.5pt;font-weight:400;color:rgba(255,255,255,0.65)}'
+    + '.cf{background:#fee2e2;color:#b91c1c;font-weight:700}'
+    + '.cc{background:#fef3c7;color:#92400e;font-weight:700}'
+    + '.leg{font-size:8.5pt;color:#374151;margin-top:6px}'
+    + '@media print{body{margin:10mm 8mm}}'
+    + '</style></head><body>'
+    + '<div class="hdr"><div class="cn">' + escHtml(empNome) + '</div><div class="per">Folha de Ponto – Período: 01 a ' + lastDay + ' de ' + mesLabel + '</div></div>'
+    + buildTbl(half1) + buildTbl(half2)
+    + '<div class="leg"><strong>NOTA:</strong> ' + legItems.join(' &nbsp;|&nbsp; ') + '</div>'
+    + '<script>window.onload=function(){setTimeout(function(){window.print()},300)}<\/script>'
+    + '</body></html>';
+  var w = window.open('', '_blank');
+  if (!w) { alert('Permite pop-ups para imprimir.'); return; }
+  w.document.write(html); w.document.close();
 }
 
 // ============================================================
@@ -7788,7 +7862,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function suiteBackup() {
   var KEYS = [
     // Suite keys
-    'inf_personalizacao_v1', 'inf_lembretes', 'inf_instrucoes_pages',
+    'inf_personalizacao_v1', 'inf_lembretes', 'inf_folha_ponto_v1', 'inf_fp_codes_v1',
     'inf_prem_v2', 'inf_premiacao_v1', 'infraimperio_recibos_v1',
     'recibo_historico_v1', 'recibo_avulso_v2', 'inf_vales_v1',
     'inf_collabs', 'inf_obras', 'inf_registos', 'inf_carros',
