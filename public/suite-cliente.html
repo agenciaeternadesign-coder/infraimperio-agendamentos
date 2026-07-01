@@ -3226,10 +3226,8 @@ function fpWorkingDays(year, month) {
 }
 
 function fpGetFuncs() {
-  if (typeof estado !== 'undefined' && estado && estado.funcionarios) {
-    return estado.funcionarios.filter(function(f) { return f.ativo !== false; });
-  }
-  return [];
+  var d = premLoad();
+  return (d.funcionarios || []).filter(function(f) { return f.ativo !== false; });
 }
 
 function fpGetCell(funcId, day) {
