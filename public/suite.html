@@ -2955,7 +2955,7 @@ document.addEventListener('DOMContentLoaded', function() {
   var PERS_KEY = 'inf_personalizacao_v1';
 
   function persLoad() {
-    try { return JSON.parse(localStorage.getItem(PERS_KEY) || '{}'); } catch(e) { return {}; }
+    try { var d = JSON.parse(localStorage.getItem(PERS_KEY) || '{}'); if (!d.logo) d.logo = '/logo.jpg'; return d; } catch(e) { return {logo: '/logo.jpg'}; }
   }
 
   function persApply(data) {
@@ -3333,6 +3333,8 @@ function fpPrint() {
   var funcs = fpGetFuncs();
   if (!funcs.length) { alert('Sem funcionários para imprimir.'); return; }
   var empNome  = (typeof estado !== 'undefined' && estado && estado.empresa && estado.empresa.nome) || 'A Empresa';
+  var _fpd = JSON.parse(localStorage.getItem('inf_personalizacao_v1') || '{}');
+  var fpLogoSrc = _fpd.logo || (window.location.origin + '/logo.jpg');
   var mesLabel = FP_MONTHS_PT[_fpMonth] + ' ' + _fpYear;
   var lastDay  = new Date(_fpYear, _fpMonth + 1, 0).getDate();
   var allDays  = fpWorkingDays(_fpYear, _fpMonth);
@@ -3359,7 +3361,7 @@ function fpPrint() {
   if (_fpCodes.code2) legItems.push(_fpCodes.code2 + ' – ' + (_fpCodes.label2 || _fpCodes.code2));
   var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Folha de Ponto – ' + mesLabel + '</title><style>'
     + 'body{font-family:Calibri,Arial,sans-serif;font-size:10.5pt;margin:12mm 10mm}'
-    + '.hdr{text-align:right;margin-bottom:10px}.hdr .cn{font-weight:bold;font-size:13pt}.hdr .per{font-size:10.5pt}'
+    + '.hdr{display:flex;align-items:center;gap:12px;margin-bottom:10px}.hdr img{height:52px;width:auto;object-fit:contain;flex-shrink:0}.hdr-txt{text-align:right;flex:1}.hdr .cn{font-weight:bold;font-size:13pt}.hdr .per{font-size:10.5pt}'
     + 'table{border-collapse:collapse;width:100%;margin-bottom:18px;font-size:8.5pt}'
     + 'th{background:#1a1a2e;color:#fff;padding:4px 5px;text-align:center;border:1px solid #444}'
     + 'th.nc{text-align:left;min-width:80px;padding-left:6px}'
@@ -3371,7 +3373,7 @@ function fpPrint() {
     + '.leg{font-size:8.5pt;color:#374151;margin-top:6px}'
     + '@media print{body{margin:10mm 8mm}}'
     + '</style></head><body>'
-    + '<div class="hdr"><div class="cn">' + escHtml(empNome) + '</div><div class="per">Folha de Ponto – Período: 01 a ' + lastDay + ' de ' + mesLabel + '</div></div>'
+    + '<div class="hdr"><img src="' + fpLogoSrc + '" alt="Logo"><div class="hdr-txt"><div class="cn">' + escHtml(empNome) + '</div><div class="per">Folha de Ponto – Período: 01 a ' + lastDay + ' de ' + mesLabel + '</div></div></div>'
     + buildTbl(half1) + buildTbl(half2)
     + '<div class="leg"><strong>NOTA:</strong> ' + legItems.join(' &nbsp;|&nbsp; ') + '</div>'
     + '<script>window.onload=function(){setTimeout(function(){window.print()},300)}<\/script>'
@@ -8360,7 +8362,8 @@ function orcImprimir() {
   var o = ORC_EDIT_ID ? orcLoad().find(function(x){ return x.id === ORC_EDIT_ID; }) : null;
   if (!o) { alert('Guarde primeiro o orçamento antes de imprimir.'); return; }
 
-  var logoSrc = (typeof SUITE_LOGO !== 'undefined') ? SUITE_LOGO : '';
+  var _pd = JSON.parse(localStorage.getItem('inf_personalizacao_v1') || '{}');
+  var logoSrc = _pd.logo || (window.location.origin + '/logo.jpg');
   var num     = o.numero || '';
   var mon     = orcMon(o.date);
   var year    = o.date ? new Date(o.date+'T12:00:00').getFullYear() : '';

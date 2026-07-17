@@ -1,25 +1,27 @@
 import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext'
 
-const CORRECT_CODE = import.meta.env.VITE_ACCESS_CODE ?? 'infraimperio'
+export default function Login() {
+  const { login } = useAuth()
+  const navigate = useNavigate()
+  const [email, setEmail]       = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError]       = useState('')
+  const [loading, setLoading]   = useState(false)
 
-export default function Login({ onSuccess }) {
-  const [code, setCode]       = useState('')
-  const [error, setError]     = useState(false)
-  const [loading, setLoading] = useState(false)
-
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
+    setError('')
     setLoading(true)
-    setTimeout(() => {
-      if (code === CORRECT_CODE) {
-        localStorage.setItem('infraimperio_auth', '1')
-        onSuccess()
-      } else {
-        setError(true)
-        setCode('')
-      }
+    try {
+      await login(email, password)
+      navigate('/')
+    } catch (err) {
+      setError(err.message || 'Credenciais inválidas. Tente novamente.')
+    } finally {
       setLoading(false)
-    }, 400)
+    }
   }
 
   return (
@@ -27,39 +29,61 @@ export default function Login({ onSuccess }) {
       <div className="w-full max-w-sm">
         {/* Logo / brand */}
         <div className="text-center mb-8">
-          <div className="w-14 h-14 bg-brand-700 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <BuildingIcon />
-          </div>
+          <img src="/logo.jpg" alt="Infraimpério" className="h-16 mx-auto mb-4 object-contain" />
           <h1 className="text-2xl font-bold text-slate-800">Infraimpério</h1>
           <p className="text-slate-500 text-sm mt-1">Gestão de Agendamentos</p>
         </div>
 
         <div className="card">
           <form onSubmit={handleSubmit} className="space-y-4">
+            {error && (
+              <div className="px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                {error}
+              </div>
+            )}
             <div>
-              <label className="label">Código de acesso</label>
+              <label className="label">Email</label>
+              <input
+                type="email"
+                className="input"
+                placeholder="email@empresa.pt"
+                value={email}
+                onChange={(e) => { setEmail(e.target.value); setError('') }}
+                autoFocus
+                required
+                autoComplete="email"
+              />
+            </div>
+            <div>
+              <label className="label">Password</label>
               <input
                 type="password"
-                className={`input text-center text-lg tracking-widest ${error ? 'border-red-400 focus:ring-red-400' : ''}`}
+                className="input"
                 placeholder="••••••••"
-                value={code}
-                onChange={(e) => { setCode(e.target.value); setError(false) }}
-                autoFocus
+                value={password}
+                onChange={(e) => { setPassword(e.target.value); setError('') }}
+                required
                 autoComplete="current-password"
               />
-              {error && (
-                <p className="text-red-500 text-xs mt-1 text-center">Código incorreto. Tenta novamente.</p>
-              )}
             </div>
             <button
               type="submit"
-              disabled={!code || loading}
+              disabled={!email || !password || loading}
               className="btn-primary w-full flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {loading ? <SpinIcon /> : <LockIcon />}
               Entrar
             </button>
           </form>
+
+          <div className="mt-4 flex items-center justify-between text-xs">
+            <Link to="/recuperar-password" className="text-brand-600 hover:underline">
+              Esqueceu a password?
+            </Link>
+            <Link to="/registo" className="text-brand-600 hover:underline">
+              Criar conta
+            </Link>
+          </div>
         </div>
 
         <p className="text-center text-xs text-slate-400 mt-6">

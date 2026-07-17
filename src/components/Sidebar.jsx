@@ -31,13 +31,7 @@ export default function Sidebar({ open, onClose }) {
         {/* Logo */}
         <div className="px-6 py-6 border-b border-slate-100">
           <div className="flex items-center gap-3">
-            {logo ? (
-              <img src={logo} alt="Logo" className="w-9 h-9 object-contain flex-shrink-0" />
-            ) : (
-              <div className="w-9 h-9 bg-brand-700 rounded-lg flex items-center justify-center flex-shrink-0">
-                <BuildingIcon />
-              </div>
-            )}
+            <img src={logo || '/logo.jpg'} alt="Logo" className="w-9 h-9 object-contain flex-shrink-0" />
             <div>
               <p className="text-slate-800 font-bold text-base leading-tight">{companyName}</p>
               <p className="text-slate-400 text-xs">Gestão de Agendamentos</p>
