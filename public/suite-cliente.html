@@ -2119,6 +2119,7 @@ textarea.si-input { resize: vertical; min-height: 64px; }
         <label class="obra-label">Estado</label>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
           <button class="obra-status-btn" data-status="planeamento" onclick="obraSetStatus('planeamento',this)">Planeamento</button>
+          <button class="obra-status-btn" data-status="aprovado" onclick="obraSetStatus('aprovado',this)">Aprovado</button>
           <button class="obra-status-btn" data-status="em_execucao" onclick="obraSetStatus('em_execucao',this)">Em Execu&#xe7;&#xe3;o</button>
           <button class="obra-status-btn" data-status="pausada" onclick="obraSetStatus('pausada',this)">Pausada</button>
           <button class="obra-status-btn" data-status="concluida" onclick="obraSetStatus('concluida',this)">Conclu&#xed;da</button>
@@ -2238,6 +2239,7 @@ textarea.si-input { resize: vertical; min-height: 64px; }
 .obra-status-btn[data-status="pausada"].obra-status-active { background:#fef3c7;color:#92400e;border-color:#fcd34d }
 .obra-status-btn[data-status="concluida"].obra-status-active { background:#ede9fe;color:#5b21b6;border-color:#c4b5fd }
 .obra-status-btn[data-status="cancelada"].obra-status-active { background:#fee2e2;color:#991b1b;border-color:#fca5a5 }
+.obra-status-btn[data-status="aprovado"].obra-status-active { background:#f0f9ff;color:#0369a1;border-color:#7dd3fc }
 /* Report modal print styles — only when body has the printing class */
 @media print {
   body.printing-relat > *:not(#prem-relat-overlay) { display:none !important; }
@@ -3498,9 +3500,9 @@ var VALES_KEY = 'inf_vales_v1';
 var EQ_FICHA_ID = null;
 
 // =============================================================================
-// KANBAN — STATUS DE OBRAS
+// KANBAN — STATUS DE OBRAS (sincronizado com inf_obras_v1)
 // =============================================================================
-var KANB_KEY = 'inf_kanban_v1';
+var KANB_KEY = 'inf_kanban_v1'; // legacy — usado só para migração
 var KANB_COLS = [
   { id:'orcamentado', label:'Orçamentado', cor:'#6366f1', bg:'#eef2ff' },
   { id:'aprovado',    label:'Aprovado',    cor:'#0ea5e9', bg:'#f0f9ff' },
@@ -3508,32 +3510,69 @@ var KANB_COLS = [
   { id:'pausa',       label:'Pausa',       cor:'#ef4444', bg:'#fef2f2' },
   { id:'concluido',   label:'Concluído',   cor:'#10b981', bg:'#f0fdf4' }
 ];
+// Mapeamento bidirecional entre estados de Obras e colunas do Kanban
+var OBRA_TO_KANB = { planeamento:'orcamentado', aprovado:'aprovado', em_execucao:'em-obra', pausada:'pausa', concluida:'concluido', cancelada:'concluido' };
+var KANB_TO_OBRA = { orcamentado:'planeamento', aprovado:'aprovado', 'em-obra':'em_execucao', pausa:'pausada', concluido:'concluida' };
 var KANB_DRAG_ID = null;
 
 function kanbLoad() { try { return JSON.parse(localStorage.getItem(KANB_KEY)||'[]'); } catch(e) { return []; } }
 function kanbSave(v) { localStorage.setItem(KANB_KEY, JSON.stringify(v)); }
-function kanbInit() { kanbRender(); }
 function kanbFmt(n) { return n.toLocaleString('pt-PT',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+
+// Migra cartões antigos de inf_kanban_v1 para inf_obras_v1 (executa uma vez)
+function kanbMigrateOldCards() {
+  var old = kanbLoad();
+  if (!old.length) return;
+  var obras = obraLoad();
+  var obraIds = {};
+  obras.forEach(function(o){ obraIds[o.id] = true; });
+  var toAdd = old.filter(function(c){ return !obraIds[c.id]; });
+  if (!toAdd.length) { kanbSave([]); return; }
+  var maxNum = 0;
+  obras.forEach(function(o){ var n=parseInt((o.numero||'').replace('OBR-',''),10); if(n>maxNum) maxNum=n; });
+  toAdd.forEach(function(card) {
+    maxNum++;
+    obras.push({
+      id: card.id,
+      numero: 'OBR-'+String(maxNum).padStart(3,'0'),
+      orcamentoId:'', orcamentoNum:'',
+      clientName: card.cliente || card.titulo || 'Sem nome',
+      clientPhone:'', address:'', workType:'remodelacao',
+      status: KANB_TO_OBRA[card.status] || 'planeamento',
+      startDate: card.dataInicio||'', endDatePlanned:'', endDateActual:null,
+      budget: parseFloat(card.valor)||0,
+      team: card.responsavel ? [card.responsavel] : [],
+      notes: card.notas||'', diary:[],
+      createdAt: card.createdAt||new Date().toISOString()
+    });
+  });
+  obraSave(obras);
+  kanbSave([]); // limpa dados antigos após migração
+}
+
+function kanbInit() { kanbMigrateOldCards(); kanbRender(); }
 
 function kanbRender() {
   var board = document.getElementById('kanb-board');
   if (!board) return;
-  var cards = kanbLoad();
+  var obras = obraLoad();
   board.innerHTML = KANB_COLS.map(function(col) {
-    var colCards = cards.filter(function(c){ return c.status === col.id; });
-    var totalVal = colCards.reduce(function(s,c){ return s+(parseFloat(c.valor)||0); },0);
-    var cardsHtml = colCards.map(function(card) {
+    var colObras = obras.filter(function(o){ return (OBRA_TO_KANB[o.status]||'orcamentado') === col.id; });
+    var totalVal = colObras.reduce(function(s,o){ return s+(parseFloat(o.budget)||0); },0);
+    var cardsHtml = colObras.map(function(o) {
+      var team = (o.team||[]).join(', ');
+      var nota = o.notes || ((o.diary||[]).length ? o.diary[o.diary.length-1].text : '');
       return '<div draggable="true" ' +
-        'ondragstart="kanbDragStart(event,\''+card.id+'\');" ' +
+        'ondragstart="kanbDragStart(event,\''+o.id+'\');" ' +
         'ondragend="kanbDragEnd(event);" ' +
-        'onclick="kanbEditarCartao(\''+card.id+'\');" ' +
+        'onclick="kanbEditarCartao(\''+o.id+'\');" ' +
         'style="background:#fff;border-radius:10px;padding:12px 14px;box-shadow:0 2px 8px rgba(0,0,0,0.08);cursor:pointer;border:1.5px solid #f1f5f9;margin-bottom:8px;user-select:none">' +
-        '<div style="font-weight:700;font-size:0.88rem;color:#1a1a2e;margin-bottom:4px">'+escHtml(card.titulo||'Sem título')+'</div>' +
-        (card.cliente ? '<div style="font-size:0.78rem;color:#6b7280">👤 '+escHtml(card.cliente)+'</div>' : '') +
-        (card.responsavel ? '<div style="font-size:0.78rem;color:#6b7280">🔧 '+escHtml(card.responsavel)+'</div>' : '') +
-        (card.valor ? '<div style="font-size:0.82rem;font-weight:700;color:'+col.cor+';margin-top:6px">'+kanbFmt(parseFloat(card.valor)||0)+' €</div>' : '') +
-        (card.dataInicio ? '<div style="font-size:0.73rem;color:#9ca3af;margin-top:4px">📅 '+card.dataInicio+'</div>' : '') +
-        (card.notas ? '<div style="font-size:0.73rem;color:#9ca3af;margin-top:3px;font-style:italic">'+escHtml(card.notas.slice(0,70))+(card.notas.length>70?'…':'')+'</div>' : '') +
+        '<div style="font-weight:700;font-size:0.88rem;color:#1a1a2e;margin-bottom:4px">'+escHtml(o.clientName||'Sem nome')+'</div>' +
+        (o.numero ? '<div style="font-size:0.72rem;color:#9ca3af;margin-bottom:3px">'+escHtml(o.numero)+'</div>' : '') +
+        (team ? '<div style="font-size:0.78rem;color:#6b7280">🔧 '+escHtml(team)+'</div>' : '') +
+        (o.budget>0 ? '<div style="font-size:0.82rem;font-weight:700;color:'+col.cor+';margin-top:6px">'+kanbFmt(o.budget)+' €</div>' : '') +
+        (o.startDate ? '<div style="font-size:0.73rem;color:#9ca3af;margin-top:4px">📅 '+o.startDate+'</div>' : '') +
+        (nota ? '<div style="font-size:0.73rem;color:#9ca3af;margin-top:3px;font-style:italic">'+escHtml(nota.slice(0,70))+(nota.length>70?'…':'')+'</div>' : '') +
       '</div>';
     }).join('');
     return '<div ' +
@@ -3544,7 +3583,7 @@ function kanbRender() {
       '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">' +
         '<div>' +
           '<div style="font-weight:800;font-size:0.9rem;color:'+col.cor+'">'+col.label+'</div>' +
-          '<div style="font-size:0.72rem;color:#9ca3af">'+colCards.length+' obra'+(colCards.length!==1?'s':'')+
+          '<div style="font-size:0.72rem;color:#9ca3af">'+colObras.length+' obra'+(colObras.length!==1?'s':'')+
             (totalVal>0?' · '+kanbFmt(totalVal)+' €':'')+
           '</div>' +
         '</div>' +
@@ -3566,80 +3605,33 @@ function kanbDragLeave(e) { e.currentTarget.style.outline=''; }
 function kanbDrop(e, colId) {
   e.preventDefault(); e.currentTarget.style.outline='';
   if (!KANB_DRAG_ID) return;
-  var cards = kanbLoad();
-  var card = cards.find(function(c){ return c.id===KANB_DRAG_ID; });
-  if (card) { card.status=colId; card.updatedAt=new Date().toISOString(); kanbSave(cards); kanbRender(); }
+  var all = obraLoad();
+  var obra = all.find(function(o){ return o.id===KANB_DRAG_ID; });
+  if (obra) {
+    obra.status = KANB_TO_OBRA[colId] || 'planeamento';
+    obraSave(all);
+    kanbRender();
+    obraRenderList();
+    premToast('✅ Estado atualizado!');
+  }
   KANB_DRAG_ID = null;
 }
 
-function kanbNovoCartao() {
-  ['kanb-edit-id','kanb-f-titulo','kanb-f-cliente','kanb-f-valor','kanb-f-responsavel','kanb-f-data','kanb-f-notas'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
-  var s=document.getElementById('kanb-f-status'); if(s) s.value='orcamentado';
-  var t=document.getElementById('kanb-modal-titulo'); if(t) t.textContent='Nova Obra';
-  var d=document.getElementById('kanb-del-btn'); if(d) d.style.display='none';
-  document.getElementById('kanb-modal').style.display='block';
-}
-
+// Abre formulário de nova obra com o estado correspondente à coluna
+function kanbNovoCartao() { kanbNovoNaColuna('orcamentado'); }
 function kanbNovoNaColuna(colId) {
-  kanbNovoCartao();
-  var s=document.getElementById('kanb-f-status'); if(s) s.value=colId;
+  obraNovoAbrir();
+  var obraStatus = KANB_TO_OBRA[colId] || 'planeamento';
+  document.querySelectorAll('.obra-status-btn').forEach(function(b){
+    b.classList.remove('obra-status-active');
+    if (b.dataset.status === obraStatus) b.classList.add('obra-status-active');
+  });
 }
 
-function kanbEditarCartao(id) {
-  var cards=kanbLoad(), card=cards.find(function(c){ return c.id===id; });
-  if (!card) return;
-  document.getElementById('kanb-edit-id').value = card.id;
-  document.getElementById('kanb-f-titulo').value = card.titulo||'';
-  document.getElementById('kanb-f-cliente').value = card.cliente||'';
-  document.getElementById('kanb-f-valor').value = card.valor||'';
-  document.getElementById('kanb-f-responsavel').value = card.responsavel||'';
-  document.getElementById('kanb-f-data').value = card.dataInicio||'';
-  document.getElementById('kanb-f-status').value = card.status||'orcamentado';
-  document.getElementById('kanb-f-notas').value = card.notas||'';
-  var t=document.getElementById('kanb-modal-titulo'); if(t) t.textContent='Editar Obra';
-  var d=document.getElementById('kanb-del-btn'); if(d) d.style.display='inline-flex';
-  document.getElementById('kanb-modal').style.display='block';
-}
+// Abre o formulário de detalhe da obra a partir do kanban
+function kanbEditarCartao(id) { obraAbrirDetalhe(id); }
 
 function kanbFecharModal() { document.getElementById('kanb-modal').style.display='none'; }
-
-function kanbGuardar() {
-  var titulo=(document.getElementById('kanb-f-titulo').value||'').trim();
-  if (!titulo) { alert('Preencha o título da obra.'); return; }
-  var editId=document.getElementById('kanb-edit-id').value;
-  var cards=kanbLoad(), now=new Date().toISOString();
-  if (editId) {
-    var card=cards.find(function(c){ return c.id===editId; });
-    if (card) {
-      card.titulo=titulo;
-      card.cliente=document.getElementById('kanb-f-cliente').value||'';
-      card.valor=document.getElementById('kanb-f-valor').value||'';
-      card.responsavel=document.getElementById('kanb-f-responsavel').value||'';
-      card.dataInicio=document.getElementById('kanb-f-data').value||'';
-      card.status=document.getElementById('kanb-f-status').value||'orcamentado';
-      card.notas=document.getElementById('kanb-f-notas').value||'';
-      card.updatedAt=now;
-    }
-  } else {
-    cards.push({ id:'k_'+Date.now(), titulo:titulo,
-      cliente:document.getElementById('kanb-f-cliente').value||'',
-      valor:document.getElementById('kanb-f-valor').value||'',
-      responsavel:document.getElementById('kanb-f-responsavel').value||'',
-      dataInicio:document.getElementById('kanb-f-data').value||'',
-      status:document.getElementById('kanb-f-status').value||'orcamentado',
-      notas:document.getElementById('kanb-f-notas').value||'',
-      createdAt:now, updatedAt:now
-    });
-  }
-  kanbSave(cards); kanbFecharModal(); kanbRender(); premToast('✅ Obra guardada!');
-}
-
-function kanbEliminar() {
-  var editId=document.getElementById('kanb-edit-id').value;
-  if (!editId||!confirm('Eliminar esta obra do kanban?')) return;
-  kanbSave(kanbLoad().filter(function(c){ return c.id!==editId; }));
-  kanbFecharModal(); kanbRender(); premToast('🗑️ Obra eliminada.');
-}
 
 
 function eqLoad() { try { return JSON.parse(localStorage.getItem(VALES_KEY)||'[]'); } catch(e) { return []; } }
@@ -7542,6 +7534,7 @@ var OBRA_FILTER = 'todas';
 var OBRA_EDIT_ID = null;
 var OBRA_STATUS_LIST = [
   {value:'planeamento',label:'Planeamento',color:'#1d4ed8',bg:'#dbeafe'},
+  {value:'aprovado',   label:'Aprovado',   color:'#0369a1',bg:'#f0f9ff'},
   {value:'em_execucao',label:'Em Execução',color:'#065f46',bg:'#d1fae5'},
   {value:'pausada',label:'Pausada',color:'#92400e',bg:'#fef3c7'},
   {value:'concluida',label:'Concluída',color:'#5b21b6',bg:'#ede9fe'},
@@ -7693,7 +7686,7 @@ function obraGuardar() {
     createdAt:ex?(ex.createdAt||new Date().toISOString()):new Date().toISOString()
   };
   if(OBRA_EDIT_ID){ var i=all.findIndex(function(x){ return x.id===OBRA_EDIT_ID; }); if(i>=0) all[i]=obra; else all.push(obra); } else { all.push(obra); }
-  obraSave(all); obraFecharForm(); obraRenderList(); premToast('✅ Obra guardada!');
+  obraSave(all); obraFecharForm(); obraRenderList(); kanbRender(); premToast('✅ Obra guardada!');
 }
 
 function obraEliminar() {
@@ -7701,7 +7694,7 @@ function obraEliminar() {
   var o=obraLoad().find(function(x){ return x.id===OBRA_EDIT_ID; });
   if(!o||!confirm('Eliminar obra '+o.numero+'?')) return;
   obraSave(obraLoad().filter(function(x){ return x.id!==OBRA_EDIT_ID; }));
-  obraFecharForm(); obraRenderList(); premToast('🗑️ Obra eliminada.');
+  obraFecharForm(); obraRenderList(); kanbRender(); premToast('🗑️ Obra eliminada.');
 }
 
 function obraRenderDiary(diary) {
