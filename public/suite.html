@@ -1060,7 +1060,6 @@ textarea.si-input { resize: vertical; min-height: 64px; }
   <button data-section="premiacao" onclick="suiteShowSection('premiacao', this)">🏆 Premiação</button>
   <button data-section="orcamentos" onclick="suiteShowSection('orcamentos', this)">📄 Orçamentos</button>
   <button data-section="obras" onclick="suiteShowSection('obras', this)">🏗️ Obras</button>
-  <button data-section="adiantamentos" onclick="suiteShowSection('adiantamentos', this)">💵 Adiantamentos</button>
   <button data-section="kanban" onclick="suiteShowSection('kanban', this)">📋 Kanban</button>
   <button data-section="folha-ponto" onclick="suiteShowSection('folha-ponto', this)">📅 Folha de Ponto</button>
   <button data-section="personalizacao" onclick="suiteShowSection('personalizacao', this)">⚙️ Personalização</button>
@@ -1131,12 +1130,6 @@ textarea.si-input { resize: vertical; min-height: 64px; }
       <span class="hc-icon">🏗️</span>
       <div class="hc-title">Obras</div>
       <div class="hc-desc">Gestão de obras ativas, equipa atribuída, diário de obra e controlo de prazos.</div>
-      <span class="hc-arrow">Abrir →</span>
-    </div>
-    <div class="home-card" style="--card-color:#7950f2" onclick="suiteGoTo('adiantamentos')">
-      <span class="hc-icon">💵</span>
-      <div class="hc-title">Adiantamentos</div>
-      <div class="hc-desc">Controlo de dinheiro adiantado a funcionários. Liberação, retorno, finalidade e saldo em aberto.</div>
       <span class="hc-arrow">Abrir →</span>
     </div>
     <div class="home-card" style="--card-color:#475569" onclick="suiteGoTo('personalizacao')">
@@ -2199,6 +2192,16 @@ textarea.si-input { resize: vertical; min-height: 64px; }
         </div>
       </div>
 
+
+      <!-- ARU / Verba 2.23 -->
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;background:#f0fdf4;border-radius:8px;padding:10px 14px;border:1.5px solid #86efac">
+        <input type="checkbox" id="orc-f-aru" style="width:18px;height:18px;accent-color:#10b981;cursor:pointer;flex-shrink:0" onchange="orcToggleAru()">
+        <label for="orc-f-aru" style="font-size:0.87rem;font-weight:700;color:#065f46;cursor:pointer;line-height:1.3">Imóvel inserido em ARU — aplica IVA 6% Verba 2.23 da Lista I do CIVA</label>
+      </div>
+      <div id="orc-aru-local-row" style="display:none;margin-bottom:12px">
+        <label class="orc-label">Localização ARU</label>
+        <input id="orc-f-aruLocal" class="orc-input" placeholder="ex: na Rua Miguel Pais, nº48, no Barreiro">
+      </div>
       <!-- Prazos -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
         <div>
@@ -2246,6 +2249,18 @@ textarea.si-input { resize: vertical; min-height: 64px; }
         <textarea id="orc-f-notes" class="orc-input" style="min-height:50px;resize:vertical" placeholder="Notas, condi&#xe7;&#xf5;es especiais..."></textarea>
       </div>
 
+
+      <!-- NOTAS DA BIBLIOTECA -->
+      <div style="margin-bottom:14px;border:1.5px solid #e5e7eb;border-radius:10px;overflow:hidden">
+        <div style="background:#f8fafc;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="orcToggleNotasPanel()">
+          <div>
+            <span style="font-weight:700;font-size:0.85rem;color:#374151">📝 Notas da biblioteca</span>
+            <span style="font-size:0.73rem;color:#9ca3af;margin-left:8px">lê de infraimperio_v2</span>
+          </div>
+          <button id="orc-notas-toggle" style="background:none;border:none;font-size:0.78rem;color:#6b7280;cursor:pointer;font-family:inherit;font-weight:700">▼ Expandir</button>
+        </div>
+        <div id="orc-notas-body" style="display:none;padding:12px;max-height:320px;overflow-y:auto"></div>
+      </div>
       <!-- Estado -->
       <div>
         <label class="orc-label">Estado</label>
@@ -2536,7 +2551,6 @@ textarea.si-input { resize: vertical; min-height: 64px; }
     'inf_registos',
     'inf_carros',
     'inf_personalizacao_v1',
-    'inf_adiantamentos_v1',
     'inf_funcionarios',
     'inf_lembretes',
     'inf_folha_ponto_v1',
@@ -2676,10 +2690,6 @@ function suiteShowSection(id, btn) {
   // Init obras
   if (id === 'obras') {
     obraInit();
-  }
-  // Init adiantamentos
-  if (id === 'adiantamentos') {
-    adiInit();
   }
 }
 
@@ -7846,6 +7856,12 @@ function orcNovoAbrir() {
   document.getElementById('orc-f-payMilestone').value = '';
   document.getElementById('orc-f-payCustom').value = '';
   document.getElementById('orc-f-notes').value = '';
+  var _aCb = document.getElementById('orc-f-aru'); if (_aCb) _aCb.checked = false;
+  var _aR  = document.getElementById('orc-aru-local-row'); if (_aR) _aR.style.display = 'none';
+  var _aLo = document.getElementById('orc-f-aruLocal'); if (_aLo) _aLo.value = '';
+  ORC_NT_SEL = []; ORC_NT_IMP = ''; ORC_NT_CON = '';
+  var _nb = document.getElementById('orc-notas-body'); if (_nb) _nb.style.display = 'none';
+  var _nt = document.getElementById('orc-notas-toggle'); if (_nt) _nt.textContent = '▼ Expandir';
   orcTogglePayRows();
   document.querySelectorAll('.orc-status-btn').forEach(function(b){ b.classList.remove('orc-status-active'); });
   var pb = document.querySelector('.orc-status-pendente'); if (pb) pb.classList.add('orc-status-active');
@@ -7881,6 +7897,12 @@ function orcAbrirDetalhe(id) {
   document.getElementById('orc-f-payMilestone').value = o.payMilestoneDesc||'';
   document.getElementById('orc-f-payCustom').value = o.payCustomText||'';
   document.getElementById('orc-f-notes').value = o.notes||'';
+  var _bCb = document.getElementById('orc-f-aru'); if (_bCb) _bCb.checked = !!o.aru;
+  var _bR  = document.getElementById('orc-aru-local-row'); if (_bR) _bR.style.display = o.aru ? 'block' : 'none';
+  var _bLo = document.getElementById('orc-f-aruLocal'); if (_bLo) _bLo.value = o.aruLocal || '';
+  ORC_NT_SEL = (o.ntSel || []).slice(); ORC_NT_IMP = o.ntImp || ''; ORC_NT_CON = o.ntCon || '';
+  var _nb2 = document.getElementById('orc-notas-body'); if (_nb2) _nb2.style.display = 'none';
+  var _nt2 = document.getElementById('orc-notas-toggle'); if (_nt2) _nt2.textContent = '▼ Expandir';
   orcTogglePayRows();
   document.querySelectorAll('.orc-status-btn').forEach(function(b){ b.classList.remove('orc-status-active'); if (b.dataset.status === o.status) b.classList.add('orc-status-active'); });
   var cb = document.getElementById('orc-criar-obra-btn'); if (cb) cb.style.display = (o.status === 'aprovado' ? 'inline-block' : 'none');
@@ -8051,7 +8073,12 @@ function orcGuardar() {
     payMode: document.getElementById('orc-f-payMode').value,
     payMilestoneDesc: document.getElementById('orc-f-payMilestone').value.trim(),
     payCustomText: document.getElementById('orc-f-payCustom').value.trim(),
-    notes: document.getElementById('orc-f-notes').value.trim(),
+    notes:    document.getElementById('orc-f-notes').value.trim(),
+    aru:      document.getElementById('orc-f-aru').checked,
+    aruLocal: (document.getElementById('orc-f-aruLocal').value || '').trim(),
+    ntSel:    ORC_NT_SEL.slice(),
+    ntImp:    ORC_NT_IMP,
+    ntCon:    ORC_NT_CON,
     status: orcGetStatus(),
     workType: (svcSnapshot[0]||{}).type || 'outro',
     createdAt: ORC_EDIT_ID ? ((all.find(function(x){ return x.id === ORC_EDIT_ID; })||{}).createdAt || new Date().toISOString()) : new Date().toISOString()
@@ -8140,6 +8167,41 @@ function orcImprimir() {
     validRange = orcDateLong(o.date) + ' a ' + orcDateLong(d2.toISOString().split('T')[0]);
   } else { validRange = 'tr\xeas meses ap\xf3s emiss\xe3o'; }
 
+  // ── ARU & Notes for print ────────────────────────────────────────────────────────────────────
+  function _getNoteById(nid) {
+    try { var _db = JSON.parse(localStorage.getItem('infraimperio_v2') || 'null');
+      return _db && _db.notas ? _db.notas.find(function(n){ return n.id === nid; }) || null : null;
+    } catch(e) { return null; }
+  }
+  var aruHtml = '';
+  if (o.aru) {
+    var _aLoc = o.aruLocal || '';
+    var _aTxt = 'Os serviços constam da Verba 2.23 da Lista I do CIVA' +
+      (_aLoc ? (_aLoc.toUpperCase().includes('ARU') ? ' ' : ', inserido em ARU em ') + _aLoc : '');
+    aruHtml = '<p style="font-size:10pt;font-style:italic;margin:5px 0 2px">' + escHtml(_aTxt) + '</p>';
+  }
+  var corpoNotesHtml = '', garNotesHtml = '';
+  if (o.ntSel && o.ntSel.length) {
+    o.ntSel.forEach(function(nid) {
+      var _n = _getNoteById(nid); if (!_n) return;
+      var _bl = '<div style="border-left:3px solid #d97706;padding:5px 10px;margin:5px 0;background:#fffdf0;font-size:10pt">' +
+        '<strong>' + escHtml(_n.rot || '') + ':</strong> ' + escHtml(_n.txt || '') + '</div>';
+      if (_n.pos === 'corpo') corpoNotesHtml += _bl;
+      else if (_n.pos === 'garantia') garNotesHtml += _bl;
+    });
+  }
+  var ntImpHtml = '<div style="background:#ffff00;padding:8px 12px;margin:10px 0;font-size:10pt">' +
+    '<strong>NOTA IMPORTANTE:</strong> Este orçamento poderá sofrer alterações caso, no início da obra, sejam verificadas situações que não estavam visíveis durante a visita de orçamentação (paredes molhadas, estruturas com danos ocultos, materiais em mau estado, etc.). O cliente será sempre informado antes de qualquer custo adicional.</div>';
+  if (o.ntImp) {
+    var _ni = _getNoteById(o.ntImp);
+    if (_ni) ntImpHtml = '<div style="background:#ffff00;padding:8px 12px;margin:10px 0;font-size:10pt"><strong>' + escHtml(_ni.rot || 'NOTA IMPORTANTE') + ':</strong> ' + escHtml(_ni.txt || '') + '</div>';
+  }
+  var ntConHtml = '<p style="margin:4px 0">NOTA: Horário de atendimento — Segunda a sexta das 08h00 às 20h00. Sábados das 09h00 às 14h00.</p>';
+  if (o.ntCon) {
+    var _nc = _getNoteById(o.ntCon);
+    if (_nc) ntConHtml = '<p style="margin:4px 0">' + escHtml(_nc.txt || '') + '</p>';
+  }
+
   // ── Shared CSS ─────────────────────────────────────────────────────────────
   // Print tip HTML (only visible on screen before printing)
   var PRINT_TIP = '<div class="orc-print-tip" style="background:#1d4ed8;color:#fff;padding:11px 18px;border-radius:8px;margin-bottom:20px;font-size:0.88rem;display:flex;align-items:center;gap:10px">' +
@@ -8195,42 +8257,43 @@ function orcImprimir() {
     CLIENT_BLOCK +
     '<p class="orc-atendendo">Atendendo \xe0 sua solicita\xe7\xe3o segue o Or\xe7amento</p>' +
     svcsHtml +
+    corpoNotesHtml +
     '<hr class="orc-sep">' +
     '<div class="orc-totals">' +
       '<p><strong>Valor do material e m\xe3o de obra</strong></p>' +
       '<p style="font-size:10.5pt"><strong>Subtotal (s/ IVA): ' + orcFmt(sub) + '€</strong></p>' +
       ivaLines +
+      aruHtml +
       '<p style="font-size:11pt"><strong>Total c/ IVA: ' + orcFmt(totalIva) + '€</strong></p>' +
       '<p style="font-size:10.5pt;font-style:italic">(' + orcNumToWords(totalIva) + ' euros)</p>' +
-    '</div>' +
-    '<br>' +
-    '<div class="orc-pay">' +
-      '<p><strong>Forma de pagamento</strong></p>' +
-      payLines +
     '</div>' +
     (o.notes ? '<div class="orc-notes"><strong>NOTA:</strong> ' + escHtml(o.notes) + '</div>' : '') +
     FOOTER +
   '</div>';
 
-  // ── PAGE 2: Conditions ─────────────────────────────────────────────────────
+  // ── PAGE 2: Conditions ──────────────────────────────────────────────────────────────────────────────────
   var PAGE2 = '<div class="orc-page orc-page-break">' +
+    (logoSrc ? '<div style="text-align:center;margin-bottom:10px"><img src="' + logoSrc + '" style="height:52px;width:auto" alt="Infraimperio"></div>' : '') +
     HDR_BAR +
-    CLIENT_BLOCK +
-    '<div style="line-height:1.8;font-size:10.5pt">' +
-      '<p style="margin:4px 0"><strong>Seguro:</strong> Empresa e colaboradores com seguros, conforme o anexo enviado</p>' +
-      '<p style="margin:4px 0"><strong>Alvar\xe1:</strong> Empresa com certificado, com alvar\xe1 (conforme o anexo enviado)</p>' +
-      '<p style="margin:4px 0"><strong>Empresa certificada:</strong> Segue em anexo o certificado da Deco Pro Teste + o certificado TOP ' + escHtml(o.certYear||'2025') + '</p>' +
-      '<p style="margin:4px 0"><strong>Eletricidade:</strong> Fornecimento de eletricidade e \xe1gua para realiza\xe7\xe3o dos servi\xe7os \xe9 fornecido pelo cliente.</p>' +
-      '<p style="margin:4px 0"><strong>Garantia da Obra:</strong> ' + escHtml(o.warranty||'3 anos de garantia para todos os servi\xe7os') + '</p>' +
-      '<p style="margin:4px 0"><strong>Validade do or\xe7amento:</strong> Tr\xeas meses (' + validRange + ')</p>' +
-      '<p style="margin:4px 0"><strong>Prazo para iniciar:</strong> ' + escHtml(o.prazoIniciar||'10 dias \xfateis ap\xf3s contrata\xe7\xe3o do servi\xe7o') + '</p>' +
-      '<p style="margin:4px 0"><strong>Prazo para t\xe9rmino:</strong> ' + escHtml(o.prazoTermino||'4 a 8 dias \xfateis') + '</p>' +
-      '<p style="margin:16px 0 4px"><strong>NOTA IMPORTANTE:</strong> Este or\xe7amento poder\xe1 sofrer altera\xe7\xf5es caso, no in\xedcio da obra, sejam verificadas situa\xe7\xf5es que n\xe3o estavam vis\xedveis durante a visita de or\xe7amenta\xe7\xe3o (paredes molhadas, estruturas com danos ocultos, materiais em mau estado, etc.). O cliente ser\xe1 sempre informado antes de qualquer custo adicional.</p>' +
-      '<p style="margin:4px 0"><strong>NOTA:</strong> Hor\xe1rio de atendimento — Segunda a sexta das 08h00 \xe0s 20h00. S\xe1bados das 09h00 \xe0s 14h00.</p>' +
-      '<p style="margin:18px 0 3px">Qualquer outro assunto estamos ao seu dispor!</p>' +
+    '<div style="line-height:1.75;font-size:10.5pt">' +
+      '<p style="margin:0 0 6px"><strong>Forma de pagamento</strong></p>' +
+      payLines +
+      aruHtml +
+      '<p style="margin:8px 0 2px"><strong>Seguro:</strong> Empresa e colaboradores com seguros, conforme o anexo enviado</p>' +
+      '<p style="margin:2px 0"><strong>Alvará:</strong> Empresa com certificado, com alvará (conforme o anexo enviado)</p>' +
+      '<p style="margin:2px 0"><strong>Empresa certificada:</strong> Segue em anexo o certificado da Deco Pro Teste + o certificado TOP ' + escHtml(o.certYear || '2025') + '</p>' +
+      '<p style="margin:2px 0"><strong>Eletricidade:</strong> Fornecimento de eletricidade e água para realização dos serviços é fornecido pelo cliente.</p>' +
+      '<p style="margin:8px 0 2px"><strong>Garantia da Obra:</strong> ' + escHtml(o.warranty || '3 anos de garantia para todos os serviços') + '</p>' +
+      garNotesHtml +
+      '<p style="margin:2px 0"><strong>Validade do orçamento:</strong> Três meses (' + validRange + ')</p>' +
+      '<p style="margin:2px 0"><strong>Prazo para iniciar:</strong> ' + escHtml(o.prazoIniciar || '10 dias úteis após contratação do serviço') + '</p>' +
+      '<p style="margin:2px 0"><strong>Prazo para término:</strong> ' + escHtml(o.prazoTermino || '4 a 8 dias úteis') + '</p>' +
+      ntImpHtml +
+      ntConHtml +
+      '<p style="margin:16px 0 3px">Qualquer outro assunto estamos ao seu dispor!</p>' +
       '<p style="margin:3px 0">Atentamente,</p>' +
-      '<p style="margin:3px 0;font-weight:bold">T\xe9cnico Manuel Santos</p>' +
-      '<p style="margin:3px 0">Escrit\xf3rio: 214 098 779 / 935 595 391</p>' +
+      '<p style="margin:3px 0;font-weight:bold">Técnico Manuel Santos</p>' +
+      '<p style="margin:3px 0">Escritório: 214 098 779 / 935 595 391</p>' +
     '</div>' +
     FOOTER +
   '</div>';
@@ -8328,6 +8391,77 @@ document.addEventListener('click', function(e) {
 });
 
 function orcInit() { orcRenderList(); }
+
+// ── ARU & Notes state ───────────────────────────────────────────────────────────────────────────────
+var ORC_NT_SEL = [];
+var ORC_NT_IMP = '';
+var ORC_NT_CON = '';
+
+function orcToggleAru() {
+  var aru = document.getElementById('orc-f-aru').checked;
+  var row = document.getElementById('orc-aru-local-row');
+  if (row) row.style.display = aru ? 'block' : 'none';
+  if (aru) { var iv = document.getElementById('orc-f-ivaMode'); if (iv) iv.value = '6'; orcCalcTotal(); }
+}
+
+function orcToggleNotasPanel() {
+  var body = document.getElementById('orc-notas-body');
+  var btn  = document.getElementById('orc-notas-toggle');
+  if (body.style.display === 'none') {
+    body.style.display = 'block';
+    btn.textContent = '▲ Recolher';
+    orcRenderNotasPanel();
+  } else {
+    body.style.display = 'none';
+    btn.textContent = '▼ Expandir';
+  }
+}
+
+function orcNtSelToggle(id) {
+  var idx = ORC_NT_SEL.indexOf(id);
+  if (idx >= 0) ORC_NT_SEL.splice(idx, 1); else ORC_NT_SEL.push(id);
+}
+
+function orcRenderNotasPanel() {
+  var panel = document.getElementById('orc-notas-body');
+  if (!panel) return;
+  var db = null;
+  try { db = JSON.parse(localStorage.getItem('infraimperio_v2') || 'null'); } catch(e) {}
+  if (!db || !db.notas || !db.notas.length) {
+    panel.innerHTML = '<div style="padding:12px;font-size:0.82rem;color:#9ca3af;text-align:center"><em>Sem notas. Abra Orcamentos-Infraimperio.html primeiro para carregar a biblioteca.</em></div>';
+    return;
+  }
+  function mkItems(list, type) {
+    return list.sort(function(a,b){return (b.n||0)-(a.n||0);}).map(function(n) {
+      var sel = type === 'cb' ? ORC_NT_SEL.includes(n.id) : (type === 'imp' ? ORC_NT_IMP === n.id : ORC_NT_CON === n.id);
+      var onch = type === 'cb'
+        ? "orcNtSelToggle('" + n.id + "')"
+        : (type === 'imp' ? "ORC_NT_IMP='" + n.id + "'" : "ORC_NT_CON='" + n.id + "'");
+      return '<label style="display:flex;align-items:flex-start;gap:8px;padding:5px 6px;cursor:pointer;border-radius:6px" ' +
+        'onmouseover="this.style.background=\'#f0f9ff\'" onmouseout="this.style.background=\'\'">' +
+        '<input type="' + (type === 'cb' ? 'checkbox' : 'radio') + '" ' + (sel ? 'checked' : '') + ' onchange="' + onch + '" ' +
+        'style="margin-top:3px;accent-color:#7c3aed;flex-shrink:0">' +
+        '<div>' +
+          '<div style="font-size:0.77rem;font-weight:700;color:#374151">' + escHtml(n.rot || n.gl || '') + '</div>' +
+          '<div style="font-size:0.71rem;color:#9ca3af">' + escHtml(((n.lab || n.txt) || '').slice(0,100)) + (((n.lab || n.txt) || '').length > 100 ? '…' : '') + '</div>' +
+        '</div>' +
+      '</label>';
+    }).join('');
+  }
+  var notas    = db.notas;
+  var corpo    = notas.filter(function(n){ return n.pos === 'corpo'; });
+  var garantia = notas.filter(function(n){ return n.pos === 'garantia'; });
+  var imp      = notas.filter(function(n){ return n.pos === 'final' && (n.g === 'importante' || n.g === 'especial'); });
+  var con      = notas.filter(function(n){ return n.pos === 'final' && n.g !== 'importante' && n.g !== 'especial'; });
+  var html = '';
+  if (corpo.length)    html += '<div style="margin-bottom:10px"><div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;color:#7c3aed;margin-bottom:4px">Notas do corpo — pág. 1</div>' + mkItems(corpo, 'cb') + '</div>';
+  if (garantia.length) html += '<div style="margin-bottom:10px"><div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;color:#7c3aed;margin-bottom:4px">Notas da garantia — pág. 2</div>' + mkItems(garantia, 'cb') + '</div>';
+  if (imp.length)      html += '<div style="margin-bottom:10px"><div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;color:#d97706;margin-bottom:4px">Nota importante — pág. 2</div>' + mkItems(imp, 'imp') + '</div>';
+  if (con.length)      html += '<div style="margin-bottom:10px"><div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;color:#0ea5e9;margin-bottom:4px">Nota de contacto — pág. 2</div>' + mkItems(con, 'con') + '</div>';
+  panel.innerHTML = html || '<div style="padding:12px;text-align:center;font-size:0.82rem;color:#9ca3af">Sem notas disponíveis.</div>';
+}
+
+
 // ── Biblioteca de serviços (infraimperio_v2) ─────────────────────────────────
 var ORC_LIB_MATCHES = {};
 
@@ -8580,377 +8714,6 @@ function obraInit() { obraRenderList(); }
 // ─── End Obras ───────────────────────────────────────────────────────────────
 // ─── End Histórico Global de Vales ──────────────────────────────────────────
 
-// =============================================================
-//  ADIANTAMENTOS — Controlo de dinheiro adiantado
-// =============================================================
-var ADI_KEY = 'inf_adiantamentos_v1';
-
-function adiLoad() {
-  try { return JSON.parse(localStorage.getItem(ADI_KEY)||'[]'); } catch(e) { return []; }
-}
-function adiSave(d) { localStorage.setItem(ADI_KEY, JSON.stringify(d)); }
-
-var INF_FUNC_KEY = 'inf_funcionarios';
-
-function infFuncLoad() {
-  try { return JSON.parse(localStorage.getItem(INF_FUNC_KEY)||'[]'); } catch(e) { return []; }
-}
-function infFuncSave(d) { localStorage.setItem(INF_FUNC_KEY, JSON.stringify(d)); }
-
-function adiGetFuncs() {
-  var shared = infFuncLoad().filter(function(f){ return f.ativo !== false; });
-  try {
-    var prem = JSON.parse(localStorage.getItem('premiacaoData')||'{}').funcionarios||[];
-    var nomes = new Set(shared.map(function(f){ return f.nome.toLowerCase().trim(); }));
-    prem.forEach(function(p) {
-      if (p.ativo !== false && !nomes.has(p.nome.toLowerCase().trim())) {
-        shared.push({ id: p.id, nome: p.nome, cargo: p.funcao||'', ativo: true });
-        nomes.add(p.nome.toLowerCase().trim());
-      }
-    });
-  } catch(e) {}
-  return shared.sort(function(a,b){ return a.nome.localeCompare(b.nome,'pt'); });
-}
-
-function infFuncRenderList() {
-  var list = infFuncLoad();
-  var el = document.getElementById('inf-func-list');
-  if (!el) return;
-  if (!list.length) {
-    el.innerHTML = '<div style="text-align:center;padding:24px;color:#9ca3af;font-size:0.85rem">Nenhum funcionário adicionado ainda.</div>';
-    return;
-  }
-  el.innerHTML = list.map(function(f) {
-    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border:1.5px solid #e5e7eb;border-radius:8px;margin-bottom:6px;background:#fff">' +
-      '<div>' +
-        '<div style="font-weight:700;font-size:0.88rem;color:#1a1a2e">' + escHtml(f.nome) + '</div>' +
-        (f.cargo ? '<div style="font-size:0.76rem;color:#6b7280">' + escHtml(f.cargo) + '</div>' : '') +
-      '</div>' +
-      '<button onclick="infFuncDelete(\'' + f.id + '\')" style="background:#fee2e2;color:#b91c1c;border:none;border-radius:6px;padding:4px 10px;font-size:0.75rem;cursor:pointer;font-family:inherit">🗑️</button>' +
-    '</div>';
-  }).join('');
-}
-
-function infFuncAdd() {
-  var nome  = (document.getElementById('inf-func-nome')||{}).value||'';
-  var cargo = (document.getElementById('inf-func-cargo')||{}).value||'';
-  nome = nome.trim(); cargo = cargo.trim();
-  if (!nome) { alert('Introduz o nome do funcionário.'); return; }
-  var list = infFuncLoad();
-  var existe = list.some(function(f){ return f.nome.toLowerCase()===nome.toLowerCase(); });
-  if (existe) { alert('Já existe um funcionário com esse nome.'); return; }
-  list.push({ id:'inf_'+Date.now().toString(36)+Math.random().toString(36).slice(2,5), nome:nome, cargo:cargo, ativo:true });
-  infFuncSave(list);
-  document.getElementById('inf-func-nome').value = '';
-  document.getElementById('inf-func-cargo').value = '';
-  infFuncRenderList();
-  adiPopulateFuncSelects();
-  premToast('✅ ' + nome + ' adicionado');
-}
-
-function infFuncDelete(id) {
-  if (!confirm('Remover este funcionário da lista partilhada?')) return;
-  infFuncSave(infFuncLoad().filter(function(f){ return f.id !== id; }));
-  infFuncRenderList();
-  adiPopulateFuncSelects();
-  premToast('🗑️ Funcionário removido');
-}
-
-function adiPopulateFuncSelects() {
-  var funcs = adiGetFuncs();
-  ['adi-filter-func','adi-f-func'].forEach(function(id) {
-    var sel = document.getElementById(id);
-    if (!sel) return;
-    var val = sel.value;
-    // keep first option
-    while (sel.options.length > 1) sel.remove(1);
-    funcs.forEach(function(f) {
-      var o = document.createElement('option');
-      o.value = f.nome; o.textContent = f.nome;
-      sel.appendChild(o);
-    });
-    sel.value = val;
-  });
-}
-
-function adiRender() {
-  var list = adiLoad();
-  var filterFunc   = (document.getElementById('adi-filter-func')||{}).value||'';
-  var filterStatus = (document.getElementById('adi-filter-status')||{}).value||'';
-
-  var filtered = list.filter(function(r) {
-    if (filterFunc   && r.funcionario !== filterFunc)   return false;
-    if (filterStatus && r.status      !== filterStatus) return false;
-    return true;
-  });
-
-  // Totals
-  var totLib = 0, totRet = 0;
-  list.forEach(function(r){ totLib += (r.liberado||0); totRet += (r.retorno||0); });
-  var totAberto = totLib - totRet;
-  var tc = document.getElementById('adi-totals');
-  if (tc) {
-    tc.innerHTML =
-      '<div class="adi-stat-card"><div class="adi-stat-label">Total Liberado</div><div class="adi-stat-value" style="color:#7950f2">' + adiMoney(totLib) + '</div></div>' +
-      '<div class="adi-stat-card"><div class="adi-stat-label">Total Retornado</div><div class="adi-stat-value" style="color:#2f9e44">' + adiMoney(totRet) + '</div></div>' +
-      '<div class="adi-stat-card"><div class="adi-stat-label">Total em Aberto</div><div class="adi-stat-value" style="color:' + (totAberto > 0 ? '#e03131' : '#2f9e44') + '">' + adiMoney(totAberto) + '</div></div>';
-  }
-
-  var el = document.getElementById('adi-list');
-  var empty = document.getElementById('adi-empty');
-  if (!el) return;
-
-  if (!filtered.length) {
-    el.innerHTML = '';
-    if (empty) empty.style.display = '';
-    return;
-  }
-  if (empty) empty.style.display = 'none';
-
-  // Sort by date desc
-  filtered.sort(function(a,b){ return (b.data||'').localeCompare(a.data||''); });
-
-  el.innerHTML = filtered.map(function(r) {
-    var saldo = (r.liberado||0) - (r.retorno||0);
-    var badgeCls = 'adi-badge-' + (r.status||'aberto');
-    var statusLabel = { aberto:'Aberto', pendente:'Pendente retorno', fechado:'Fechado' }[r.status]||r.status;
-    return '<div class="adi-row">' +
-      '<div>' +
-        '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">' +
-          '<span style="font-weight:700;font-size:0.9rem;color:#1a1a2e">' + escHtml(r.funcionario||'—') + '</span>' +
-          '<span class="adi-badge ' + badgeCls + '">' + statusLabel + '</span>' +
-        '</div>' +
-        '<div style="font-size:0.78rem;color:#6b7280;margin-bottom:6px">' + escHtml(r.data||'—') + (r.finalidade ? ' &nbsp;·&nbsp; ' + escHtml(r.finalidade) : '') + '</div>' +
-        '<div style="display:flex;gap:16px;flex-wrap:wrap;font-size:0.82rem">' +
-          '<span>💰 Liberado: <strong>' + adiMoney(r.liberado||0) + '</strong></span>' +
-          '<span>↩️ Retorno: <strong>' + adiMoney(r.retorno||0) + '</strong></span>' +
-          '<span style="color:' + (saldo > 0 ? '#e03131' : '#2f9e44') + '">⚖️ Saldo: <strong>' + adiMoney(saldo) + '</strong></span>' +
-        '</div>' +
-        (r.obs ? '<div style="font-size:0.78rem;color:#9ca3af;margin-top:4px">' + escHtml(r.obs) + '</div>' : '') +
-      '</div>' +
-      '<div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">' +
-        '<button onclick="adiEdit(\'' + r.id + '\')" style="background:#f3f4f6;color:#374151;border:none;border-radius:6px;padding:4px 10px;font-size:0.75rem;cursor:pointer;font-family:inherit">✏️ Editar</button>' +
-        '<button onclick="adiDelete(\'' + r.id + '\')" style="background:#fee2e2;color:#b91c1c;border:none;border-radius:6px;padding:4px 10px;font-size:0.75rem;cursor:pointer;font-family:inherit">🗑️ Apagar</button>' +
-      '</div>' +
-    '</div>';
-  }).join('');
-}
-
-function adiMoney(n) {
-  return (n||0).toLocaleString('pt-PT', { minimumFractionDigits:2, maximumFractionDigits:2 }) + '€';
-}
-
-function adiCalcSaldo() {
-  var lib = parseFloat(document.getElementById('adi-f-liberado').value)||0;
-  var ret = parseFloat(document.getElementById('adi-f-retorno').value)||0;
-  document.getElementById('adi-f-saldo').value = adiMoney(lib - ret);
-}
-
-function adiOpenForm(id) {
-  adiPopulateFuncSelects();
-  document.getElementById('adi-edit-id').value = '';
-  document.getElementById('adi-f-func').value = '';
-  document.getElementById('adi-f-data').value = new Date().toISOString().slice(0,10);
-  document.getElementById('adi-f-liberado').value = '';
-  document.getElementById('adi-f-retorno').value = '';
-  document.getElementById('adi-f-saldo').value = '0,00€';
-  document.getElementById('adi-f-finalidade').value = '';
-  document.getElementById('adi-f-status').value = 'aberto';
-  document.getElementById('adi-f-obs').value = '';
-  document.getElementById('adi-modal-title').textContent = 'Novo Adiantamento';
-  document.getElementById('adi-modal').style.display = 'flex';
-}
-
-function adiCloseForm() {
-  document.getElementById('adi-modal').style.display = 'none';
-}
-
-function adiEdit(id) {
-  var r = adiLoad().find(function(x){ return x.id === id; });
-  if (!r) return;
-  adiPopulateFuncSelects();
-  document.getElementById('adi-edit-id').value = r.id;
-  document.getElementById('adi-f-func').value = r.funcionario||'';
-  document.getElementById('adi-f-data').value = r.data||'';
-  document.getElementById('adi-f-liberado').value = r.liberado||0;
-  document.getElementById('adi-f-retorno').value = r.retorno||0;
-  adiCalcSaldo();
-  document.getElementById('adi-f-finalidade').value = r.finalidade||'';
-  document.getElementById('adi-f-status').value = r.status||'aberto';
-  document.getElementById('adi-f-obs').value = r.obs||'';
-  document.getElementById('adi-modal-title').textContent = 'Editar Adiantamento';
-  document.getElementById('adi-modal').style.display = 'flex';
-}
-
-function adiSaveForm() {
-  var func = document.getElementById('adi-f-func').value.trim();
-  var lib  = parseFloat(document.getElementById('adi-f-liberado').value)||0;
-  var fin  = document.getElementById('adi-f-finalidade').value.trim();
-  if (!func) { alert('Selecione o funcionário.'); return; }
-  if (!lib)  { alert('Introduza a quantia liberada.'); return; }
-  if (!fin)  { alert('Indique a finalidade.'); return; }
-
-  var list = adiLoad();
-  var editId = document.getElementById('adi-edit-id').value;
-  var record = {
-    id:          editId || 'adi_' + Date.now(),
-    funcionario: func,
-    data:        document.getElementById('adi-f-data').value,
-    liberado:    lib,
-    retorno:     parseFloat(document.getElementById('adi-f-retorno').value)||0,
-    finalidade:  fin,
-    status:      document.getElementById('adi-f-status').value,
-    obs:         document.getElementById('adi-f-obs').value.trim(),
-    criadoEm:    editId ? undefined : new Date().toISOString()
-  };
-
-  if (editId) {
-    var idx = list.findIndex(function(x){ return x.id === editId; });
-    if (idx >= 0) list[idx] = record; else list.push(record);
-  } else {
-    list.unshift(record);
-  }
-
-  adiSave(list);
-  adiCloseForm();
-  adiRender();
-  premToast(editId ? '✅ Adiantamento atualizado' : '✅ Adiantamento registado');
-}
-
-function adiDelete(id) {
-  if (!confirm('Apagar este registo?')) return;
-  var list = adiLoad().filter(function(x){ return x.id !== id; });
-  adiSave(list);
-  adiRender();
-  premToast('🗑️ Registo eliminado');
-}
-
-function adiInit() {
-  adiPopulateFuncSelects();
-  adiRender();
-  infFuncRenderList();
-}
-// ─── End Adiantamentos ────────────────────────────────────────────────────────
-
 </script>
-
-<!-- ============================================================
-     ADIANTAMENTOS — Controlo de dinheiro adiantado
-     ============================================================ -->
-<div id="section-adiantamentos" class="suite-section">
-  <div class="si-section-wrap">
-
-    <!-- Totais -->
-    <div id="adi-totals" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px"></div>
-
-    <!-- Toolbar -->
-    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px">
-      <select id="adi-filter-func" onchange="adiRender()" class="si-input" style="min-width:160px">
-        <option value="">Todos os funcionários</option>
-      </select>
-      <select id="adi-filter-status" onchange="adiRender()" class="si-input" style="min-width:140px">
-        <option value="">Todos os estados</option>
-        <option value="aberto">Aberto</option>
-        <option value="pendente">Pendente retorno</option>
-        <option value="fechado">Fechado</option>
-      </select>
-      <button onclick="adiOpenForm()" style="margin-left:auto;background:#7950f2;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:0.88rem;font-weight:700;cursor:pointer;font-family:inherit">+ Novo Adiantamento</button>
-    </div>
-
-    <!-- Lista -->
-    <div id="adi-list"></div>
-    <div id="adi-empty" style="display:none;text-align:center;padding:48px 16px;color:#9ca3af;font-size:0.9rem">Nenhum registo encontrado.</div>
-
-    <!-- Gerir Funcionários -->
-    <div style="margin-top:32px;border:2px solid #ede9fe;border-radius:12px;background:#faf5ff;padding:20px">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
-        <span style="font-size:1.1rem">👥</span>
-        <h3 style="margin:0;font-size:1rem;font-weight:700;color:#5b21b6;font-family:'Oswald',sans-serif;letter-spacing:0.03em">Gerir Funcionários</h3>
-        <span style="font-size:0.72rem;color:#7c3aed;background:#ede9fe;border-radius:20px;padding:2px 8px">Lista partilhada</span>
-      </div>
-      <!-- Form adicionar -->
-      <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:end;margin-bottom:16px">
-        <div>
-          <label class="si-label">Nome *</label>
-          <input type="text" id="inf-func-nome" class="si-input" placeholder="Ex: João Silva" onkeydown="if(event.key==='Enter')infFuncAdd()">
-        </div>
-        <div>
-          <label class="si-label">Cargo</label>
-          <input type="text" id="inf-func-cargo" class="si-input" placeholder="Ex: Técnico, Motorista..." onkeydown="if(event.key==='Enter')infFuncAdd()">
-        </div>
-        <button onclick="infFuncAdd()" style="background:#7950f2;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">+ Adicionar</button>
-      </div>
-      <!-- Lista de funcionários -->
-      <div id="inf-func-list"></div>
-    </div>
-
-  </div>
-
-  <!-- Modal form -->
-  <div id="adi-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)adiCloseForm()">
-    <div class="modal-box" style="max-width:560px;width:100%">
-      <div class="modal-header">
-        <span id="adi-modal-title" style="font-weight:700;font-size:1rem;color:var(--text)">Novo Adiantamento</span>
-        <button onclick="adiCloseForm()" class="modal-close">×</button>
-      </div>
-      <div style="padding:20px 24px;display:flex;flex-direction:column;gap:14px">
-        <input type="hidden" id="adi-edit-id">
-
-        <div>
-          <label class="si-label">Funcionário *</label>
-          <select id="adi-f-func" class="si-input">
-            <option value="">Selecionar funcionário</option>
-          </select>
-        </div>
-
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-          <div>
-            <label class="si-label">Data *</label>
-            <input type="date" id="adi-f-data" class="si-input">
-          </div>
-          <div>
-            <label class="si-label">Estado</label>
-            <select id="adi-f-status" class="si-input">
-              <option value="aberto">Aberto</option>
-              <option value="pendente">Pendente retorno</option>
-              <option value="fechado">Fechado</option>
-            </select>
-          </div>
-        </div>
-
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-          <div>
-            <label class="si-label">Quantia Liberada (€) *</label>
-            <input type="number" id="adi-f-liberado" class="si-input" min="0" step="0.01" placeholder="0.00" oninput="adiCalcSaldo()">
-          </div>
-          <div>
-            <label class="si-label">Quantia Retornada (€)</label>
-            <input type="number" id="adi-f-retorno" class="si-input" min="0" step="0.01" placeholder="0.00" oninput="adiCalcSaldo()">
-          </div>
-        </div>
-
-        <div>
-          <label class="si-label">Saldo em Aberto (€)</label>
-          <input type="text" id="adi-f-saldo" class="si-input" readonly style="font-weight:700;color:#7950f2">
-        </div>
-
-        <div>
-          <label class="si-label">Finalidade *</label>
-          <input type="text" id="adi-f-finalidade" class="si-input" placeholder="Ex: combustível, matéria-prima...">
-        </div>
-
-        <div>
-          <label class="si-label">Observações</label>
-          <textarea id="adi-f-obs" class="si-input" rows="3" placeholder="Notas adicionais..."></textarea>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button onclick="adiCloseForm()" class="si-btn si-btn-ghost">Cancelar</button>
-        <button onclick="adiSaveForm()" style="background:#7950f2;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Guardar</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 </body>
 </html>
