@@ -1061,7 +1061,7 @@ textarea.si-input { resize: vertical; min-height: 64px; }
   <button data-section="orcamentos" onclick="suiteShowSection('orcamentos', this)">📄 Orçamentos</button>
   <button data-section="obras" onclick="suiteShowSection('obras', this)">🏗️ Obras</button>
   <button data-section="adiantamentos" onclick="suiteShowSection('adiantamentos', this)">💵 Adiantamentos</button>
-  <button data-section="stock" onclick="suiteShowSection('stock', this)">📦 Stock</button>
+  <button data-section="kanban" onclick="suiteShowSection('kanban', this)">📋 Kanban</button>
   <button data-section="folha-ponto" onclick="suiteShowSection('folha-ponto', this)">📅 Folha de Ponto</button>
   <button data-section="personalizacao" onclick="suiteShowSection('personalizacao', this)">⚙️ Personalização</button>
 </nav>
@@ -1991,332 +1991,79 @@ textarea.si-input { resize: vertical; min-height: 64px; }
 </style>
 
 <!-- =====================================================
-     SECÇÃO: STOCK / MATERIAIS DE CONSTRUÇÃO
+     SECÇÃO: KANBAN — STATUS DE OBRAS
      ===================================================== -->
-<div id="section-stock" class="suite-section">
-  <div style="padding:20px 24px 56px;max-width:1100px;margin:0 auto">
-    <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;flex-wrap:wrap">
-      <div style="width:48px;height:48px;border-radius:14px;background:#1a1a2e;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">📦</div>
-      <div style="flex:1;min-width:0">
-        <h2 style="font-family:'Oswald',sans-serif;font-size:1.45rem;font-weight:700;color:#1a1a2e;margin:0">Stock de Materiais</h2>
-        <div style="font-size:0.78rem;color:#9ca3af">Controlo de materiais de construção</div>
-      </div>
-      <button onclick="stockHistGlobal()" style="background:#1a1a2e;color:#fff;border:none;border-radius:8px;padding:9px 14px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">📋 Movimentos</button>
-      <button onclick="stockAbrirForm()" style="background:#d97706;color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">➕ Novo Material</button>
-    </div>
-    <div id="stock-summary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px"></div>
-    <div style="margin-bottom:14px">
-      <input type="text" id="stock-search" oninput="stockRender()" placeholder="Pesquisar material ou categoria..." style="width:100%;max-width:360px;border:1.5px solid #e5e7eb;border-radius:8px;padding:9px 12px;font-size:0.88rem;font-family:inherit;box-sizing:border-box">
-    </div>
-    <div id="stock-list"></div>
-    <div id="stock-empty" style="display:none;text-align:center;padding:56px 16px;color:#9ca3af">
-      <div style="font-size:2.5rem;margin-bottom:10px">📦</div>
-      <div>Sem materiais registados.<br>Clica em <strong>Novo Material</strong> para começar.</div>
-    </div>
-  </div>
-</div>
-
-<div id="stock-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9200;align-items:flex-start;justify-content:center;overflow-y:auto;padding:24px 16px">
-  <div style="background:#fff;width:100%;max-width:480px;border-radius:16px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,0.35);margin:auto">
-    <div style="background:linear-gradient(135deg,#1a1a2e,#2d1b69);padding:18px 20px;display:flex;align-items:center;justify-content:space-between">
-      <div id="stock-modal-title" style="font-family:'Oswald',sans-serif;font-size:1.2rem;font-weight:800;color:#fff">Novo Material</div>
-      <button onclick="stockFecharForm()" style="background:rgba(255,255,255,0.15);border:none;color:#fff;width:30px;height:30px;border-radius:7px;cursor:pointer;font-size:1rem">✕</button>
-    </div>
-    <div style="padding:20px" id="stock-modal-body"></div>
-  </div>
-</div>
-
-<div id="stock-hist-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9200;align-items:flex-start;justify-content:center;overflow-y:auto;padding:24px 16px">
-  <div style="background:#fff;width:100%;max-width:640px;border-radius:16px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,0.35);margin:auto">
-    <div style="background:linear-gradient(135deg,#1a1a2e,#2d1b69);padding:18px 20px;display:flex;align-items:center;justify-content:space-between">
-      <div style="font-family:'Oswald',sans-serif;font-size:1.2rem;font-weight:800;color:#fff">Movimentos de Stock</div>
-      <button onclick="stockHistFechar()" style="background:rgba(255,255,255,0.15);border:none;color:#fff;width:30px;height:30px;border-radius:7px;cursor:pointer;font-size:1rem">✕</button>
-    </div>
-    <div style="padding:12px 20px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-      <label style="font-size:0.78rem;font-weight:600;color:#6b7280">Filtrar por obra:</label>
-      <select id="stock-hist-obra" class="stock-inp" style="max-width:280px" onchange="stockHistRender()"></select>
-    </div>
-    <div id="stock-hist-list" style="padding:0 20px 24px;max-height:60vh;overflow-y:auto"></div>
-  </div>
-</div>
-
-<style>
-.stock-row{display:grid;grid-template-columns:1fr auto auto auto;gap:10px;align-items:center;background:#fff;border:1.5px solid #e5e7eb;border-radius:10px;padding:12px 14px;margin-bottom:8px}
-.stock-row.low{border-color:#fecaca;background:#fef2f2}
-.stock-inp{width:100%;border:1.5px solid #e5e7eb;border-radius:7px;padding:8px 10px;font-size:0.88rem;font-family:inherit;box-sizing:border-box}
-.stock-lbl{font-size:0.72rem;font-weight:600;color:#6b7280;display:block;margin-bottom:3px}
-.stock-qbtn{width:30px;height:30px;border:none;border-radius:7px;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0}
-.stock-mbtn{border:none;border-radius:7px;font-size:0.74rem;font-weight:700;cursor:pointer;font-family:inherit;padding:7px 9px;white-space:nowrap}
-@media(max-width:640px){.stock-row{grid-template-columns:1fr auto;row-gap:8px}.stock-mbtn{font-size:0.7rem;padding:6px 7px}}
-</style>
-
-<!-- =====================================================
-     SECÇÃO: FOLHA DE PONTO
-     ===================================================== -->
-<div id="section-folha-ponto" class="suite-section">
-  <div style="padding:24px 20px 60px;max-width:1200px;margin:0 auto">
-
-    <!-- Header -->
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap">
-      <div style="display:flex;align-items:center;gap:14px">
-        <div style="width:52px;height:52px;border-radius:14px;background:#e8f5e9;border:2px solid #2e7d32;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">📅</div>
-        <div>
-          <h2 style="font-family:'Oswald',sans-serif;font-size:1.5rem;font-weight:700;color:#1a1a2e;margin:0 0 2px">Folha de Ponto</h2>
-          <div style="font-size:12px;color:#6b7280">Registo mensal de presenças e faltas</div>
-        </div>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-        <button onclick="fpPrevMonth()" class="fp-nav-btn">&#8249;</button>
-        <span id="fp-month-label" style="font-weight:700;font-size:1rem;min-width:160px;text-align:center;color:#1a1a2e"></span>
-        <button onclick="fpNextMonth()" class="fp-nav-btn">&#8250;</button>
-        <button onclick="fpPrint()" style="background:#2e7d32;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:background 0.15s" onmouseover="this.style.background='#1b5e20'" onmouseout="this.style.background='#2e7d32'">&#128424; Imprimir</button>
-      </div>
-    </div>
-
-    <!-- Legend bar -->
-    <div style="background:#f9fafb;border:1.5px solid #e5e7eb;border-radius:10px;padding:10px 16px;margin-bottom:20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;font-size:0.82rem;color:#374151">
-      <strong>Legenda:</strong>
-      <span>Vazio = presente</span>
-      <span id="fp-leg-f" style="background:#fee2e2;color:#b91c1c;padding:2px 8px;border-radius:5px;font-weight:700">F = Falta</span>
-      <span id="fp-leg-c2" style="background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:5px;font-weight:700"></span>
-      <button onclick="fpEditCodes()" style="margin-left:auto;background:none;border:1.5px solid #d1d5db;border-radius:7px;padding:4px 10px;font-size:11px;color:#6b7280;cursor:pointer;font-family:inherit;transition:all 0.15s" onmouseover="this.style.borderColor='#2e7d32';this.style.color='#2e7d32'" onmouseout="this.style.borderColor='#d1d5db';this.style.color='#6b7280'">&#9999; Editar c&#243;digos</button>
-    </div>
-
-    <!-- No employees message -->
-    <div id="fp-no-func" style="display:none;text-align:center;padding:56px 16px;color:#9ca3af">
-      <div style="font-size:2.5rem;margin-bottom:10px">&#128119;</div>
-      <div style="font-size:0.9rem">Nenhum funcion&#225;rio ativo.<br>Adiciona funcion&#225;rios no separador <strong>Pagamentos</strong>.</div>
-    </div>
-
-    <!-- Tables rendered by JS -->
-    <div id="fp-table-1" style="overflow-x:auto;margin-bottom:24px"></div>
-    <div id="fp-table-2" style="overflow-x:auto"></div>
-
-  </div>
-</div>
-
-<style>
-.fp-nav-btn { background:#f3f4f6;border:1.5px solid #e5e7eb;border-radius:8px;padding:6px 14px;font-size:16px;cursor:pointer;font-weight:700;color:#374151;transition:all 0.15s;font-family:inherit }
-.fp-nav-btn:hover { background:#e8f5e9;border-color:#2e7d32;color:#2e7d32 }
-.fp-table { border-collapse:collapse;width:100%;font-size:0.8rem }
-.fp-table th { background:#1a1a2e;color:#fff;padding:5px 6px;text-align:center;font-weight:700;white-space:nowrap }
-.fp-table th.fp-th-nome { text-align:left;min-width:120px;padding-left:10px }
-.fp-table td { border:1px solid #e5e7eb;padding:0;text-align:center;vertical-align:middle }
-.fp-table td.fp-td-nome { padding:7px 10px;text-align:left;font-weight:600;color:#1a1a2e;background:#fafafa;white-space:nowrap }
-.fp-table tr:hover td.fp-td-nome { background:#f0fdf4 }
-.fp-cell { width:36px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:700;font-size:0.75rem;user-select:none;transition:filter 0.1s }
-.fp-cell:hover { filter:brightness(0.88) }
-.fp-cell[data-v=""] { background:#fff;color:transparent }
-.fp-cell[data-v="F"] { background:#fee2e2;color:#b91c1c }
-.fp-dow { font-size:0.65rem;font-weight:400;color:rgba(255,255,255,0.65) }
-</style>
-
-<!-- =====================================================
-     SECÇÃO: PREMIAÇÃO
-     ===================================================== -->
-<div id="section-premiacao" class="suite-section">
-  <div style="padding:20px 24px 56px;max-width:1100px;margin:0 auto">
-
-    <!-- Header -->
-    <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px">
-      <div style="width:48px;height:48px;border-radius:14px;background:#fef3c7;border:2px solid #d97706;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">🏆</div>
-      <div>
-        <h2 style="font-family:'Oswald',sans-serif;font-size:1.45rem;font-weight:700;color:#1a1a2e;margin:0 0 1px">Premiação Mensal</h2>
-        <div id="prem-today-lbl" style="font-size:12px;color:#6b7280"></div>
-      </div>
-    </div>
-
-    <!-- Tab nav -->
-    <div style="display:flex;gap:4px;margin-bottom:20px;overflow-x:auto;padding-bottom:2px">
-      <button class="prem-tab prem-tab-active" onclick="premTab('registar',this)">📋 Registar</button>
-      <button class="prem-tab" onclick="premTab('equipa',this)">👷 Equipa</button>
-      <button class="prem-tab" onclick="premTab('obras',this)">🏗️ Obras</button>
-      <button class="prem-tab" onclick="premTab('ranking',this)">🏆 Ranking</button>
-      <button class="prem-tab" onclick="premTab('contadores',this)">📊 Contadores</button>
-    </div>
-
-    <!-- Panel: Registar -->
-    <div id="prem-panel-registar">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;background:#f9fafb;border:1.5px solid #e5e7eb;border-radius:10px;padding:10px 14px">
-        <span style="font-size:0.82rem;font-weight:700;color:#374151;white-space:nowrap">📅 Registar para:</span>
-        <input type="date" id="prem-active-date" onchange="premSetDate(this.value)" style="border:1.5px solid #e5e7eb;border-radius:7px;padding:5px 10px;font-size:0.85rem;font-family:inherit;color:#1a1a2e;background:#fff;cursor:pointer;flex:1;min-width:140px">
-        <button onclick="premSetDate(new Date().toISOString().slice(0,10))" style="background:#e5e7eb;border:none;border-radius:7px;padding:5px 12px;font-size:0.78rem;font-weight:700;color:#374151;cursor:pointer;font-family:inherit;white-space:nowrap">↩ Hoje</button>
-        <span id="prem-date-warn" style="display:none;font-size:0.75rem;color:#d97706;font-weight:700;white-space:nowrap">⚠️ Data diferente de hoje</span>
-      </div>
-      <div style="font-size:0.77rem;color:#9ca3af;font-weight:600;margin-bottom:14px">📸 Foto WA = +1pt · 🔑 Chave = +1pt · ✅ Presença = +1pt · ⚠️ Reclamação = −2pts</div>
-      <div id="prem-reg-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:12px"></div>
-      <div id="prem-reg-empty" style="display:none;text-align:center;padding:56px 16px;color:#9ca3af">
-        <div style="font-size:2.5rem;margin-bottom:10px">👷</div>
-        <div style="font-size:0.9rem">Nenhum funcionário.<br>Adiciona na tab <strong>Equipa</strong>.</div>
-      </div>
-    </div>
-
-    <!-- Panel: Equipa -->
-    <div id="prem-panel-equipa" style="display:none">
-      <div class="prem-add-box">
-        <div style="font-weight:700;font-size:0.88rem;color:#1a1a2e;margin-bottom:10px">➕ Novo funcionário</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-          <input id="pnome" class="prem-inp" placeholder="Nome completo">
-          <input id="pfunc" class="prem-inp" placeholder="Função (ex: Pedreiro)">
-        </div>
-        <input id="pobs" class="prem-inp" placeholder="Observações (opcional)" style="width:100%;box-sizing:border-box;margin-bottom:10px">
-        <div style="display:flex;gap:8px;align-items:center">
-          <button onclick="premAddFuncionario()" style="background:#d97706;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-weight:700;font-size:0.88rem;cursor:pointer;font-family:inherit">Adicionar</button>
-          <button onclick="premImportFromFolha()" style="background:#fff;color:#d97706;border:1.5px solid #d97706;border-radius:8px;padding:9px 14px;font-weight:700;font-size:0.82rem;cursor:pointer;font-family:inherit">📋 Importar da Folha de Ponto</button>
-        </div>
-      </div>
-      <div id="prem-equipa-list" style="margin-top:16px"></div>
-    </div>
-
-    <!-- Panel: Obras -->
-    <div id="prem-panel-obras" style="display:none">
-      <div class="prem-add-box">
-        <div style="font-weight:700;font-size:0.88rem;color:#1a1a2e;margin-bottom:10px">➕ Nova obra</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-          <input id="pob-nome" class="prem-inp" placeholder="Nome da obra">
-          <input id="pob-local" class="prem-inp" placeholder="Local / Morada">
-        </div>
-        <button onclick="premAddObra()" style="background:#d97706;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-weight:700;font-size:0.88rem;cursor:pointer;font-family:inherit">Adicionar</button>
-      </div>
-      <div id="prem-obras-list" style="margin-top:16px"></div>
-    </div>
-
-    <!-- Panel: Contadores -->
-    <div id="prem-panel-contadores" style="display:none">
-      <div style="margin-bottom:16px;font-size:0.82rem;color:#6b7280">Contadores independentes por categoria — use o <strong>+</strong> para registar e <strong>Reset</strong> para zerar.</div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px">
-
-        <!-- Card Fotos -->
-        <div style="background:#fff;border:1.5px solid #bfdbfe;border-radius:14px;overflow:hidden">
-          <div style="background:linear-gradient(135deg,#1d4ed8,#3b82f6);padding:12px 16px;display:flex;align-items:center;justify-content:space-between">
-            <span style="font-family:'Oswald',sans-serif;font-size:1rem;font-weight:700;color:#fff">📸 Fotos</span>
-            <button onclick="contadoresReset('fotos')" style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);color:#fff;border-radius:6px;padding:3px 10px;font-size:0.72rem;font-weight:700;cursor:pointer;font-family:inherit">Reset</button>
-          </div>
-          <div id="cont-list-fotos" style="padding:8px 0;max-height:360px;overflow-y:auto"></div>
-        </div>
-
-        <!-- Card Chave -->
-        <div style="background:#fff;border:1.5px solid #fed7aa;border-radius:14px;overflow:hidden">
-          <div style="background:linear-gradient(135deg,#c2410c,#f97316);padding:12px 16px;display:flex;align-items:center;justify-content:space-between">
-            <span style="font-family:'Oswald',sans-serif;font-size:1rem;font-weight:700;color:#fff">🔑 Chave</span>
-            <button onclick="contadoresReset('chave')" style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);color:#fff;border-radius:6px;padding:3px 10px;font-size:0.72rem;font-weight:700;cursor:pointer;font-family:inherit">Reset</button>
-          </div>
-          <div id="cont-list-chave" style="padding:8px 0;max-height:360px;overflow-y:auto"></div>
-        </div>
-
-        <!-- Card Presença -->
-        <div style="background:#fff;border:1.5px solid #bbf7d0;border-radius:14px;overflow:hidden">
-          <div style="background:linear-gradient(135deg,#15803d,#22c55e);padding:12px 16px;display:flex;align-items:center;justify-content:space-between">
-            <span style="font-family:'Oswald',sans-serif;font-size:1rem;font-weight:700;color:#fff">✅ Presença</span>
-            <button onclick="contadoresReset('presenca')" style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);color:#fff;border-radius:6px;padding:3px 10px;font-size:0.72rem;font-weight:700;cursor:pointer;font-family:inherit">Reset</button>
-          </div>
-          <div id="cont-list-presenca" style="padding:8px 0;max-height:360px;overflow-y:auto"></div>
-        </div>
-
-        <!-- Card Reclamações -->
-        <div style="background:#fff;border:1.5px solid #fecaca;border-radius:14px;overflow:hidden">
-          <div style="background:linear-gradient(135deg,#991b1b,#ef4444);padding:12px 16px;display:flex;align-items:center;justify-content:space-between">
-            <span style="font-family:'Oswald',sans-serif;font-size:1rem;font-weight:700;color:#fff">⚠️ Reclamações</span>
-            <button onclick="contadoresReset('reclamacoes')" style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);color:#fff;border-radius:6px;padding:3px 10px;font-size:0.72rem;font-weight:700;cursor:pointer;font-family:inherit">Reset</button>
-          </div>
-          <div id="cont-list-reclamacoes" style="padding:8px 0;max-height:360px;overflow-y:auto"></div>
-        </div>
-
-      </div>
-
-      <!-- Pontuação Total -->
-      <div style="margin-top:24px">
-        <div style="font-family:'Oswald',sans-serif;font-size:1.05rem;font-weight:700;color:#1a1a2e;margin-bottom:10px">📊 Pontuação Total <span style="font-size:0.72rem;font-weight:400;color:#6b7280;font-family:inherit">(Fotos + Chave + Presença − Reclamações×4)</span></div>
-        <div id="cont-total-ranking" style="background:#fff;border:1.5px solid #e5e7eb;border-radius:14px;overflow:hidden"></div>
-      </div>
-
-    </div>
-
-    <!-- Panel: Ranking -->
-    <div id="prem-panel-ranking" style="display:none">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap">
-        <select id="prem-rk-m" onchange="premRankRender()" style="border:1.5px solid #e5e7eb;border-radius:8px;padding:7px 10px;font-size:0.88rem;font-family:inherit;background:#fff"></select>
-        <select id="prem-rk-y" onchange="premRankRender()" style="border:1.5px solid #e5e7eb;border-radius:8px;padding:7px 10px;font-size:0.88rem;font-family:inherit;background:#fff"></select>
-      </div>
-      <div id="prem-winner"></div>
-      <div id="prem-rank-list"></div>
-      <div style="margin-top:20px;text-align:center">
-        <button onclick="premGerarRelatorio()" style="background:#1a1a2e;color:#fff;border:none;border-radius:10px;padding:11px 22px;font-size:0.88rem;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:8px;transition:background 0.15s" onmouseover="this.style.background='#d97706'" onmouseout="this.style.background='#1a1a2e'">📄 Gerar Relatório do Mês</button>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-
-<!-- =====================================================
-     SECÇÃO: EQUIPA
-     ===================================================== -->
-<div id="section-equipa" class="suite-section">
-  <div style="padding:20px 24px 56px;max-width:1100px;margin:0 auto">
+<div id="section-kanban" class="suite-section">
+  <div style="padding:20px 24px 64px">
     <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;flex-wrap:wrap">
-      <div style="width:48px;height:48px;border-radius:14px;background:#1a1a2e;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">&#x1F464;</div>
+      <div style="width:48px;height:48px;border-radius:14px;background:#7c3aed;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">📋</div>
       <div style="flex:1;min-width:0">
-        <h2 style="font-family:'Oswald',sans-serif;font-size:1.45rem;font-weight:700;color:#1a1a2e;margin:0">Equipa</h2>
-        <div style="font-size:0.78rem;color:#9ca3af">Fichas de funcionários &middot; Vales &middot; Premiação</div>
+        <h2 style="font-family:'Oswald',sans-serif;font-size:1.45rem;font-weight:700;color:#1a1a2e;margin:0">Kanban — Status de Obras</h2>
+        <div style="font-size:0.78rem;color:#9ca3af">Arraste cartões entre colunas para atualizar o estado</div>
       </div>
-      <button onclick="eqHistValesAbrir()" style="background:#1a1a2e;color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;display:flex;align-items:center;gap:6px">&#x1F4CB; Hist&oacute;rico de Vales</button>
+      <button onclick="kanbNovoCartao()" style="background:#7c3aed;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit">+ Nova Obra</button>
     </div>
-    <div id="eq-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px"></div>
-    <div id="eq-empty" style="display:none;text-align:center;padding:56px 16px;color:#9ca3af">
-      <div style="font-size:2.5rem;margin-bottom:10px">&#x1F477;</div>
-      <div>Nenhum funcionário.<br>Adiciona na secção <strong>Premiação &rarr; Equipa</strong>.</div>
-    </div>
+    <div id="kanb-board" style="display:flex;gap:14px;overflow-x:auto;padding-bottom:24px;align-items:flex-start;min-height:400px"></div>
   </div>
 </div>
 
-
-<!-- HISTÓRICO GLOBAL DE VALES MODAL -->
-<div id="eq-hist-vales-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:9150;overflow-y:auto;padding:24px 16px">
-  <div style="background:#fff;max-width:700px;margin:0 auto;border-radius:16px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,0.35)">
-    <!-- Header -->
-    <div style="background:linear-gradient(135deg,#1a1a2e,#2d1b69);padding:18px 20px;display:flex;align-items:center;justify-content:space-between">
-      <div>
-        <div style="font-size:0.7rem;color:#a5b4fc;letter-spacing:0.1em;text-transform:uppercase">Equipa</div>
-        <div style="font-family:'Oswald',sans-serif;font-size:1.3rem;font-weight:800;color:#fff">Hist&oacute;rico de Vales</div>
-      </div>
-      <button onclick="eqHistValesFechar()" style="background:rgba(255,255,255,0.15);border:none;color:#fff;width:30px;height:30px;border-radius:7px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center">&#x2715;</button>
-    </div>
-    <!-- Summary bar -->
-    <div id="eq-hist-vales-summary" style="padding:14px 20px 0"></div>
-    <!-- Filters -->
-    <div style="padding:12px 20px;display:flex;gap:6px;flex-wrap:wrap">
-      <button class="eq-hv-filter eq-hv-active" data-f="todos" onclick="eqHistValesFiltrar('todos',this)">Todos</button>
-      <button class="eq-hv-filter" data-f="aberto" onclick="eqHistValesFiltrar('aberto',this)">Em aberto</button>
-      <button class="eq-hv-filter" data-f="pago" onclick="eqHistValesFiltrar('pago',this)">Pagos</button>
-      <input type="text" id="eq-hv-search" placeholder="Pesquisar nome ou descrição..." oninput="eqHistValesRender()" style="margin-left:auto;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:0.8rem;font-family:inherit;width:200px;box-sizing:border-box">
-    </div>
-    <!-- List -->
-    <div id="eq-hist-vales-list" style="padding:0 20px 24px;max-height:60vh;overflow-y:auto"></div>
-  </div>
-</div>
-
-<!-- FICHA MODAL -->
-<div id="eq-ficha-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:9100;align-items:flex-start;justify-content:center;overflow-y:auto;padding:24px 16px">
-  <div id="eq-ficha-modal" style="background:#fff;width:100%;max-width:520px;border-radius:16px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,0.35);margin:auto">
-    <div style="background:linear-gradient(135deg,#1a1a2e,#2d1b69);padding:20px 20px 0 20px;color:#fff">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px">
-        <div id="eq-ficha-hdr" style="display:flex;align-items:center;gap:12px;flex:1;min-width:0"></div>
-        <button onclick="eqFecharFicha()" style="background:rgba(255,255,255,0.15);border:none;color:#fff;width:30px;height:30px;border-radius:7px;cursor:pointer;font-size:1rem;flex-shrink:0;display:flex;align-items:center;justify-content:center">&#x2715;</button>
-      </div>
-      <div style="display:flex;gap:2px">
-        <button class="eq-ficha-tab eq-tab-active" data-tab="geral" onclick="eqFichaTab('geral',this)">&#x1F4CA; Geral</button>
-        <button class="eq-ficha-tab" data-tab="vales" onclick="eqFichaTab('vales',this)">&#x1F4B6; Vales</button>
-        <button class="eq-ficha-tab" data-tab="premiacao" onclick="eqFichaTab('premiacao',this)">&#x1F3C6; Premia&ccedil;&atilde;o</button>
-      </div>
+<!-- KANBAN — MODAL CARTÃO -->
+<div id="kanb-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9200;overflow-y:auto;padding:24px 16px">
+  <div style="background:#fff;max-width:540px;width:100%;border-radius:16px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,0.35);margin:0 auto">
+    <div style="background:linear-gradient(135deg,#5b21b6,#7c3aed);padding:18px 20px;display:flex;align-items:center;justify-content:space-between">
+      <div id="kanb-modal-titulo" style="font-family:'Oswald',sans-serif;font-size:1.2rem;font-weight:800;color:#fff">Nova Obra</div>
+      <button onclick="kanbFecharModal()" style="background:rgba(255,255,255,0.15);border:none;color:#fff;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:1rem">✕</button>
     </div>
     <div style="padding:20px">
-      <div id="eq-panel-geral"></div>
-      <div id="eq-panel-vales" style="display:none"></div>
-      <div id="eq-panel-premiacao" style="display:none"></div>
+      <input type="hidden" id="kanb-edit-id">
+      <div style="margin-bottom:12px">
+        <label class="orc-label">Título / Descrição da Obra *</label>
+        <input id="kanb-f-titulo" class="orc-input" placeholder="ex: Telhado Sr. António Silva">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+        <div>
+          <label class="orc-label">Cliente</label>
+          <input id="kanb-f-cliente" class="orc-input" placeholder="Nome do cliente">
+        </div>
+        <div>
+          <label class="orc-label">Valor estimado (€)</label>
+          <input id="kanb-f-valor" class="orc-input" type="number" min="0" step="0.01" placeholder="0">
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+        <div>
+          <label class="orc-label">Responsável</label>
+          <input id="kanb-f-responsavel" class="orc-input" placeholder="Técnico / Equipa">
+        </div>
+        <div>
+          <label class="orc-label">Data início</label>
+          <input id="kanb-f-data" class="orc-input" type="date">
+        </div>
+      </div>
+      <div style="margin-bottom:12px">
+        <label class="orc-label">Estado</label>
+        <select id="kanb-f-status" class="orc-input">
+          <option value="orcamentado">Orçamentado</option>
+          <option value="aprovado">Aprovado</option>
+          <option value="em-obra">Em Obra</option>
+          <option value="pausa">Pausa</option>
+          <option value="concluido">Concluído</option>
+        </select>
+      </div>
+      <div>
+        <label class="orc-label">Notas</label>
+        <textarea id="kanb-f-notas" class="orc-input" style="min-height:60px;resize:vertical" placeholder="Observações sobre a obra..."></textarea>
+      </div>
+    </div>
+    <div style="padding:14px 20px;border-top:1px solid #f1f5f9;display:flex;gap:8px;background:#fafafa;align-items:center">
+      <button id="kanb-del-btn" style="display:none;background:#fee2e2;color:#dc2626;border:1.5px solid #fecaca;border-radius:8px;padding:8px 14px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit" onclick="kanbEliminar()">🗑 Eliminar</button>
+      <div style="flex:1"></div>
+      <button onclick="kanbFecharModal()" style="background:#f1f5f9;color:#374151;border:1.5px solid #e5e7eb;border-radius:8px;padding:8px 14px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit">Cancelar</button>
+      <button onclick="kanbGuardar()" style="background:#7c3aed;color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit">Guardar</button>
     </div>
   </div>
 </div>
+
 <!-- =====================================================
      SECÇÃO: ORÇAMENTOS
      ===================================================== -->
@@ -2781,7 +2528,7 @@ textarea.si-input { resize: vertical; min-height: 64px; }
     'inf_prem_v2',
     'inf_premiacao_v1',
     'inf_vales_v1',
-    'inf_stock_v1',
+    'inf_kanban_v1',
     'inf_obras_v1',
     'inf_orcamentos_v2',
     'inf_collabs',
@@ -2918,9 +2665,9 @@ function suiteShowSection(id, btn) {
   if (id === 'equipa') {
     eqInit();
   }
-  // Init stock de materiais
-  if (id === 'stock') {
-    stockInit();
+  // Init kanban
+  if (id === 'kanban') {
+    kanbInit();
   }
   // Init orçamentos
   if (id === 'orcamentos') {
@@ -4013,197 +3760,149 @@ var VALES_KEY = 'inf_vales_v1';
 var EQ_FICHA_ID = null;
 
 // =============================================================================
-// STOCK DE MATERIAIS DE CONSTRUÇÃO
+// KANBAN — STATUS DE OBRAS
 // =============================================================================
-var STOCK_KEY = 'inf_stock_v1';
-var STOCK_UNITS = ['un','saco','kg','m','m²','m³','L','cx','palete','rolo'];
-function stockLoad() { try { return JSON.parse(localStorage.getItem(STOCK_KEY)||'[]'); } catch(e) { return []; } }
-function stockSave(v) { localStorage.setItem(STOCK_KEY, JSON.stringify(v)); }
-function stockInit() { stockRender(); }
-function stockEscAttr(s) { return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+var KANB_KEY = 'inf_kanban_v1';
+var KANB_COLS = [
+  { id:'orcamentado', label:'Orçamentado', cor:'#6366f1', bg:'#eef2ff' },
+  { id:'aprovado',    label:'Aprovado',    cor:'#0ea5e9', bg:'#f0f9ff' },
+  { id:'em-obra',     label:'Em Obra',     cor:'#f59e0b', bg:'#fffbeb' },
+  { id:'pausa',       label:'Pausa',       cor:'#ef4444', bg:'#fef2f2' },
+  { id:'concluido',   label:'Concluído',   cor:'#10b981', bg:'#f0fdf4' }
+];
+var KANB_DRAG_ID = null;
 
-function stockCard(label, val, color) {
-  return '<div style="background:#fff;border:1.5px solid #e5e7eb;border-radius:12px;padding:14px;text-align:center">' +
-    '<div style="font-family:\'Oswald\',sans-serif;font-size:1.6rem;font-weight:800;color:'+color+'">'+val+'</div>' +
-    '<div style="font-size:0.66rem;color:#9ca3af;text-transform:uppercase;font-weight:600;margin-top:2px">'+label+'</div></div>';
-}
+function kanbLoad() { try { return JSON.parse(localStorage.getItem(KANB_KEY)||'[]'); } catch(e) { return []; } }
+function kanbSave(v) { localStorage.setItem(KANB_KEY, JSON.stringify(v)); }
+function kanbInit() { kanbRender(); }
+function kanbFmt(n) { return n.toLocaleString('pt-PT',{minimumFractionDigits:2,maximumFractionDigits:2}); }
 
-function stockRender() {
-  var list = document.getElementById('stock-list'); if (!list) return;
-  var empty = document.getElementById('stock-empty');
-  var items = stockLoad();
-  var q = ((document.getElementById('stock-search')||{}).value||'').toLowerCase();
-  var low = items.filter(function(m){ return (parseFloat(m.qtd)||0) <= (parseFloat(m.minimo)||0); });
-  var sum = document.getElementById('stock-summary');
-  if (sum) sum.innerHTML = stockCard('Materiais', items.length, '#1a1a2e') + stockCard('Em falta', low.length, low.length?'#b91c1c':'#16a34a');
-
-  var filtered = items.filter(function(m){ return !q || (m.nome||'').toLowerCase().indexOf(q)>=0 || (m.categoria||'').toLowerCase().indexOf(q)>=0; });
-  if (!items.length) { list.innerHTML=''; if (empty) empty.style.display=''; return; }
-  if (empty) empty.style.display='none';
-  if (!filtered.length) { list.innerHTML='<div style="text-align:center;padding:32px;color:#9ca3af;font-size:0.88rem">Nada encontrado.</div>'; return; }
-  filtered.sort(function(a,b){ return (a.nome||'').localeCompare(b.nome||'','pt'); });
-  var qq = '\x27';
-  list.innerHTML = filtered.map(function(m) {
-    var qtd = parseFloat(m.qtd)||0, min = parseFloat(m.minimo)||0, isLow = qtd<=min;
-    return '<div class="stock-row'+(isLow?' low':'')+'">' +
-      '<div style="min-width:0"><div style="font-weight:700;color:#1a1a2e;font-size:0.95rem">'+escHtml(m.nome)+(isLow?' <span style="background:#fee2e2;color:#b91c1c;border-radius:20px;padding:1px 8px;font-size:0.66rem;font-weight:700">BAIXO</span>':'')+'</div>' +
-        '<div style="font-size:0.74rem;color:#9ca3af">'+escHtml(m.categoria||'—')+(m.fornecedor?' · '+escHtml(m.fornecedor):'')+' · mín: '+min+' '+escHtml(m.unidade||'')+'</div></div>' +
-      '<div style="text-align:center;min-width:54px"><div style="font-family:\'Oswald\',sans-serif;font-size:1.15rem;font-weight:800;color:'+(isLow?'#b91c1c':'#1a1a2e')+'">'+qtd+'</div><div style="font-size:0.62rem;color:#9ca3af">'+escHtml(m.unidade||'un')+'</div></div>' +
-      '<div style="display:flex;gap:4px">' +
-        '<button class="stock-mbtn" style="background:#d1fae5;color:#065f46" onclick="stockAbrirMov('+qq+m.id+qq+','+qq+'entrada'+qq+')">↓ Entrada</button>' +
-        '<button class="stock-mbtn" style="background:#fef3c7;color:#92400e" onclick="stockAbrirMov('+qq+m.id+qq+','+qq+'saida'+qq+')">↑ Saída</button>' +
+function kanbRender() {
+  var board = document.getElementById('kanb-board');
+  if (!board) return;
+  var cards = kanbLoad();
+  board.innerHTML = KANB_COLS.map(function(col) {
+    var colCards = cards.filter(function(c){ return c.status === col.id; });
+    var totalVal = colCards.reduce(function(s,c){ return s+(parseFloat(c.valor)||0); },0);
+    var cardsHtml = colCards.map(function(card) {
+      return '<div draggable="true" ' +
+        'ondragstart="kanbDragStart(event,\''+card.id+'\');" ' +
+        'ondragend="kanbDragEnd(event);" ' +
+        'onclick="kanbEditarCartao(\''+card.id+'\');" ' +
+        'style="background:#fff;border-radius:10px;padding:12px 14px;box-shadow:0 2px 8px rgba(0,0,0,0.08);cursor:pointer;border:1.5px solid #f1f5f9;margin-bottom:8px;user-select:none">' +
+        '<div style="font-weight:700;font-size:0.88rem;color:#1a1a2e;margin-bottom:4px">'+escHtml(card.titulo||'Sem título')+'</div>' +
+        (card.cliente ? '<div style="font-size:0.78rem;color:#6b7280">👤 '+escHtml(card.cliente)+'</div>' : '') +
+        (card.responsavel ? '<div style="font-size:0.78rem;color:#6b7280">🔧 '+escHtml(card.responsavel)+'</div>' : '') +
+        (card.valor ? '<div style="font-size:0.82rem;font-weight:700;color:'+col.cor+';margin-top:6px">'+kanbFmt(parseFloat(card.valor)||0)+' €</div>' : '') +
+        (card.dataInicio ? '<div style="font-size:0.73rem;color:#9ca3af;margin-top:4px">📅 '+card.dataInicio+'</div>' : '') +
+        (card.notas ? '<div style="font-size:0.73rem;color:#9ca3af;margin-top:3px;font-style:italic">'+escHtml(card.notas.slice(0,70))+(card.notas.length>70?'…':'')+'</div>' : '') +
+      '</div>';
+    }).join('');
+    return '<div ' +
+      'ondragover="kanbDragOver(event);" ' +
+      'ondrop="kanbDrop(event,\''+col.id+'\');" ' +
+      'ondragleave="kanbDragLeave(event);" ' +
+      'style="min-width:220px;width:220px;background:'+col.bg+';border-radius:14px;padding:12px;flex-shrink:0">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">' +
+        '<div>' +
+          '<div style="font-weight:800;font-size:0.9rem;color:'+col.cor+'">'+col.label+'</div>' +
+          '<div style="font-size:0.72rem;color:#9ca3af">'+colCards.length+' obra'+(colCards.length!==1?'s':'')+
+            (totalVal>0?' · '+kanbFmt(totalVal)+' €':'')+
+          '</div>' +
+        '</div>' +
+        '<button onclick="kanbNovoNaColuna(\''+col.id+'\')" ' +
+          'style="background:'+col.cor+';color:#fff;border:none;width:26px;height:26px;border-radius:6px;cursor:pointer;font-size:1.1rem;line-height:1;display:flex;align-items:center;justify-content:center">+</button>' +
       '</div>' +
-      '<div style="display:flex;gap:4px">' +
-        '<button class="stock-qbtn" style="background:#f3f4f6;color:#374151" onclick="stockAbrirForm('+qq+m.id+qq+')" title="Editar">✏️</button>' +
-        '<button class="stock-qbtn" style="background:#f3f4f6;color:#b91c1c" onclick="stockEliminar('+qq+m.id+qq+')" title="Eliminar">🗑️</button>' +
-      '</div>' +
+      '<div style="display:flex;flex-direction:column;min-height:80px">'+cardsHtml+'</div>' +
     '</div>';
   }).join('');
 }
 
-// Obras (ligadas ao separador Obras — store inf_obras_v1)
-function stockObras() { try { return JSON.parse(localStorage.getItem('inf_obras_v1')||'[]'); } catch(e) { return []; } }
-function stockObraLabel(o) { return ((o.numero?o.numero+' — ':'')+(o.clientName||o.nome||'Obra')); }
-
-// Abre o formulário de movimento (entrada ou saída). Na saída pede a obra.
-function stockAbrirMov(id, tipo) {
-  var m = stockLoad().find(function(x){ return x.id===id; }); if (!m) return;
-  var isSaida = tipo === 'saida';
-  document.getElementById('stock-modal-title').textContent = (isSaida?'Saída':'Entrada')+' — '+m.nome;
-  var today = new Date().toISOString().slice(0,10);
-  var obras = stockObras();
-  var obraSel = '';
-  if (isSaida) {
-    if (!obras.length) {
-      obraSel = '<div style="margin-bottom:10px"><label class="stock-lbl">Obra</label>' +
-        '<div style="font-size:0.8rem;color:#b91c1c;background:#fef2f2;border:1.5px solid #fecaca;border-radius:8px;padding:8px 10px">Ainda não há obras. Cria uma no separador <strong>Obras</strong>.</div></div>';
-    } else {
-      obraSel = '<div style="margin-bottom:10px"><label class="stock-lbl">Obra (para onde sai) *</label>' +
-        '<select id="stk-mov-obra" class="stock-inp"><option value="">— escolher obra —</option>' +
-        obras.map(function(o){ return '<option value="'+o.id+'">'+stockEscAttr(stockObraLabel(o))+'</option>'; }).join('') +
-        '</select></div>';
-    }
-  }
-  document.getElementById('stock-modal-body').innerHTML =
-    '<div style="background:#f9fafb;border:1.5px solid #e5e7eb;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:0.82rem;color:#374151">Em stock: <strong>'+(parseFloat(m.qtd)||0)+' '+escHtml(m.unidade||'un')+'</strong></div>' +
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">' +
-      '<div><label class="stock-lbl">Quantidade *</label><input id="stk-mov-qtd" type="number" step="0.01" min="0.01" class="stock-inp" placeholder="0"></div>' +
-      '<div><label class="stock-lbl">Data</label><input id="stk-mov-data" type="date" class="stock-inp" value="'+today+'"></div>' +
-    '</div>' +
-    obraSel +
-    '<div style="margin-bottom:16px"><label class="stock-lbl">Nota (opcional)</label><input id="stk-mov-nota" class="stock-inp" placeholder="Ex: receção de fornecedor / aplicado na obra"></div>' +
-    '<div style="display:flex;gap:8px">' +
-      '<button onclick="stockFecharForm()" style="flex:1;background:#f3f4f6;color:#374151;border:none;border-radius:8px;padding:10px;font-weight:700;cursor:pointer;font-family:inherit">Cancelar</button>' +
-      '<button onclick="stockGuardarMov('+qStr(id)+','+qStr(tipo)+')" style="flex:2;background:'+(isSaida?'#d97706':'#16a34a')+';color:#fff;border:none;border-radius:8px;padding:10px;font-weight:700;cursor:pointer;font-family:inherit">Registar '+(isSaida?'Saída':'Entrada')+'</button>' +
-    '</div>';
-  document.getElementById('stock-modal-overlay').style.display = 'flex';
+function kanbDragStart(e, id) { KANB_DRAG_ID = id; e.currentTarget.style.opacity='0.5'; }
+function kanbDragEnd(e) {
+  e.currentTarget.style.opacity='';
+  document.querySelectorAll('[ondragover]').forEach(function(c){ c.style.outline=''; });
+}
+function kanbDragOver(e) { e.preventDefault(); e.currentTarget.style.outline='2px dashed #7c3aed'; }
+function kanbDragLeave(e) { e.currentTarget.style.outline=''; }
+function kanbDrop(e, colId) {
+  e.preventDefault(); e.currentTarget.style.outline='';
+  if (!KANB_DRAG_ID) return;
+  var cards = kanbLoad();
+  var card = cards.find(function(c){ return c.id===KANB_DRAG_ID; });
+  if (card) { card.status=colId; card.updatedAt=new Date().toISOString(); kanbSave(cards); kanbRender(); }
+  KANB_DRAG_ID = null;
 }
 
-function stockGuardarMov(id, tipo) {
-  var items = stockLoad(), m = items.find(function(x){ return x.id===id; }); if (!m) return;
-  var qtd = parseFloat(document.getElementById('stk-mov-qtd').value);
-  if (!qtd || qtd <= 0) { alert('Indique uma quantidade válida.'); return; }
-  var isSaida = tipo === 'saida';
-  var mov = { id:'mov_'+Date.now().toString(36)+Math.random().toString(36).slice(2,4), tipo:tipo, qtd:qtd, data:document.getElementById('stk-mov-data').value, nota:(document.getElementById('stk-mov-nota').value||'').trim(), ts:new Date().toISOString() };
-  if (isSaida) {
-    var sel = document.getElementById('stk-mov-obra');
-    if (sel) {
-      if (!sel.value) { alert('Escolha a obra para onde sai o material.'); return; }
-      var o = stockObras().find(function(x){ return x.id===sel.value; });
-      mov.obraId = sel.value; mov.obraNome = o ? stockObraLabel(o) : '';
+function kanbNovoCartao() {
+  ['kanb-edit-id','kanb-f-titulo','kanb-f-cliente','kanb-f-valor','kanb-f-responsavel','kanb-f-data','kanb-f-notas'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
+  var s=document.getElementById('kanb-f-status'); if(s) s.value='orcamentado';
+  var t=document.getElementById('kanb-modal-titulo'); if(t) t.textContent='Nova Obra';
+  var d=document.getElementById('kanb-del-btn'); if(d) d.style.display='none';
+  document.getElementById('kanb-modal').style.display='block';
+}
+
+function kanbNovoNaColuna(colId) {
+  kanbNovoCartao();
+  var s=document.getElementById('kanb-f-status'); if(s) s.value=colId;
+}
+
+function kanbEditarCartao(id) {
+  var cards=kanbLoad(), card=cards.find(function(c){ return c.id===id; });
+  if (!card) return;
+  document.getElementById('kanb-edit-id').value = card.id;
+  document.getElementById('kanb-f-titulo').value = card.titulo||'';
+  document.getElementById('kanb-f-cliente').value = card.cliente||'';
+  document.getElementById('kanb-f-valor').value = card.valor||'';
+  document.getElementById('kanb-f-responsavel').value = card.responsavel||'';
+  document.getElementById('kanb-f-data').value = card.dataInicio||'';
+  document.getElementById('kanb-f-status').value = card.status||'orcamentado';
+  document.getElementById('kanb-f-notas').value = card.notas||'';
+  var t=document.getElementById('kanb-modal-titulo'); if(t) t.textContent='Editar Obra';
+  var d=document.getElementById('kanb-del-btn'); if(d) d.style.display='inline-flex';
+  document.getElementById('kanb-modal').style.display='block';
+}
+
+function kanbFecharModal() { document.getElementById('kanb-modal').style.display='none'; }
+
+function kanbGuardar() {
+  var titulo=(document.getElementById('kanb-f-titulo').value||'').trim();
+  if (!titulo) { alert('Preencha o título da obra.'); return; }
+  var editId=document.getElementById('kanb-edit-id').value;
+  var cards=kanbLoad(), now=new Date().toISOString();
+  if (editId) {
+    var card=cards.find(function(c){ return c.id===editId; });
+    if (card) {
+      card.titulo=titulo;
+      card.cliente=document.getElementById('kanb-f-cliente').value||'';
+      card.valor=document.getElementById('kanb-f-valor').value||'';
+      card.responsavel=document.getElementById('kanb-f-responsavel').value||'';
+      card.dataInicio=document.getElementById('kanb-f-data').value||'';
+      card.status=document.getElementById('kanb-f-status').value||'orcamentado';
+      card.notas=document.getElementById('kanb-f-notas').value||'';
+      card.updatedAt=now;
     }
-    if (qtd > (parseFloat(m.qtd)||0) && !confirm('A saída ('+qtd+') é maior que o stock atual ('+(parseFloat(m.qtd)||0)+'). Continuar?')) return;
-    m.qtd = Math.max(0, (parseFloat(m.qtd)||0) - qtd);
   } else {
-    m.qtd = (parseFloat(m.qtd)||0) + qtd;
+    cards.push({ id:'k_'+Date.now(), titulo:titulo,
+      cliente:document.getElementById('kanb-f-cliente').value||'',
+      valor:document.getElementById('kanb-f-valor').value||'',
+      responsavel:document.getElementById('kanb-f-responsavel').value||'',
+      dataInicio:document.getElementById('kanb-f-data').value||'',
+      status:document.getElementById('kanb-f-status').value||'orcamentado',
+      notas:document.getElementById('kanb-f-notas').value||'',
+      createdAt:now, updatedAt:now
+    });
   }
-  m.movimentos = m.movimentos || [];
-  m.movimentos.push(mov);
-  stockSave(items); stockFecharForm(); stockRender();
-  premToast('✅ '+(isSaida?'Saída':'Entrada')+' registada: '+qtd+' '+(m.unidade||'un'));
+  kanbSave(cards); kanbFecharModal(); kanbRender(); premToast('✅ Obra guardada!');
 }
 
-// Histórico global de movimentos (com filtro por obra) — saídas ligadas às obras
-function stockHistGlobal() {
-  var sel = document.getElementById('stock-hist-obra');
-  var obras = stockObras();
-  sel.innerHTML = '<option value="">Todas</option><option value="__entradas">Só entradas</option>' +
-    obras.map(function(o){ return '<option value="'+o.id+'">'+stockEscAttr(stockObraLabel(o))+'</option>'; }).join('');
-  stockHistRender();
-  document.getElementById('stock-hist-overlay').style.display = 'flex';
-}
-function stockHistFechar() { var ov=document.getElementById('stock-hist-overlay'); if (ov) ov.style.display='none'; }
-function stockHistRender() {
-  var filtro = (document.getElementById('stock-hist-obra')||{}).value || '';
-  var movs = [];
-  stockLoad().forEach(function(m){
-    (m.movimentos||[]).forEach(function(mv){ movs.push(Object.assign({ material:m.nome, unidade:m.unidade||'un' }, mv)); });
-  });
-  movs.sort(function(a,b){ return (b.ts||'').localeCompare(a.ts||''); });
-  if (filtro === '__entradas') movs = movs.filter(function(mv){ return mv.tipo==='entrada'; });
-  else if (filtro) movs = movs.filter(function(mv){ return mv.obraId===filtro; });
-  var el = document.getElementById('stock-hist-list');
-  if (!movs.length) { el.innerHTML='<div style="text-align:center;padding:32px;color:#9ca3af;font-size:0.88rem">Sem movimentos.</div>'; return; }
-  el.innerHTML = movs.map(function(mv){
-    var isS = mv.tipo==='saida';
-    var dt = mv.data ? new Date(mv.data+'T12:00').toLocaleDateString('pt-PT') : '—';
-    return '<div style="display:flex;align-items:center;gap:10px;border-bottom:1px solid #f3f4f6;padding:10px 0">' +
-      '<div style="width:34px;height:34px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1rem;background:'+(isS?'#fef3c7':'#d1fae5')+';color:'+(isS?'#92400e':'#065f46')+'">'+(isS?'↑':'↓')+'</div>' +
-      '<div style="flex:1;min-width:0"><div style="font-weight:700;font-size:0.9rem;color:#1a1a2e">'+escHtml(mv.material)+' · '+(isS?'-':'+')+mv.qtd+' '+escHtml(mv.unidade)+'</div>' +
-      '<div style="font-size:0.74rem;color:#9ca3af">'+dt+(isS&&mv.obraNome?' · Obra: '+escHtml(mv.obraNome):'')+(mv.nota?' · '+escHtml(mv.nota):'')+'</div></div>' +
-    '</div>';
-  }).join('');
+function kanbEliminar() {
+  var editId=document.getElementById('kanb-edit-id').value;
+  if (!editId||!confirm('Eliminar esta obra do kanban?')) return;
+  kanbSave(kanbLoad().filter(function(c){ return c.id!==editId; }));
+  kanbFecharModal(); kanbRender(); premToast('🗑️ Obra eliminada.');
 }
 
-function stockAbrirForm(id) {
-  var m = id ? stockLoad().find(function(x){ return x.id===id; }) : { id:'', nome:'', categoria:'', unidade:'un', qtd:0, minimo:0, fornecedor:'', notas:'' };
-  if (!m) return;
-  document.getElementById('stock-modal-title').textContent = id ? 'Editar Material' : 'Novo Material';
-  var unitOpts = STOCK_UNITS.map(function(u){ return '<option value="'+u+'"'+(m.unidade===u?' selected':'')+'>'+u+'</option>'; }).join('');
-  document.getElementById('stock-modal-body').innerHTML =
-    '<div style="margin-bottom:10px"><label class="stock-lbl">Nome do material *</label><input id="stk-nome" class="stock-inp" value="'+stockEscAttr(m.nome)+'" placeholder="Ex: Cimento 25kg"></div>' +
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">' +
-      '<div><label class="stock-lbl">Categoria</label><input id="stk-cat" class="stock-inp" value="'+stockEscAttr(m.categoria)+'" placeholder="Ex: Cimentos"></div>' +
-      '<div><label class="stock-lbl">Unidade</label><select id="stk-un" class="stock-inp">'+unitOpts+'</select></div>' +
-    '</div>' +
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">' +
-      '<div><label class="stock-lbl">Quantidade atual</label><input id="stk-qtd" type="number" step="0.01" min="0" class="stock-inp" value="'+(m.qtd||0)+'"></div>' +
-      '<div><label class="stock-lbl">Stock mínimo</label><input id="stk-min" type="number" step="0.01" min="0" class="stock-inp" value="'+(m.minimo||0)+'"></div>' +
-    '</div>' +
-    '<div style="margin-bottom:10px"><label class="stock-lbl">Fornecedor (opcional)</label><input id="stk-forn" class="stock-inp" value="'+stockEscAttr(m.fornecedor)+'" placeholder="Ex: Leroy Merlin"></div>' +
-    '<div style="margin-bottom:16px"><label class="stock-lbl">Notas (opcional)</label><input id="stk-notas" class="stock-inp" value="'+stockEscAttr(m.notas)+'"></div>' +
-    '<div style="display:flex;gap:8px">' +
-      '<button onclick="stockFecharForm()" style="flex:1;background:#f3f4f6;color:#374151;border:none;border-radius:8px;padding:10px;font-weight:700;cursor:pointer;font-family:inherit">Cancelar</button>' +
-      '<button onclick="stockGuardar('+(id?(qStr(id)):'')+')" style="flex:2;background:#d97706;color:#fff;border:none;border-radius:8px;padding:10px;font-weight:700;cursor:pointer;font-family:inherit">Guardar</button>' +
-    '</div>';
-  document.getElementById('stock-modal-overlay').style.display = 'flex';
-}
-function qStr(s){ return '\x27'+s+'\x27'; }
-function stockFecharForm() { var ov = document.getElementById('stock-modal-overlay'); if (ov) ov.style.display='none'; }
-
-function stockGuardar(id) {
-  var nome = (document.getElementById('stk-nome').value||'').trim();
-  if (!nome) { alert('O nome do material é obrigatório.'); return; }
-  var dados = {
-    nome: nome,
-    categoria: (document.getElementById('stk-cat').value||'').trim(),
-    unidade: document.getElementById('stk-un').value,
-    qtd: parseFloat(document.getElementById('stk-qtd').value)||0,
-    minimo: parseFloat(document.getElementById('stk-min').value)||0,
-    fornecedor: (document.getElementById('stk-forn').value||'').trim(),
-    notas: (document.getElementById('stk-notas').value||'').trim()
-  };
-  var items = stockLoad();
-  if (id) { Object.assign(items.find(function(x){ return x.id===id; }), dados); }
-  else { items.push(Object.assign({ id:'stk_'+Date.now().toString(36)+Math.random().toString(36).slice(2,5) }, dados)); }
-  stockSave(items); stockFecharForm(); stockRender();
-}
-
-function stockEliminar(id) {
-  if (!confirm('Eliminar este material?')) return;
-  stockSave(stockLoad().filter(function(x){ return x.id!==id; }));
-  stockRender();
-}
 
 function eqLoad() { try { return JSON.parse(localStorage.getItem(VALES_KEY)||'[]'); } catch(e) { return []; } }
 function eqSave(v) { localStorage.setItem(VALES_KEY, JSON.stringify(v)); }
@@ -8056,10 +7755,10 @@ function _orcIntWords(n) {
   if (n < 100) return tens[Math.floor(n/10)] + (n%10 ? ' e ' + units[n%10] : '');
   if (n === 100) return 'cem';
   if (n < 1000) return hundreds[Math.floor(n/100)] + (n%100 ? ' e ' + _orcIntWords(n%100) : '');
-  if (n < 2000) return 'mil' + (n%1000 ? ' e ' + _orcIntWords(n%1000) : '');
+  if (n < 2000) { var r0=n%1000; return 'mil'+(r0?(r0<100||r0%100===0?' e ':' ')+_orcIntWords(r0):''); }
   if (n < 1000000) {
     var t = Math.floor(n/1000), r = n%1000;
-    return _orcIntWords(t) + ' mil' + (r ? ' e ' + _orcIntWords(r) : '');
+    return _orcIntWords(t) + ' mil' + (r ? (r<100||r%100===0?' e ':' ') + _orcIntWords(r) : '');
   }
   return n.toString();
 }
@@ -8253,6 +7952,13 @@ function orcRenderServices() {
           wOpts.replace('value="'+svc.type+'"','value="'+svc.type+'" selected') +
         '</select>' +
         (ORC_SERVICES.length > 1 ? '<button onclick="orcRemoveService('+si+')" style="background:#fee2e2;color:#dc2626;border:none;border-radius:6px;padding:5px 10px;font-size:0.78rem;cursor:pointer;font-family:inherit;font-weight:700;flex-shrink:0">✕ Remover</button>' : '') +
+      '</div>' +
+      '<div style="margin-bottom:8px;position:relative">' +
+        '<label class="orc-label">🔍 Pesquisar serviço na biblioteca</label>' +
+        '<input class="orc-input" placeholder="Procure pelo tipo de obra... (ex: telhado, pintura, fachada)" ' +
+          'oninput="orcLibSearch('+si+',this.value)" autocomplete="off" ' +
+          'style="background:#f5f3ff;border-color:#7c3aed">' +
+        '<div id="orc-lib-dd-'+si+'" style="display:none;position:absolute;top:calc(100% - 4px);left:0;right:0;background:#fff;border:1.5px solid #7c3aed;border-top:none;border-radius:0 0 8px 8px;max-height:220px;overflow-y:auto;z-index:500;box-shadow:0 8px 24px rgba(124,58,237,0.15)"></div>' +
       '</div>' +
       '<div style="margin-bottom:8px">' +
         '<label class="orc-label">Título do Serviço (para o orçamento)</label>' +
@@ -8492,9 +8198,10 @@ function orcImprimir() {
     '<hr class="orc-sep">' +
     '<div class="orc-totals">' +
       '<p><strong>Valor do material e m\xe3o de obra</strong></p>' +
-      '<p style="font-size:11pt"><strong>' + orcFmt(sub) + '€ (' + orcNumToWords(sub) + ' euros) +IVA</strong></p>' +
+      '<p style="font-size:10.5pt"><strong>Subtotal (s/ IVA): ' + orcFmt(sub) + '€</strong></p>' +
       ivaLines +
-      '<p style="font-size:11pt"><strong>Soma j\xe1 com IVA ' + orcFmt(totalIva) + '€</strong></p>' +
+      '<p style="font-size:11pt"><strong>Total c/ IVA: ' + orcFmt(totalIva) + '€</strong></p>' +
+      '<p style="font-size:10.5pt;font-style:italic">(' + orcNumToWords(totalIva) + ' euros)</p>' +
     '</div>' +
     '<br>' +
     '<div class="orc-pay">' +
@@ -8621,6 +8328,53 @@ document.addEventListener('click', function(e) {
 });
 
 function orcInit() { orcRenderList(); }
+// ── Biblioteca de serviços (infraimperio_v2) ─────────────────────────────────
+var ORC_LIB_MATCHES = {};
+
+function orcGetLib() {
+  try { var db=JSON.parse(localStorage.getItem('infraimperio_v2')||'null'); return (db&&Array.isArray(db.lib))?db.lib:[]; } catch(e){return [];}
+}
+
+function orcLibSearch(si, q) {
+  var dd = document.getElementById('orc-lib-dd-'+si);
+  if (!dd) return;
+  if (!q || q.length < 2) { dd.style.display='none'; return; }
+  var lib = orcGetLib();
+  if (!lib.length) {
+    dd.innerHTML='<div style="padding:10px 14px;font-size:0.82rem;color:#9ca3af;text-align:center">Biblioteca não encontrada. Abra a app Orcamentos-Infraimperio.html primeiro para carregar os serviços.</div>';
+    dd.style.display='block'; return;
+  }
+  function norm(s){ return (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
+  var ql = norm(q);
+  var matches = lib.filter(function(s){ return norm(s.nome).includes(ql)||norm(s.cat||'').includes(ql); })
+    .sort(function(a,b){ return (b.freq||0)-(a.freq||0); }).slice(0,14);
+  ORC_LIB_MATCHES[si] = matches;
+  if (!matches.length) { dd.style.display='none'; return; }
+  dd.innerHTML = matches.map(function(s,i){
+    return '<div style="padding:9px 14px;cursor:pointer;border-bottom:1px solid #f0f0f0;font-size:0.83rem" ' +
+      'onmousedown="orcLibApply('+si+','+i+')" ' +
+      'onmouseover="this.style.background=\'#f5f3ff\'" onmouseout="this.style.background=\'\'">'+
+      '<div style="font-weight:700;color:#1a1a2e">'+escHtml(s.nome||'')+'</div>'+
+      '<div style="font-size:0.73rem;color:#7c3aed">'+escHtml(s.cat||'')+'</div>'+
+    '</div>';
+  }).join('');
+  dd.style.display='block';
+}
+
+function orcLibApply(si, i) {
+  var matches=ORC_LIB_MATCHES[si];
+  if (!matches||!matches[i]) return;
+  var s=matches[i];
+  ORC_SERVICES[si].name=s.nome||'';
+  ORC_SERVICES[si].items=(s.tarefas||[]).slice();
+  orcRenderServices(); orcCalcTotal();
+  var wEl=document.getElementById('orc-f-warranty');
+  if (wEl && !wEl.value && s.garantia) wEl.value=s.garantia;
+  var pEl=document.getElementById('orc-f-prazoTermino');
+  if (pEl && !pEl.value && s.prazo) pEl.value=s.prazo;
+}
+
+
 // ─── End Orçamentos ──────────────────────────────────────────────────────────
 
 // ============================================================
