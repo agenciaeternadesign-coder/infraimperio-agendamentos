@@ -1964,6 +1964,211 @@ textarea.si-input { resize: vertical; min-height: 64px; }
 <!-- =====================================================
      SECÇÃO: KANBAN — STATUS DE OBRAS
      ===================================================== -->
+
+
+<!-- =====================================================
+     SECÇÃO: FOLHA DE PONTO
+     ===================================================== -->
+<div id="section-folha-ponto" class="suite-section">
+  <div style="padding:24px 20px 60px;max-width:1200px;margin:0 auto">
+
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:14px">
+        <div style="width:52px;height:52px;border-radius:14px;background:#e8f5e9;border:2px solid #2e7d32;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">📅</div>
+        <div>
+          <h2 style="font-family:'Oswald',sans-serif;font-size:1.5rem;font-weight:700;color:#1a1a2e;margin:0 0 2px">Folha de Ponto</h2>
+          <div style="font-size:12px;color:#6b7280">Registo mensal de presenças e faltas</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <button onclick="fpPrevMonth()" class="fp-nav-btn">&#8249;</button>
+        <span id="fp-month-label" style="font-weight:700;font-size:1rem;min-width:160px;text-align:center;color:#1a1a2e"></span>
+        <button onclick="fpNextMonth()" class="fp-nav-btn">&#8250;</button>
+        <button onclick="fpPrint()" style="background:#2e7d32;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:background 0.15s" onmouseover="this.style.background='#1b5e20'" onmouseout="this.style.background='#2e7d32'">&#128424; Imprimir</button>
+      </div>
+    </div>
+
+    <!-- Legend bar -->
+    <div style="background:#f9fafb;border:1.5px solid #e5e7eb;border-radius:10px;padding:10px 16px;margin-bottom:20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;font-size:0.82rem;color:#374151">
+      <strong>Legenda:</strong>
+      <span>Vazio = presente</span>
+      <span id="fp-leg-f" style="background:#fee2e2;color:#b91c1c;padding:2px 8px;border-radius:5px;font-weight:700">F = Falta</span>
+      <span id="fp-leg-c2" style="background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:5px;font-weight:700"></span>
+      <button onclick="fpEditCodes()" style="margin-left:auto;background:none;border:1.5px solid #d1d5db;border-radius:7px;padding:4px 10px;font-size:11px;color:#6b7280;cursor:pointer;font-family:inherit;transition:all 0.15s" onmouseover="this.style.borderColor='#2e7d32';this.style.color='#2e7d32'" onmouseout="this.style.borderColor='#d1d5db';this.style.color='#6b7280'">&#9999; Editar c&#243;digos</button>
+    </div>
+
+    <!-- No employees message -->
+    <div id="fp-no-func" style="display:none;text-align:center;padding:56px 16px;color:#9ca3af">
+      <div style="font-size:2.5rem;margin-bottom:10px">&#128119;</div>
+      <div style="font-size:0.9rem">Nenhum funcion&#225;rio ativo.<br>Adiciona funcion&#225;rios no separador <strong>Pagamentos</strong>.</div>
+    </div>
+
+    <!-- Tables rendered by JS -->
+    <div id="fp-table-1" style="overflow-x:auto;margin-bottom:24px"></div>
+    <div id="fp-table-2" style="overflow-x:auto"></div>
+
+  </div>
+</div>
+
+<!-- =====================================================
+     SECÇÃO: PREMIAÇÃO
+     ===================================================== -->
+<div id="section-premiacao" class="suite-section">
+  <div style="padding:20px 24px 56px;max-width:1100px;margin:0 auto">
+
+    <!-- Header -->
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px">
+      <div style="width:48px;height:48px;border-radius:14px;background:#fef3c7;border:2px solid #d97706;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">🏆</div>
+      <div>
+        <h2 style="font-family:'Oswald',sans-serif;font-size:1.45rem;font-weight:700;color:#1a1a2e;margin:0 0 1px">Premiação Mensal</h2>
+        <div id="prem-today-lbl" style="font-size:12px;color:#6b7280"></div>
+      </div>
+    </div>
+
+    <!-- Tab nav -->
+    <div style="display:flex;gap:4px;margin-bottom:20px;overflow-x:auto;padding-bottom:2px">
+      <button class="prem-tab prem-tab-active" onclick="premTab('registar',this)">📋 Registar</button>
+      <button class="prem-tab" onclick="premTab('equipa',this)">👷 Equipa</button>
+      <button class="prem-tab" onclick="premTab('obras',this)">🏗️ Obras</button>
+      <button class="prem-tab" onclick="premTab('ranking',this)">🏆 Ranking</button>
+      <button class="prem-tab" onclick="premTab('contadores',this)">📊 Contadores</button>
+    </div>
+
+    <!-- Panel: Registar -->
+    <div id="prem-panel-registar">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;background:#f9fafb;border:1.5px solid #e5e7eb;border-radius:10px;padding:10px 14px">
+        <span style="font-size:0.82rem;font-weight:700;color:#374151;white-space:nowrap">📅 Registar para:</span>
+        <input type="date" id="prem-active-date" onchange="premSetDate(this.value)" style="border:1.5px solid #e5e7eb;border-radius:7px;padding:5px 10px;font-size:0.85rem;font-family:inherit;color:#1a1a2e;background:#fff;cursor:pointer;flex:1;min-width:140px">
+        <button onclick="premSetDate(new Date().toISOString().slice(0,10))" style="background:#e5e7eb;border:none;border-radius:7px;padding:5px 12px;font-size:0.78rem;font-weight:700;color:#374151;cursor:pointer;font-family:inherit;white-space:nowrap">↩ Hoje</button>
+        <span id="prem-date-warn" style="display:none;font-size:0.75rem;color:#d97706;font-weight:700;white-space:nowrap">⚠️ Data diferente de hoje</span>
+      </div>
+      <div style="font-size:0.77rem;color:#9ca3af;font-weight:600;margin-bottom:14px">📸 Foto WA = +1pt · 🔑 Chave = +1pt · ✅ Presença = +1pt · ⚠️ Reclamação = −2pts</div>
+      <div id="prem-reg-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:12px"></div>
+      <div id="prem-reg-empty" style="display:none;text-align:center;padding:56px 16px;color:#9ca3af">
+        <div style="font-size:2.5rem;margin-bottom:10px">👷</div>
+        <div style="font-size:0.9rem">Nenhum funcionário.<br>Adiciona na tab <strong>Equipa</strong>.</div>
+      </div>
+    </div>
+
+    <!-- Panel: Equipa -->
+    <div id="prem-panel-equipa" style="display:none">
+      <div class="prem-add-box">
+        <div style="font-weight:700;font-size:0.88rem;color:#1a1a2e;margin-bottom:10px">➕ Novo funcionário</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+          <input id="pnome" class="prem-inp" placeholder="Nome completo">
+          <input id="pfunc" class="prem-inp" placeholder="Função (ex: Pedreiro)">
+        </div>
+        <input id="pobs" class="prem-inp" placeholder="Observações (opcional)" style="width:100%;box-sizing:border-box;margin-bottom:10px">
+        <div style="display:flex;gap:8px;align-items:center">
+          <button onclick="premAddFuncionario()" style="background:#d97706;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-weight:700;font-size:0.88rem;cursor:pointer;font-family:inherit">Adicionar</button>
+          <button onclick="premImportFromFolha()" style="background:#fff;color:#d97706;border:1.5px solid #d97706;border-radius:8px;padding:9px 14px;font-weight:700;font-size:0.82rem;cursor:pointer;font-family:inherit">📋 Importar da Folha de Ponto</button>
+        </div>
+      </div>
+      <div id="prem-equipa-list" style="margin-top:16px"></div>
+    </div>
+
+    <!-- Panel: Obras -->
+    <div id="prem-panel-obras" style="display:none">
+      <div class="prem-add-box">
+        <div style="font-weight:700;font-size:0.88rem;color:#1a1a2e;margin-bottom:10px">➕ Nova obra</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+          <input id="pob-nome" class="prem-inp" placeholder="Nome da obra">
+          <input id="pob-local" class="prem-inp" placeholder="Local / Morada">
+        </div>
+        <button onclick="premAddObra()" style="background:#d97706;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-weight:700;font-size:0.88rem;cursor:pointer;font-family:inherit">Adicionar</button>
+      </div>
+      <div id="prem-obras-list" style="margin-top:16px"></div>
+    </div>
+
+    <!-- Panel: Contadores -->
+    <div id="prem-panel-contadores" style="display:none">
+      <div style="margin-bottom:16px;font-size:0.82rem;color:#6b7280">Contadores independentes por categoria — use o <strong>+</strong> para registar e <strong>Reset</strong> para zerar.</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px">
+
+        <!-- Card Fotos -->
+        <div style="background:#fff;border:1.5px solid #bfdbfe;border-radius:14px;overflow:hidden">
+          <div style="background:linear-gradient(135deg,#1d4ed8,#3b82f6);padding:12px 16px;display:flex;align-items:center;justify-content:space-between">
+            <span style="font-family:'Oswald',sans-serif;font-size:1rem;font-weight:700;color:#fff">📸 Fotos</span>
+            <button onclick="contadoresReset('fotos')" style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);color:#fff;border-radius:6px;padding:3px 10px;font-size:0.72rem;font-weight:700;cursor:pointer;font-family:inherit">Reset</button>
+          </div>
+          <div id="cont-list-fotos" style="padding:8px 0;max-height:360px;overflow-y:auto"></div>
+        </div>
+
+        <!-- Card Chave -->
+        <div style="background:#fff;border:1.5px solid #fed7aa;border-radius:14px;overflow:hidden">
+          <div style="background:linear-gradient(135deg,#c2410c,#f97316);padding:12px 16px;display:flex;align-items:center;justify-content:space-between">
+            <span style="font-family:'Oswald',sans-serif;font-size:1rem;font-weight:700;color:#fff">🔑 Chave</span>
+            <button onclick="contadoresReset('chave')" style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);color:#fff;border-radius:6px;padding:3px 10px;font-size:0.72rem;font-weight:700;cursor:pointer;font-family:inherit">Reset</button>
+          </div>
+          <div id="cont-list-chave" style="padding:8px 0;max-height:360px;overflow-y:auto"></div>
+        </div>
+
+        <!-- Card Presença -->
+        <div style="background:#fff;border:1.5px solid #bbf7d0;border-radius:14px;overflow:hidden">
+          <div style="background:linear-gradient(135deg,#15803d,#22c55e);padding:12px 16px;display:flex;align-items:center;justify-content:space-between">
+            <span style="font-family:'Oswald',sans-serif;font-size:1rem;font-weight:700;color:#fff">✅ Presença</span>
+            <button onclick="contadoresReset('presenca')" style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);color:#fff;border-radius:6px;padding:3px 10px;font-size:0.72rem;font-weight:700;cursor:pointer;font-family:inherit">Reset</button>
+          </div>
+          <div id="cont-list-presenca" style="padding:8px 0;max-height:360px;overflow-y:auto"></div>
+        </div>
+
+        <!-- Card Reclamações -->
+        <div style="background:#fff;border:1.5px solid #fecaca;border-radius:14px;overflow:hidden">
+          <div style="background:linear-gradient(135deg,#991b1b,#ef4444);padding:12px 16px;display:flex;align-items:center;justify-content:space-between">
+            <span style="font-family:'Oswald',sans-serif;font-size:1rem;font-weight:700;color:#fff">⚠️ Reclamações</span>
+            <button onclick="contadoresReset('reclamacoes')" style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);color:#fff;border-radius:6px;padding:3px 10px;font-size:0.72rem;font-weight:700;cursor:pointer;font-family:inherit">Reset</button>
+          </div>
+          <div id="cont-list-reclamacoes" style="padding:8px 0;max-height:360px;overflow-y:auto"></div>
+        </div>
+
+      </div>
+
+      <!-- Pontuação Total -->
+      <div style="margin-top:24px">
+        <div style="font-family:'Oswald',sans-serif;font-size:1.05rem;font-weight:700;color:#1a1a2e;margin-bottom:10px">📊 Pontuação Total <span style="font-size:0.72rem;font-weight:400;color:#6b7280;font-family:inherit">(Fotos + Chave + Presença − Reclamações×4)</span></div>
+        <div id="cont-total-ranking" style="background:#fff;border:1.5px solid #e5e7eb;border-radius:14px;overflow:hidden"></div>
+      </div>
+
+    </div>
+
+    <!-- Panel: Ranking -->
+    <div id="prem-panel-ranking" style="display:none">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+        <select id="prem-rk-m" onchange="premRankRender()" style="border:1.5px solid #e5e7eb;border-radius:8px;padding:7px 10px;font-size:0.88rem;font-family:inherit;background:#fff"></select>
+        <select id="prem-rk-y" onchange="premRankRender()" style="border:1.5px solid #e5e7eb;border-radius:8px;padding:7px 10px;font-size:0.88rem;font-family:inherit;background:#fff"></select>
+      </div>
+      <div id="prem-winner"></div>
+      <div id="prem-rank-list"></div>
+      <div style="margin-top:20px;text-align:center">
+        <button onclick="premGerarRelatorio()" style="background:#1a1a2e;color:#fff;border:none;border-radius:10px;padding:11px 22px;font-size:0.88rem;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:8px;transition:background 0.15s" onmouseover="this.style.background='#d97706'" onmouseout="this.style.background='#1a1a2e'">📄 Gerar Relatório do Mês</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- =====================================================
+     SECÇÃO: EQUIPA
+     ===================================================== -->
+<div id="section-equipa" class="suite-section">
+  <div style="padding:20px 24px 56px;max-width:1100px;margin:0 auto">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;flex-wrap:wrap">
+      <div style="width:48px;height:48px;border-radius:14px;background:#1a1a2e;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">&#x1F464;</div>
+      <div style="flex:1;min-width:0">
+        <h2 style="font-family:'Oswald',sans-serif;font-size:1.45rem;font-weight:700;color:#1a1a2e;margin:0">Equipa</h2>
+        <div style="font-size:0.78rem;color:#9ca3af">Fichas de funcionários &middot; Vales &middot; Premiação</div>
+      </div>
+      <button onclick="eqHistValesAbrir()" style="background:#1a1a2e;color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;display:flex;align-items:center;gap:6px">&#x1F4CB; Hist&oacute;rico de Vales</button>
+    </div>
+    <div id="eq-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px"></div>
+    <div id="eq-empty" style="display:none;text-align:center;padding:56px 16px;color:#9ca3af">
+      <div style="font-size:2.5rem;margin-bottom:10px">&#x1F477;</div>
+      <div>Nenhum funcionário.<br>Adiciona na secção <strong>Premiação &rarr; Equipa</strong>.</div>
+    </div>
+  </div>
+</div>
+
 <div id="section-kanban" class="suite-section">
   <div style="padding:20px 24px 64px">
     <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;flex-wrap:wrap">
