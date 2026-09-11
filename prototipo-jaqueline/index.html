@@ -1,0 +1,1384 @@
+<title>Método Jaqueline Mendonça</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Karla:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --paper:#F7F1E6; --paper-2:#EFE5D4; --card:#FFFCF6; --card-2:#F6EEE0;
+  --ink:#2B1D13; --ink-2:#6B5442; --ink-3:#937B63;
+  --line:#E0CFB4; --line-2:#CDB795;
+  --brown:#5C3B23; --brown-2:#7A5334;
+  --gold:#8F6C23; --gold-2:#C7A24F; --gold-wash:#EFE0BC;
+  --sage:#5F7455; --sage-wash:#DFE6D6;
+  --clay:#A2513C; --clay-wash:#F2DED6;
+  --on-brown:#FFFCF6; --shadow:rgba(60,38,20,.10);
+  --radius:10px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#17110C; --paper-2:#1E1710; --card:#241C15; --card-2:#2C231A;
+    --ink:#F3E9D9; --ink-2:#C9B69D; --ink-3:#9C8A72;
+    --line:#3B2E22; --line-2:#54412F;
+    --brown:#D9B189; --brown-2:#C39A72;
+    --gold:#D9B267; --gold-2:#E7C989; --gold-wash:#3A2D17;
+    --sage:#9CB08F; --sage-wash:#28301F;
+    --clay:#D9917B; --clay-wash:#38211A;
+    --on-brown:#1B140E; --shadow:rgba(0,0,0,.45);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#17110C; --paper-2:#1E1710; --card:#241C15; --card-2:#2C231A;
+  --ink:#F3E9D9; --ink-2:#C9B69D; --ink-3:#9C8A72;
+  --line:#3B2E22; --line-2:#54412F;
+  --brown:#D9B189; --brown-2:#C39A72;
+  --gold:#D9B267; --gold-2:#E7C989; --gold-wash:#3A2D17;
+  --sage:#9CB08F; --sage-wash:#28301F;
+  --clay:#D9917B; --clay-wash:#38211A;
+  --on-brown:#1B140E; --shadow:rgba(0,0,0,.45);
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:"Karla","Helvetica Neue",Arial,sans-serif;
+  font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1120px; margin:0 auto; padding-inline:20px; padding-block:0}
+h1,h2,h3,h4{font-family:"Fraunces",Georgia,"Times New Roman",serif; font-weight:500; text-wrap:balance; margin:0; letter-spacing:-.01em}
+p{margin:0}
+a{color:var(--brown)}
+.eyebrow{
+  font-size:11px; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--gold); font-weight:700;
+}
+.mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace; font-variant-numeric:tabular-nums}
+.rule{height:1px; background:var(--line); border:0; margin:0}
+
+/* ---------- capa ---------- */
+.hero{padding-block:64px 40px; position:relative; overflow:hidden}
+.hero-grid{display:grid; grid-template-columns:1.25fr .75fr; gap:48px; align-items:end}
+.crest{
+  width:60px;height:60px;border-radius:50%;border:1px solid var(--line-2);
+  display:grid;place-items:center;margin-bottom:26px;
+  background:radial-gradient(circle at 35% 30%, var(--gold-wash), transparent 70%);
+}
+.crest span{font-family:"Fraunces",serif;font-size:22px;color:var(--gold);letter-spacing:.02em}
+.hero h1{font-size:clamp(40px,6.4vw,72px); line-height:1.02; margin-bottom:18px}
+.hero h1 em{font-style:italic; color:var(--brown)}
+.lede{font-size:clamp(17px,2vw,20px); color:var(--ink-2); max-width:56ch}
+.meta{display:flex; flex-direction:column; gap:14px; border-left:1px solid var(--line); padding-left:20px}
+.meta div{display:flex; flex-direction:column; gap:2px}
+.meta dt{font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3)}
+.meta dd{margin:0; font-size:15px; color:var(--ink)}
+.hero-note{
+  margin-top:36px; display:flex; gap:10px; flex-wrap:wrap;
+}
+.chip{
+  border:1px solid var(--line-2); border-radius:999px; padding:5px 13px;
+  font-size:12.5px; color:var(--ink-2); background:var(--card);
+}
+.chip b{color:var(--brown); font-weight:600}
+
+/* ---------- secções ---------- */
+section{padding-block:56px}
+.sec-head{display:flex; flex-direction:column; gap:10px; margin-bottom:32px; max-width:64ch}
+.sec-head h2{font-size:clamp(26px,3.4vw,38px)}
+.sec-head p{color:var(--ink-2)}
+
+/* dor -> resposta */
+.pairs{display:grid; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden}
+.pair{display:grid; grid-template-columns:1fr 1.3fr; gap:0; background:var(--paper)}
+.pair > div{padding:20px 22px; background:var(--card)}
+.pair .now{background:var(--card-2); color:var(--ink-2)}
+.pair .now b{display:block; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3); margin-bottom:6px; font-weight:700}
+.pair .then b{display:block; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--gold); margin-bottom:6px; font-weight:700}
+
+/* módulos */
+.mods{display:grid; grid-template-columns:repeat(3,1fr); gap:18px}
+.mod{
+  background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+  padding:22px; display:flex; flex-direction:column; gap:10px;
+}
+.mod h3{font-size:19px}
+.mod .tag{font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3); font-weight:700}
+.mod p{color:var(--ink-2); font-size:14.5px}
+.mod ul{margin:4px 0 0; padding-left:16px; color:var(--ink-2); font-size:14px; display:flex; flex-direction:column; gap:5px}
+.mod li::marker{color:var(--gold-2)}
+
+/* jornada */
+.journey{position:relative; display:grid; grid-template-columns:repeat(4,1fr); gap:20px; margin-top:8px}
+.phase{border-top:2px solid var(--line-2); padding-top:16px; display:flex; flex-direction:column; gap:8px}
+.phase.is-key{border-top-color:var(--gold)}
+.phase .mark{font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--gold); letter-spacing:.08em}
+.phase h4{font-size:17px}
+.phase p{font-size:14px; color:var(--ink-2)}
+.phase ul{margin:0; padding-left:15px; font-size:13.5px; color:var(--ink-2); display:flex; flex-direction:column; gap:4px}
+
+/* ---------- janela da aplicação ---------- */
+.app-intro{display:flex; justify-content:space-between; align-items:flex-end; gap:24px; flex-wrap:wrap; margin-bottom:22px}
+.app{
+  border:1px solid var(--line-2); border-radius:14px; overflow:hidden;
+  background:var(--card); box-shadow:0 18px 44px -28px var(--shadow);
+}
+.titlebar{
+  display:flex; align-items:center; gap:12px; padding:11px 16px;
+  background:var(--card-2); border-bottom:1px solid var(--line);
+}
+.dots{display:flex; gap:6px}
+.dots i{width:9px;height:9px;border-radius:50%;background:var(--line-2); display:block}
+.dots i:first-child{background:var(--clay)}
+.dots i:nth-child(2){background:var(--gold-2)}
+.dots i:nth-child(3){background:var(--sage)}
+.titlebar .path{font-size:12.5px; color:var(--ink-3); font-family:"IBM Plex Mono",monospace}
+.titlebar .who{margin-left:auto; font-size:12.5px; color:var(--ink-2); display:flex; align-items:center; gap:8px}
+.avatar{width:24px;height:24px;border-radius:50%;background:var(--gold-wash); color:var(--brown); display:grid; place-items:center; font-size:11px; font-weight:700; border:1px solid var(--line-2)}
+.app-body{display:grid; grid-template-columns:212px 1fr; min-height:620px}
+.side{border-right:1px solid var(--line); background:var(--card-2); padding:16px 12px; display:flex; flex-direction:column; gap:4px}
+.side .grp{font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3); font-weight:700; padding:14px 10px 6px}
+.navbtn{
+  display:flex; align-items:center; gap:10px; width:100%; text-align:left;
+  background:none; border:0; border-radius:8px; padding:9px 10px; cursor:pointer;
+  font:inherit; font-size:14px; color:var(--ink-2);
+}
+.navbtn:hover{background:var(--card); color:var(--ink)}
+.navbtn[aria-selected="true"]{background:var(--brown); color:var(--on-brown); font-weight:600}
+.navbtn .ico{width:16px; height:16px; flex:none; opacity:.9}
+.navbtn .badge{margin-left:auto; font-size:11px; background:var(--clay-wash); color:var(--clay); border-radius:999px; padding:1px 7px; font-weight:700}
+.navbtn[aria-selected="true"] .badge{background:rgba(255,255,255,.22); color:inherit}
+.screen{padding:26px 28px; display:flex; flex-direction:column; gap:22px; background:var(--card)}
+.screen[hidden]{display:none !important}
+.screen-head{display:flex; justify-content:space-between; align-items:flex-start; gap:18px; flex-wrap:wrap}
+.screen-head h3{font-size:24px}
+.screen-head p{font-size:14px; color:var(--ink-2); margin-top:4px}
+.btn{
+  font:inherit; font-size:13.5px; font-weight:600; border-radius:8px; padding:8px 14px; cursor:pointer;
+  border:1px solid var(--brown); background:var(--brown); color:var(--on-brown);
+}
+.btn.ghost{background:transparent; color:var(--brown); border-color:var(--line-2)}
+.btn.gold{background:var(--gold); border-color:var(--gold); color:var(--on-brown)}
+.btn:focus-visible,.navbtn:focus-visible,.tab:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--gold); outline-offset:2px}
+
+/* kpis */
+.kpis{display:grid; grid-template-columns:repeat(4,1fr); gap:14px}
+.kpi{border:1px solid var(--line); border-radius:var(--radius); padding:14px 16px; background:var(--card-2)}
+.kpi .k{font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); font-weight:700}
+.kpi .v{font-family:"Fraunces",serif; font-size:30px; line-height:1.15; margin-top:6px; font-variant-numeric:tabular-nums}
+.kpi .d{font-size:12.5px; color:var(--ink-2); margin-top:2px}
+.kpi .d .up{color:var(--sage); font-weight:700}
+
+.cols{display:grid; grid-template-columns:1.4fr 1fr; gap:20px; align-items:start}
+.panel{border:1px solid var(--line); border-radius:var(--radius); background:var(--card); overflow:hidden}
+.panel > header{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:13px 16px; border-bottom:1px solid var(--line); background:var(--card-2)}
+.panel > header h4{font-size:15px}
+.panel > header span{font-size:12px; color:var(--ink-3)}
+.panel .body{padding:14px 16px; display:flex; flex-direction:column; gap:12px}
+
+.row{display:flex; align-items:center; gap:12px; padding:11px 0; border-bottom:1px dashed var(--line)}
+.row:last-child{border-bottom:0; padding-bottom:0}
+.row:first-child{padding-top:0}
+.row .time{font-family:"IBM Plex Mono",monospace; font-size:13px; color:var(--brown); width:46px; flex:none}
+.row .who2{display:flex; flex-direction:column; gap:1px; min-width:0}
+.row .who2 strong{font-size:14.5px; font-weight:600}
+.row .who2 span{font-size:12.5px; color:var(--ink-2)}
+.row .end{margin-left:auto; display:flex; align-items:center; gap:8px; flex:none}
+.pill{font-size:11.5px; font-weight:700; border-radius:999px; padding:3px 10px; border:1px solid transparent; white-space:nowrap}
+.pill.sage{background:var(--sage-wash); color:var(--sage); border-color:var(--sage)}
+.pill.gold{background:var(--gold-wash); color:var(--gold); border-color:var(--gold-2)}
+.pill.clay{background:var(--clay-wash); color:var(--clay); border-color:var(--clay)}
+.pill.mute{background:var(--card-2); color:var(--ink-2); border-color:var(--line-2)}
+
+.alert{display:flex; gap:11px; padding:11px 12px; border-radius:8px; border:1px solid var(--line); background:var(--card-2)}
+.alert .bar{width:3px; border-radius:2px; flex:none; background:var(--gold)}
+.alert.warn .bar{background:var(--clay)}
+.alert p{font-size:13.5px; color:var(--ink-2)}
+.alert strong{color:var(--ink); font-weight:600}
+
+/* barra de adesão */
+.bars{display:flex; flex-direction:column; gap:10px}
+.bars .b{display:grid; grid-template-columns:96px 1fr 46px; align-items:center; gap:10px; font-size:13px}
+.track{height:8px; border-radius:4px; background:var(--card-2); border:1px solid var(--line); overflow:hidden}
+.track i{display:block; height:100%; background:var(--gold-2); border-right:1px solid var(--gold)}
+.bars .b span:last-child{text-align:right; color:var(--ink-2)}
+
+/* ---------- ficha / formulário ---------- */
+.form-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:16px}
+.field{display:flex; flex-direction:column; gap:5px}
+.field label{font-size:11.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); font-weight:700}
+.field input,.field select,.field textarea{
+  font:inherit; font-size:14px; color:var(--ink); background:var(--card-2);
+  border:1px solid var(--line-2); border-radius:8px; padding:9px 11px; width:100%;
+}
+.field textarea{min-height:74px; resize:vertical}
+.field .hint{font-size:12px; color:var(--ink-3)}
+.fieldset{border:1px solid var(--line); border-radius:var(--radius); padding:0; margin:0; background:var(--card)}
+.fieldset > legend{
+  margin-left:14px; padding:0 8px; font-size:11.5px; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--gold); font-weight:700;
+}
+.fieldset .inner{padding:16px 18px 18px; display:flex; flex-direction:column; gap:16px}
+.checks{display:flex; flex-wrap:wrap; gap:8px}
+.check{
+  display:inline-flex; align-items:center; gap:7px; font-size:13.5px; color:var(--ink-2);
+  border:1px solid var(--line-2); background:var(--card-2); border-radius:999px; padding:6px 12px; cursor:pointer;
+}
+.check input{accent-color:var(--brown); margin:0}
+.check:has(input:checked){background:var(--gold-wash); border-color:var(--gold-2); color:var(--ink)}
+.scale{display:flex; gap:6px; flex-wrap:wrap}
+.scale label{
+  border:1px solid var(--line-2); border-radius:8px; padding:8px 12px; cursor:pointer;
+  font-size:13px; background:var(--card-2); color:var(--ink-2); text-align:center; min-width:54px;
+}
+.scale label:has(input:checked){background:var(--brown); color:var(--on-brown); border-color:var(--brown); font-weight:600}
+.scale input{position:absolute; opacity:0; width:0; height:0}
+.consent{display:flex; gap:12px; border:1px solid var(--gold-2); background:var(--gold-wash); border-radius:var(--radius); padding:14px 16px}
+.consent p{font-size:13px; color:var(--ink-2)}
+.consent strong{color:var(--ink)}
+
+/* ---------- evolução fotográfica ---------- */
+.timeline{display:grid; grid-template-columns:repeat(5,1fr); gap:12px}
+.shot{
+  border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; background:var(--card-2);
+  display:flex; flex-direction:column;
+}
+.shot .img{aspect-ratio:3/4; position:relative; display:grid; place-items:center; background:
+  linear-gradient(160deg, var(--card-2), var(--paper-2));}
+.shot .img canvas{width:100%; height:100%; display:block}
+.shot .img.empty{border-bottom:1px dashed var(--line-2)}
+.shot .img.empty span{font-size:12px; color:var(--ink-3); text-align:center; padding:0 10px}
+.shot .cap{padding:8px 10px; display:flex; align-items:center; justify-content:space-between; gap:6px; border-top:1px solid var(--line)}
+.shot .cap b{font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--brown)}
+.shot .cap span{font-size:11.5px; color:var(--ink-3)}
+.angles{display:flex; gap:6px; flex-wrap:wrap}
+.angle{font-size:11.5px; border:1px solid var(--line-2); border-radius:6px; padding:4px 9px; color:var(--ink-2); background:var(--card-2)}
+.angle.on{background:var(--brown); color:var(--on-brown); border-color:var(--brown)}
+
+.compare{position:relative; border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; background:var(--paper-2)}
+.compare .stack{position:relative; aspect-ratio:16/10}
+.compare canvas{position:absolute; inset:0; width:100%; height:100%}
+.compare .top{clip-path:inset(0 50% 0 0)}
+.compare .lbl{
+  position:absolute; bottom:10px; font-size:11px; letter-spacing:.12em; text-transform:uppercase;
+  font-weight:700; background:var(--card); border:1px solid var(--line-2); color:var(--ink-2);
+  border-radius:999px; padding:3px 10px;
+}
+.compare .lbl.l{left:10px} .compare .lbl.r{right:10px}
+.compare .handle{position:absolute; top:0; bottom:0; width:2px; background:var(--gold); pointer-events:none}
+.compare .handle::after{
+  content:""; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  width:26px;height:26px;border-radius:50%;background:var(--gold); border:2px solid var(--card);
+}
+.compare input[type=range]{position:absolute; inset:auto 0 0 0; width:100%; margin:0; opacity:0; height:100%; cursor:ew-resize}
+.metrics{display:grid; grid-template-columns:repeat(auto-fit,minmax(136px,1fr)); gap:12px}
+.metric{border:1px solid var(--line); border-radius:8px; padding:11px 13px; background:var(--card-2)}
+.metric .m{font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); font-weight:700}
+.metric .n{font-family:"IBM Plex Mono",monospace; font-size:19px; margin-top:4px}
+.metric .n small{font-size:12px; color:var(--ink-3)}
+.metric .delta{font-size:12px; font-weight:700; color:var(--sage)}
+
+/* ---------- blends ---------- */
+.formula{display:grid; grid-template-columns:1.1fr .9fr; gap:20px; align-items:start}
+table.recipe{width:100%; border-collapse:collapse; font-size:14px}
+table.recipe th{
+  text-align:left; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3);
+  font-weight:700; padding:0 0 8px; border-bottom:1px solid var(--line);
+}
+table.recipe td{padding:9px 0; border-bottom:1px dashed var(--line)}
+table.recipe td:last-child,table.recipe th:last-child{text-align:right; font-family:"IBM Plex Mono",monospace}
+table.recipe tr:last-child td{border-bottom:0; font-weight:700}
+.label-print{
+  border:1px solid var(--line-2); border-radius:var(--radius); padding:18px; background:var(--paper-2);
+  display:flex; flex-direction:column; gap:8px; position:relative;
+}
+.label-print::before{content:""; position:absolute; inset:6px; border:1px solid var(--gold-2); border-radius:6px; pointer-events:none; opacity:.6}
+.label-print h5{font-family:"Fraunces",serif; font-size:19px; margin:0; text-align:center; color:var(--brown)}
+.label-print .sub{text-align:center; font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--gold)}
+.label-print dl{margin:6px 0 0; display:grid; grid-template-columns:auto 1fr; gap:5px 12px; font-size:12.5px}
+.label-print dt{color:var(--ink-3)}
+.label-print dd{margin:0; font-family:"IBM Plex Mono",monospace; color:var(--ink)}
+.stock{display:flex; flex-direction:column; gap:9px}
+.stock .s{display:grid; grid-template-columns:1fr 62px 76px; gap:10px; align-items:center; font-size:13.5px; padding-bottom:8px; border-bottom:1px dashed var(--line)}
+.stock .s:last-child{border-bottom:0}
+.stock .q{font-family:"IBM Plex Mono",monospace; text-align:right; color:var(--ink-2)}
+
+/* ---------- comunicação ---------- */
+.comms{display:grid; grid-template-columns:1fr 300px; gap:20px; align-items:start}
+.rule-list{display:flex; flex-direction:column; gap:10px}
+.rulecard{
+  border:1px solid var(--line); border-radius:var(--radius); background:var(--card-2);
+  padding:13px 15px; display:grid; grid-template-columns:auto 1fr auto; gap:12px; align-items:center;
+}
+.rulecard .when{font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--brown); background:var(--card); border:1px solid var(--line-2); border-radius:6px; padding:5px 8px; white-space:nowrap}
+.rulecard .what strong{display:block; font-size:14px; font-weight:600}
+.rulecard .what span{font-size:12.5px; color:var(--ink-2)}
+.switch{position:relative; width:40px; height:22px; flex:none}
+.switch input{position:absolute; opacity:0; width:100%; height:100%; margin:0; cursor:pointer}
+.switch .track2{position:absolute; inset:0; border-radius:999px; background:var(--line-2); transition:background .18s}
+.switch .track2::after{content:""; position:absolute; top:2px; left:2px; width:18px; height:18px; border-radius:50%; background:var(--card); transition:transform .18s}
+.switch input:checked + .track2{background:var(--sage)}
+.switch input:checked + .track2::after{transform:translateX(18px)}
+.switch input:focus-visible + .track2{outline:2px solid var(--gold); outline-offset:2px}
+
+.phone{
+  border:9px solid var(--brown); border-radius:26px; background:var(--paper-2);
+  padding:14px 12px; display:flex; flex-direction:column; gap:9px; min-height:360px;
+}
+.phone .bar{display:flex; justify-content:space-between; font-size:10.5px; color:var(--ink-3); font-family:"IBM Plex Mono",monospace}
+.sms{background:var(--card); border:1px solid var(--line); border-radius:12px 12px 12px 3px; padding:10px 12px; font-size:13px; color:var(--ink); box-shadow:0 2px 6px -4px var(--shadow)}
+.sms .from{font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--gold); font-weight:700; margin-bottom:4px}
+.sms.out{background:var(--sage-wash); border-color:var(--sage); border-radius:12px 12px 3px 12px; align-self:flex-end; max-width:80%}
+.mailcard{border:1px solid var(--line); border-radius:var(--radius); overflow:hidden}
+.mailcard .subject{padding:11px 14px; background:var(--card-2); border-bottom:1px solid var(--line); font-size:13.5px}
+.mailcard .subject b{color:var(--brown)}
+.mailcard .prev{padding:14px; font-size:13.5px; color:var(--ink-2); display:flex; flex-direction:column; gap:9px}
+.mailcard .prev .hdr{font-family:"Fraunces",serif; font-size:17px; color:var(--ink)}
+
+/* ---------- gestão ---------- */
+.chart-wrap{padding:4px 2px 0}
+.legend{display:flex; gap:14px; flex-wrap:wrap; font-size:12.5px; color:var(--ink-2); margin-top:8px}
+.legend i{display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:6px}
+table.admin{width:100%; border-collapse:collapse; font-size:13.5px}
+table.admin th{text-align:left; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); font-weight:700; padding:0 8px 8px 0; border-bottom:1px solid var(--line)}
+table.admin td{padding:9px 8px 9px 0; border-bottom:1px dashed var(--line)}
+table.admin td.num{text-align:right; font-family:"IBM Plex Mono",monospace}
+.tablescroll{overflow-x:auto}
+
+/* ---------- arquitectura / fases ---------- */
+.stack-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:18px}
+.layer{border:1px solid var(--line); border-radius:var(--radius); background:var(--card); padding:18px 20px; display:flex; flex-direction:column; gap:8px}
+.layer h4{font-size:17px; display:flex; align-items:center; gap:9px}
+.layer h4 em{font-style:normal; font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--gold); font-weight:700; font-family:"Karla",sans-serif}
+.layer p{font-size:14px; color:var(--ink-2)}
+.layer .kv{font-size:13px; color:var(--ink-2); display:flex; flex-direction:column; gap:4px; margin-top:2px}
+.layer .kv b{color:var(--ink); font-weight:600}
+
+.roadmap{display:flex; flex-direction:column; gap:0; border:1px solid var(--line); border-radius:var(--radius); overflow:hidden}
+.step{display:grid; grid-template-columns:64px 1fr 150px; gap:18px; padding:18px 20px; background:var(--card); border-bottom:1px solid var(--line); align-items:start}
+.step:last-child{border-bottom:0}
+.step:nth-child(even){background:var(--card-2)}
+.step .n{font-family:"Fraunces",serif; font-size:26px; color:var(--gold); line-height:1}
+.step h4{font-size:17px; margin-bottom:5px}
+.step p{font-size:14px; color:var(--ink-2)}
+.step .est{font-size:12.5px; color:var(--ink-2); text-align:right}
+.step .est b{display:block; font-family:"IBM Plex Mono",monospace; font-size:15px; color:var(--ink)}
+
+.questions{display:grid; grid-template-columns:repeat(2,1fr); gap:14px}
+.q{border-left:2px solid var(--gold-2); padding:4px 0 4px 16px}
+.q h4{font-size:16px; margin-bottom:4px}
+.q p{font-size:13.5px; color:var(--ink-2)}
+
+.note{
+  border:1px solid var(--line-2); border-radius:var(--radius); background:var(--card-2);
+  padding:16px 18px; font-size:13.5px; color:var(--ink-2); display:flex; flex-direction:column; gap:7px;
+}
+.note b{color:var(--ink)}
+footer{padding-block:48px 60px; border-top:1px solid var(--line); margin-top:40px; display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap; font-size:13px; color:var(--ink-3)}
+
+@media (prefers-reduced-motion: reduce){*{transition:none !important; animation:none !important}}
+@media (max-width:960px){
+  .hero-grid{grid-template-columns:1fr; gap:30px; align-items:start}
+  .mods{grid-template-columns:repeat(2,1fr)}
+  .journey{grid-template-columns:repeat(2,1fr)}
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .cols,.formula,.comms,.stack-grid,.questions{grid-template-columns:1fr}
+  .app-body{grid-template-columns:1fr}
+  .side{flex-direction:row; overflow-x:auto; border-right:0; border-bottom:1px solid var(--line); padding:10px}
+  .side .grp{display:none}
+  .navbtn{white-space:nowrap; width:auto}
+  .timeline{grid-template-columns:repeat(3,1fr)}
+}
+@media (max-width:620px){
+  .mods,.journey,.form-grid,.metrics,.kpis{grid-template-columns:1fr}
+  .pair{grid-template-columns:1fr}
+  .timeline{grid-template-columns:repeat(2,1fr)}
+  .step{grid-template-columns:1fr; gap:8px}
+  .step .est{text-align:left}
+  .screen{padding:18px 16px}
+  .rulecard{grid-template-columns:1fr auto; gap:8px}
+  .rulecard .when{grid-column:1/-1; justify-self:start}
+}
+</style>
+
+<div class="wrap">
+
+<header class="hero">
+  <div class="hero-grid">
+    <div>
+      <div class="crest"><span>JM</span></div>
+      <p class="eyebrow">Proposta de sistema · v1 para apreciação</p>
+      <h1>O método já existe.<br>Falta-lhe uma <em>casa</em>.</h1>
+      <p class="lede">Um sistema único para a terapia capilar da Jaqueline Mendonça: anamnese digital, registo fotográfico mês a mês, as formulações dos blends, os lembretes automáticos às clientes e a gestão do negócio — tudo ligado ao protocolo de 3, 6 e 9 meses.</p>
+    </div>
+    <dl class="meta">
+      <div><dt>Cliente</dt><dd>Jaqueline Mendonça — Terapia Capilar</dd></div>
+      <div><dt>Fase</dt><dd>Apresentação da ideia e protótipo navegável</dd></div>
+      <div><dt>Âmbito</dt><dd>Aplicação web (telemóvel, tablet e computador)</dd></div>
+      <div><dt>Data</dt><dd>Setembro de 2026</dd></div>
+    </dl>
+  </div>
+  <div class="hero-note">
+    <span class="chip"><b>7</b> módulos</span>
+    <span class="chip"><b>3 / 6 / 9</b> meses de acompanhamento</span>
+    <span class="chip">Fotografia clínica <b>mensal</b></span>
+    <span class="chip">Lembretes <b>SMS e WhatsApp</b></span>
+    <span class="chip">Tons <b>beige, marrom e dourado</b></span>
+  </div>
+</header>
+
+<hr class="rule">
+
+<section id="porque">
+  <div class="sec-head">
+    <p class="eyebrow">Ponto de partida</p>
+    <h2>O que muda no dia-a-dia</h2>
+    <p>À esquerda, a forma como este trabalho costuma ser feito — cadernos, galeria do telemóvel, mensagens escritas uma a uma. À direita, o que o sistema passa a fazer.</p>
+  </div>
+  <div class="pairs">
+    <div class="pair">
+      <div class="now"><b>Hoje</b>Fichas em papel, cada uma num formato diferente, difíceis de comparar passados seis meses.</div>
+      <div class="then"><b>Com o sistema</b>Anamnese digital estruturada, assinada no tablet, sempre igual — e comparável entre clientes e entre meses.</div>
+    </div>
+    <div class="pair">
+      <div class="now"><b>Hoje</b>Fotos perdidas na galeria do telemóvel, com enquadramentos diferentes e sem data fiável.</div>
+      <div class="then"><b>Com o sistema</b>Cinco ângulos fixos, guia de enquadramento no ecrã, arquivo por mês (M0 a M9) e comparação lado a lado.</div>
+    </div>
+    <div class="pair">
+      <div class="now"><b>Hoje</b>A composição de cada blend está na cabeça e em folhas soltas; o que foi usado em Março já não se sabe ao certo.</div>
+      <div class="then"><b>Com o sistema</b>Biblioteca de ativos, formulação com percentagens, lote e validade, rótulo para imprimir e histórico por cliente.</div>
+    </div>
+    <div class="pair">
+      <div class="now"><b>Hoje</b>Lembretes escritos um a um no WhatsApp, faltas que só se descobrem à hora marcada.</div>
+      <div class="then"><b>Com o sistema</b>Régua automática: confirmação a 48h, preparação a 24h, aviso de foto mensal e de blend a acabar.</div>
+    </div>
+    <div class="pair">
+      <div class="now"><b>Hoje</b>Faturação estimada de cabeça, sem saber quantas clientes chegam ao fim do protocolo.</div>
+      <div class="then"><b>Com o sistema</b>Receita por mês e por pacote, ticket médio, adesão ao protocolo e taxa de renovação num só painel.</div>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<section id="modulos">
+  <div class="sec-head">
+    <p class="eyebrow">Âmbito</p>
+    <h2>Os sete módulos</h2>
+    <p>Cada módulo funciona sozinho, mas todos escrevem na mesma ficha da cliente. É isso que permite, no mês 6, ver numa só página a anamnese inicial, as fotos, os blends usados e o que foi pago.</p>
+  </div>
+  <div class="mods">
+    <article class="mod">
+      <p class="tag">Clínico</p>
+      <h3>Ficha de anamnese</h3>
+      <p>O questionário capilar completo, em secções, preenchido no tablet ou enviado à cliente antes da primeira sessão.</p>
+      <ul>
+        <li>Saúde geral, medicação, tiroide, pós-parto, ferro</li>
+        <li>Rotina, químicas, frequência de lavagem</li>
+        <li>Couro cabeludo, curvatura, porosidade, elasticidade</li>
+        <li>Teste de tração e densidade de partida</li>
+        <li>Consentimento informado e autorização de imagem, assinados no ecrã</li>
+      </ul>
+    </article>
+    <article class="mod">
+      <p class="tag">Clínico</p>
+      <h3>Evolução fotográfica</h3>
+      <p>Um registo por mês, sempre nos mesmos cinco ângulos, com guia de enquadramento sobreposto para as fotos ficarem comparáveis.</p>
+      <ul>
+        <li>Linha do tempo M0 → M9</li>
+        <li>Comparador com barra deslizante</li>
+        <li>Envio pela própria cliente, a partir do telemóvel</li>
+        <li>Armazenamento privado, com apagamento a pedido</li>
+      </ul>
+    </article>
+    <article class="mod">
+      <p class="tag">Clínico</p>
+      <h3>Blends e formulações</h3>
+      <p>A parte que torna o método único, escrita e versionada: o que entra em cada frasco, para quem, e porquê.</p>
+      <ul>
+        <li>Biblioteca de ativos e veiculantes</li>
+        <li>Formulação em percentagem, com cálculo automático em ml</li>
+        <li>Contraindicações assinaladas a partir da anamnese</li>
+        <li>Lote, validade e rótulo para imprimir</li>
+        <li>Stock de matéria-prima com aviso de rutura</li>
+      </ul>
+    </article>
+    <article class="mod">
+      <p class="tag">Acompanhamento</p>
+      <h3>Protocolos 3 / 6 / 9 meses</h3>
+      <p>O método transformado em percurso: cada protocolo tem fases, sessões previstas, blends por fase e avaliação mensal.</p>
+      <ul>
+        <li>Modelos reutilizáveis, criados uma vez</li>
+        <li>Sessões geradas automaticamente na agenda</li>
+        <li>Checklist de reavaliação em cada marco</li>
+        <li>Estado visível: em dia, atrasada, concluída</li>
+      </ul>
+    </article>
+    <article class="mod">
+      <p class="tag">Comunicação</p>
+      <h3>E-mails automáticos</h3>
+      <p>As mensagens que se repetem em todas as clientes, escritas uma vez e enviadas sozinhas no momento certo.</p>
+      <ul>
+        <li>Boas-vindas com o link da anamnese</li>
+        <li>Instruções do blend e posologia</li>
+        <li>Relatório mensal com fotos e evolução</li>
+        <li>Convite para reavaliação de fase</li>
+        <li>Reativação de clientes paradas há 60 dias</li>
+      </ul>
+    </article>
+    <article class="mod">
+      <p class="tag">Comunicação</p>
+      <h3>Lembretes por SMS e WhatsApp</h3>
+      <p>Régua de lembretes ligada à agenda e ao protocolo, através da Twilio, com registo de tudo o que foi enviado.</p>
+      <ul>
+        <li>Confirmação a 48h, com resposta SIM / NÃO</li>
+        <li>Preparação da sessão a 24h</li>
+        <li>Aviso de foto mensal com link direto</li>
+        <li>Aviso de blend a terminar</li>
+        <li>Histórico por cliente, sem mensagens repetidas</li>
+      </ul>
+    </article>
+    <article class="mod">
+      <p class="tag">Negócio</p>
+      <h3>Gestão do negócio</h3>
+      <p>A administração que costuma ficar para o fim do mês, atualizada à medida que as sessões acontecem.</p>
+      <ul>
+        <li>Agenda, pacotes e pagamentos faseados</li>
+        <li>Receita, despesa e ticket médio</li>
+        <li>Adesão ao protocolo e taxa de renovação</li>
+        <li>Origem das clientes e funil de contactos</li>
+        <li>Exportação para a contabilidade</li>
+      </ul>
+    </article>
+  </div>
+</section>
+
+<hr class="rule">
+
+<section id="jornada">
+  <div class="sec-head">
+    <p class="eyebrow">Como o sistema acompanha o método</p>
+    <h2>A jornada de 9 meses</h2>
+    <p>Os marcos abaixo seguem a lógica de 3, 6 e 9 meses. Os conteúdos de cada fase são definidos pela Jaqueline — o sistema limita-se a garantir que nada é esquecido no caminho.</p>
+  </div>
+  <div class="journey">
+    <div class="phase is-key">
+      <span class="mark">M0</span>
+      <h4>Avaliação inicial</h4>
+      <p>A sessão que fixa o ponto de partida.</p>
+      <ul><li>Anamnese completa</li><li>Fotos nos cinco ângulos</li><li>Consentimentos assinados</li><li>Protocolo escolhido e blend inicial</li></ul>
+    </div>
+    <div class="phase is-key">
+      <span class="mark">M1 — M3</span>
+      <h4>Fase de reequilíbrio</h4>
+      <p>Primeiro marco de reavaliação.</p>
+      <ul><li>Foto mensal pedida automaticamente</li><li>Ajuste do blend ao fim do mês 3</li><li>Relatório de evolução por e-mail</li><li>Decisão: manter ou avançar para 6 meses</li></ul>
+    </div>
+    <div class="phase is-key">
+      <span class="mark">M4 — M6</span>
+      <h4>Fase de fortalecimento</h4>
+      <p>Onde a comparação fotográfica começa a falar.</p>
+      <ul><li>Comparação M0 vs M6 lado a lado</li><li>Segunda formulação do blend</li><li>Renovação do pacote assinalada a 30 dias</li></ul>
+    </div>
+    <div class="phase is-key">
+      <span class="mark">M7 — M9</span>
+      <h4>Fase de manutenção</h4>
+      <p>Fecho do ciclo e continuidade.</p>
+      <ul><li>Relatório final com todo o percurso</li><li>Plano de manutenção e blend caseiro</li><li>Pedido de testemunho e autorização de uso</li></ul>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<section id="prototipo">
+  <div class="sec-head">
+    <p class="eyebrow">Protótipo navegável</p>
+    <h2>O sistema por dentro</h2>
+    <p>Seis ecrãs clicáveis com a aparência e o comportamento propostos. Os nomes, números e formulações são <strong>exemplos inventados para a demonstração</strong> — servem para mostrar a estrutura, não são dados reais nem recomendações clínicas.</p>
+  </div>
+
+  <div class="app">
+    <div class="titlebar">
+      <span class="dots"><i></i><i></i><i></i></span>
+      <span class="path">jaquelinemendonca.pt/estudio</span>
+      <span class="who"><span class="avatar">JM</span> Jaqueline Mendonça</span>
+    </div>
+    <div class="app-body">
+      <nav class="side" role="tablist" aria-label="Módulos do sistema">
+        <p class="grp">Atendimento</p>
+        <button class="navbtn tab" role="tab" id="tab-painel" aria-controls="sc-painel" aria-selected="true" data-screen="painel">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+          Painel do dia
+        </button>
+        <button class="navbtn tab" role="tab" id="tab-anamnese" aria-controls="sc-anamnese" aria-selected="false" data-screen="anamnese">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M7 3h10a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>
+          Ficha de anamnese
+        </button>
+        <button class="navbtn tab" role="tab" id="tab-evolucao" aria-controls="sc-evolucao" aria-selected="false" data-screen="evolucao">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="6" width="18" height="14" rx="2"/><circle cx="12" cy="13" r="3.5"/><path d="M9 6l1.5-2h3L15 6"/></svg>
+          Evolução fotográfica
+          <span class="badge">5</span>
+        </button>
+        <p class="grp">Método</p>
+        <button class="navbtn tab" role="tab" id="tab-blends" aria-controls="sc-blends" aria-selected="false" data-screen="blends">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M10 3h4v5l4.2 8.4A3 3 0 0 1 15.5 21h-7a3 3 0 0 1-2.7-4.6L10 8V3Z"/><path d="M7.5 15h9"/></svg>
+          Blends
+        </button>
+        <p class="grp">Relação</p>
+        <button class="navbtn tab" role="tab" id="tab-comunicacao" aria-controls="sc-comunicacao" aria-selected="false" data-screen="comunicacao">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 5h16v11H9l-5 4V5Z"/><path d="M8 9h8M8 12.5h5"/></svg>
+          Comunicação
+        </button>
+        <button class="navbtn tab" role="tab" id="tab-gestao" aria-controls="sc-gestao" aria-selected="false" data-screen="gestao">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+          Gestão
+        </button>
+      </nav>
+
+      <!-- ============ PAINEL ============ -->
+      <div class="screen" id="sc-painel" role="tabpanel" aria-labelledby="tab-painel">
+        <div class="screen-head">
+          <div>
+            <h3>Quinta-feira, 11 de setembro</h3>
+            <p>6 sessões marcadas · 2 avaliações de fase · 1 blend a preparar</p>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn ghost" type="button">Exportar dia</button>
+            <button class="btn" type="button">Nova sessão</button>
+          </div>
+        </div>
+
+        <div class="kpis">
+          <div class="kpi"><p class="k">Sessões hoje</p><p class="v">6</p><p class="d">4 confirmadas por SMS</p></div>
+          <div class="kpi"><p class="k">Em protocolo</p><p class="v">38</p><p class="d"><span class="up">+4</span> face a agosto</p></div>
+          <div class="kpi"><p class="k">Fotos por rever</p><p class="v">5</p><p class="d">enviadas pelas clientes</p></div>
+          <div class="kpi"><p class="k">Receita do mês</p><p class="v">4 820 €</p><p class="d">meta: 6 000 €</p></div>
+        </div>
+
+        <div class="cols">
+          <div class="panel">
+            <header><h4>Agenda de hoje</h4><span>Estúdio · Sala 1</span></header>
+            <div class="body">
+              <div class="row">
+                <span class="time">09:00</span>
+                <span class="who2"><strong>Carla Nogueira</strong><span>Avaliação mensal · M4 de 6 · Blend Raiz Forte</span></span>
+                <span class="end"><span class="pill sage">Confirmada</span></span>
+              </div>
+              <div class="row">
+                <span class="time">10:30</span>
+                <span class="who2"><strong>Marta Vilar</strong><span>Primeira consulta · anamnese completa</span></span>
+                <span class="end"><span class="pill gold">Ficha por preencher</span></span>
+              </div>
+              <div class="row">
+                <span class="time">12:00</span>
+                <span class="who2"><strong>Inês Rocha</strong><span>Sessão de fase · M9 de 9 · relatório final</span></span>
+                <span class="end"><span class="pill sage">Confirmada</span></span>
+              </div>
+              <div class="row">
+                <span class="time">14:30</span>
+                <span class="who2"><strong>Sofia Almeida</strong><span>Reavaliação M3 · decisão de renovação</span></span>
+                <span class="end"><span class="pill clay">Sem resposta</span></span>
+              </div>
+              <div class="row">
+                <span class="time">16:00</span>
+                <span class="who2"><strong>Rita Campos</strong><span>Aplicação · M2 de 3</span></span>
+                <span class="end"><span class="pill sage">Confirmada</span></span>
+              </div>
+              <div class="row">
+                <span class="time">17:30</span>
+                <span class="who2"><strong>Helena Duarte</strong><span>Sessão de manutenção · pós-protocolo</span></span>
+                <span class="end"><span class="pill mute">A confirmar</span></span>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="panel">
+              <header><h4>A precisar de si</h4><span>4 avisos</span></header>
+              <div class="body">
+                <div class="alert warn"><span class="bar"></span><p><strong>Sofia Almeida</strong> não enviou a foto de M3. Último aviso há 6 dias.</p></div>
+                <div class="alert"><span class="bar"></span><p>Lote <span class="mono">B-2609</span> do <strong>Blend Raiz Forte</strong> termina a 30/09. Preparar reposição.</p></div>
+                <div class="alert"><span class="bar"></span><p><strong>Inês Rocha</strong> chega hoje ao M9. Relatório final por gerar.</p></div>
+                <div class="alert warn"><span class="bar"></span><p>Óleo de jojoba abaixo do mínimo: restam <span class="mono">180 ml</span>.</p></div>
+              </div>
+            </div>
+            <div class="panel">
+              <header><h4>Adesão ao protocolo</h4><span>últimos 90 dias</span></header>
+              <div class="body">
+                <div class="bars">
+                  <div class="b"><span>3 meses</span><span class="track"><i style="width:88%"></i></span><span class="mono">88%</span></div>
+                  <div class="b"><span>6 meses</span><span class="track"><i style="width:74%"></i></span><span class="mono">74%</span></div>
+                  <div class="b"><span>9 meses</span><span class="track"><i style="width:61%"></i></span><span class="mono">61%</span></div>
+                  <div class="b"><span>Foto mensal</span><span class="track"><i style="width:69%"></i></span><span class="mono">69%</span></div>
+                </div>
+                <p style="font-size:12.5px;color:var(--ink-3)">Percentagem de clientes que cumpre as sessões previstas em cada protocolo.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ ANAMNESE ============ -->
+      <div class="screen" id="sc-anamnese" role="tabpanel" aria-labelledby="tab-anamnese" hidden>
+        <div class="screen-head">
+          <div>
+            <h3>Ficha de anamnese — Marta Vilar</h3>
+            <p>Primeira consulta · 11/09/2026 · preenchida no tablet durante a avaliação</p>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn ghost" type="button">Enviar à cliente</button>
+            <button class="btn" type="button">Guardar e assinar</button>
+          </div>
+        </div>
+
+        <fieldset class="fieldset">
+          <legend>Identificação</legend>
+          <div class="inner">
+            <div class="form-grid">
+              <div class="field"><label for="an-nome">Nome completo</label><input id="an-nome" value="Marta Vilar Antunes"></div>
+              <div class="field"><label for="an-nasc">Data de nascimento</label><input id="an-nasc" value="14/03/1991"></div>
+              <div class="field"><label for="an-tel">Telemóvel</label><input id="an-tel" value="+351 912 345 678"><p class="hint">Usado para os lembretes por SMS e WhatsApp.</p></div>
+              <div class="field"><label for="an-email">E-mail</label><input id="an-email" value="marta.vilar@exemplo.pt"></div>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend>Saúde e histórico</legend>
+          <div class="inner">
+            <div class="field">
+              <label>Situações a assinalar</label>
+              <div class="checks">
+                <label class="check"><input type="checkbox" id="an-s1" checked> Pós-parto (8 meses)</label>
+                <label class="check"><input type="checkbox" id="an-s2" checked> Alterações da tiroide</label>
+                <label class="check"><input type="checkbox" id="an-s3"> Anemia / ferro baixo</label>
+                <label class="check"><input type="checkbox" id="an-s4"> Ovário poliquístico</label>
+                <label class="check"><input type="checkbox" id="an-s5"> Gravidez ou amamentação</label>
+                <label class="check"><input type="checkbox" id="an-s6" checked> Stress elevado</label>
+                <label class="check"><input type="checkbox" id="an-s7"> Dermatite seborreica</label>
+                <label class="check"><input type="checkbox" id="an-s8"> Psoríase</label>
+              </div>
+              <p class="hint">As respostas assinaladas ficam ligadas às contraindicações dos blends.</p>
+            </div>
+            <div class="form-grid">
+              <div class="field"><label for="an-med">Medicação atual</label><input id="an-med" value="Levotiroxina 50 mcg"></div>
+              <div class="field"><label for="an-alg">Alergias conhecidas</label><input id="an-alg" value="Nenhuma referida"></div>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend>Rotina e químicas</legend>
+          <div class="inner">
+            <div class="form-grid">
+              <div class="field"><label for="an-lav">Frequência de lavagem</label>
+                <select id="an-lav"><option>Diária</option><option selected>Dia sim, dia não</option><option>2x por semana</option><option>1x por semana</option></select>
+              </div>
+              <div class="field"><label for="an-quim">Última química</label><input id="an-quim" value="Coloração — há 5 semanas"></div>
+            </div>
+            <div class="field">
+              <label>Químicas já usadas</label>
+              <div class="checks">
+                <label class="check"><input type="checkbox" id="an-q1" checked> Coloração</label>
+                <label class="check"><input type="checkbox" id="an-q2"> Descoloração</label>
+                <label class="check"><input type="checkbox" id="an-q3" checked> Progressiva</label>
+                <label class="check"><input type="checkbox" id="an-q4"> Alisamento definitivo</label>
+                <label class="check"><input type="checkbox" id="an-q5"> Permanente</label>
+              </div>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend>Avaliação do couro cabeludo e do fio</legend>
+          <div class="inner">
+            <div class="field">
+              <label>Oleosidade na raiz</label>
+              <div class="scale">
+                <label><input type="radio" name="an-ole" id="an-ole1"> Seca</label>
+                <label><input type="radio" name="an-ole" id="an-ole2"> Normal</label>
+                <label><input type="radio" name="an-ole" id="an-ole3" checked> Oleosa</label>
+                <label><input type="radio" name="an-ole" id="an-ole4"> Muito oleosa</label>
+              </div>
+            </div>
+            <div class="field">
+              <label>Queda referida pela cliente</label>
+              <div class="scale">
+                <label><input type="radio" name="an-qd" id="an-qd1"> Ligeira</label>
+                <label><input type="radio" name="an-qd" id="an-qd2"> Moderada</label>
+                <label><input type="radio" name="an-qd" id="an-qd3" checked> Intensa</label>
+                <label><input type="radio" name="an-qd" id="an-qd4"> Muito intensa</label>
+              </div>
+            </div>
+            <div class="form-grid">
+              <div class="field"><label for="an-trac">Teste de tração</label>
+                <select id="an-trac"><option>Negativo</option><option selected>Positivo — 4 fios</option><option>Positivo — mais de 6 fios</option></select>
+              </div>
+              <div class="field"><label for="an-dens">Densidade de partida (fios/cm²)</label><input id="an-dens" class="mono" value="118"><p class="hint">Medida com dermatoscópio na zona do topo.</p></div>
+              <div class="field"><label for="an-por">Porosidade</label>
+                <select id="an-por"><option>Baixa</option><option selected>Média</option><option>Alta</option></select>
+              </div>
+              <div class="field"><label for="an-curv">Curvatura</label>
+                <select id="an-curv"><option>Liso</option><option selected>Ondulado 2B</option><option>Cacheado 3A</option><option>Crespo 4B</option></select>
+              </div>
+            </div>
+            <div class="field"><label for="an-obs">Observações da terapeuta</label><textarea id="an-obs">Descamação ligeira na zona parietal. Fios finos no topo, comprimento com desgaste da progressiva. Cliente refere queda desde o 4.º mês pós-parto.</textarea></div>
+          </div>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend>Protocolo proposto</legend>
+          <div class="inner">
+            <div class="form-grid">
+              <div class="field"><label for="an-prot">Protocolo</label>
+                <select id="an-prot"><option>3 meses — reequilíbrio</option><option selected>6 meses — fortalecimento</option><option>9 meses — completo</option></select>
+              </div>
+              <div class="field"><label for="an-blend">Blend inicial</label>
+                <select id="an-blend"><option selected>Raiz Forte — fórmula 04</option><option>Calmaria — couro sensível</option><option>Equilíbrio — raiz oleosa</option></select>
+              </div>
+            </div>
+          </div>
+        </fieldset>
+
+        <div class="consent">
+          <div>
+            <p style="font-size:13.5px"><strong>Consentimento informado e autorização de imagem.</strong> A cliente assina no ecrã. As fotografias ficam guardadas em arquivo privado, são usadas apenas no acompanhamento e só vão para redes sociais com autorização separada, que pode ser retirada a qualquer momento. A ficha pode ser exportada ou apagada a pedido da cliente.</p>
+            <p style="margin-top:8px;font-size:12.5px;color:var(--ink-3)">Texto de exemplo — o texto final deve ser validado por quem trate da proteção de dados.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ EVOLUÇÃO ============ -->
+      <div class="screen" id="sc-evolucao" role="tabpanel" aria-labelledby="tab-evolucao" hidden>
+        <div class="screen-head">
+          <div>
+            <h3>Evolução — Carla Nogueira</h3>
+            <p>Protocolo de 6 meses · atualmente no mês 4 · registo iniciado a 12/05/2026</p>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn ghost" type="button">Pedir foto à cliente</button>
+            <button class="btn" type="button">Novo registo</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <header><h4>Ângulos do registo</h4><span>o mesmo enquadramento em todos os meses</span></header>
+          <div class="body">
+            <div class="angles">
+              <span class="angle on">1 · Topo</span>
+              <span class="angle">2 · Coroa</span>
+              <span class="angle">3 · Frontal</span>
+              <span class="angle">4 · Lateral direita</span>
+              <span class="angle">5 · Nuca</span>
+            </div>
+            <p style="font-size:13px;color:var(--ink-2)">Ao fotografar, a câmara mostra por cima a silhueta da foto do mês anterior — é assim que os registos ficam comparáveis mês a mês.</p>
+          </div>
+        </div>
+
+        <div class="timeline">
+          <figure class="shot" style="margin:0">
+            <div class="img"><canvas data-density="118" width="240" height="320" aria-label="Mapa de densidade simulado do mês 0"></canvas></div>
+            <figcaption class="cap"><b>M0</b><span>12/05</span></figcaption>
+          </figure>
+          <figure class="shot" style="margin:0">
+            <div class="img"><canvas data-density="121" width="240" height="320" aria-label="Mapa de densidade simulado do mês 1"></canvas></div>
+            <figcaption class="cap"><b>M1</b><span>11/06</span></figcaption>
+          </figure>
+          <figure class="shot" style="margin:0">
+            <div class="img"><canvas data-density="127" width="240" height="320" aria-label="Mapa de densidade simulado do mês 2"></canvas></div>
+            <figcaption class="cap"><b>M2</b><span>10/07</span></figcaption>
+          </figure>
+          <figure class="shot" style="margin:0">
+            <div class="img"><canvas data-density="134" width="240" height="320" aria-label="Mapa de densidade simulado do mês 3"></canvas></div>
+            <figcaption class="cap"><b>M3</b><span>09/08</span></figcaption>
+          </figure>
+          <figure class="shot" style="margin:0">
+            <div class="img empty"><span>Foto de M4<br>por enviar</span></div>
+            <figcaption class="cap"><b>M4</b><span>hoje</span></figcaption>
+          </figure>
+        </div>
+        <p style="font-size:12.5px;color:var(--ink-3);margin-top:-8px">As imagens acima são mapas de densidade gerados para a demonstração. No sistema real, cada quadrado é a fotografia do mês.</p>
+
+        <div class="cols">
+          <div class="panel">
+            <header><h4>Comparar M0 com M3</h4><span>arraste a barra</span></header>
+            <div class="body">
+              <div class="compare">
+                <div class="stack">
+                  <canvas id="cmp-after" width="640" height="400" aria-label="Mapa de densidade simulado do mês 3"></canvas>
+                  <canvas id="cmp-before" class="top" width="640" height="400" aria-label="Mapa de densidade simulado do mês 0"></canvas>
+                  <span class="handle" id="cmp-handle" style="left:50%"></span>
+                  <span class="lbl l">M0 · maio</span>
+                  <span class="lbl r">M3 · agosto</span>
+                  <input type="range" id="cmp-range" min="0" max="100" value="50" aria-label="Comparar mês 0 com mês 3">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="panel">
+              <header><h4>Medições</h4><span>zona do topo</span></header>
+              <div class="body">
+                <div class="metrics">
+                  <div class="metric"><p class="m">Densidade</p><p class="n">134 <small>fios/cm²</small></p><p class="delta">+16 desde M0</p></div>
+                  <div class="metric"><p class="m">Teste de tração</p><p class="n">2 <small>fios</small></p><p class="delta">era 4 em M0</p></div>
+                  <div class="metric"><p class="m">Oleosidade</p><p class="n">Normal</p><p class="delta">era oleosa</p></div>
+                </div>
+                <p style="font-size:12.5px;color:var(--ink-3)">Valores de exemplo. Os campos medidos são definidos consigo — o sistema só guarda e compara o que fizer sentido no método.</p>
+              </div>
+            </div>
+            <div class="panel">
+              <header><h4>Notas da sessão</h4><span>M3 · 09/08</span></header>
+              <div class="body">
+                <p style="font-size:13.5px;color:var(--ink-2)">Menor queda ao pentear. Raiz com menos oleosidade ao segundo dia. Ajustada a percentagem de hortelã-pimenta no blend por sensação de frio excessivo.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ BLENDS ============ -->
+      <div class="screen" id="sc-blends" role="tabpanel" aria-labelledby="tab-blends" hidden>
+        <div class="screen-head">
+          <div>
+            <h3>Blend Raiz Forte — fórmula 04</h3>
+            <p>Fase de fortalecimento · usado em 14 clientes · última revisão a 02/09/2026</p>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn ghost" type="button">Nova versão</button>
+            <button class="btn gold" type="button">Imprimir rótulo</button>
+          </div>
+        </div>
+
+        <div class="formula">
+          <div class="panel">
+            <header><h4>Composição</h4><span>base de 100 ml</span></header>
+            <div class="body">
+              <table class="recipe">
+                <thead><tr><th>Componente</th><th>Função</th><th>%</th><th>ml</th></tr></thead>
+                <tbody>
+                  <tr><td>Extrato de jaborandi</td><td>Ativo principal</td><td>5,0</td><td>5,0</td></tr>
+                  <tr><td>Óleo essencial de alecrim</td><td>Ativo</td><td>3,0</td><td>3,0</td></tr>
+                  <tr><td>Óleo essencial de hortelã-pimenta</td><td>Ativo</td><td>1,5</td><td>1,5</td></tr>
+                  <tr><td>Pantenol</td><td>Condicionante</td><td>2,0</td><td>2,0</td></tr>
+                  <tr><td>Óleo de jojoba</td><td>Veiculante</td><td>88,5</td><td>88,5</td></tr>
+                  <tr><td>Total</td><td></td><td>100,0</td><td>100,0</td></tr>
+                </tbody>
+              </table>
+              <div class="alert warn" style="margin-top:6px"><span class="bar"></span><p><strong>Contraindicação assinalada:</strong> alecrim e hortelã-pimenta ficam bloqueados para clientes com gravidez ou amamentação na anamnese. O sistema avisa antes de associar o blend.</p></div>
+              <p style="font-size:12.5px;color:var(--ink-3)">Fórmula inventada para a demonstração. As composições reais, as percentagens e as contraindicações são definidas pela Jaqueline e pela sua formulação.</p>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="label-print">
+              <p class="sub">Jaqueline Mendonça</p>
+              <h5>Raiz Forte</h5>
+              <p style="text-align:center;font-size:12px;color:var(--ink-2)">Tónico capilar de uso externo</p>
+              <dl>
+                <dt>Cliente</dt><dd>Carla Nogueira</dd>
+                <dt>Fórmula</dt><dd>04</dd>
+                <dt>Lote</dt><dd>B-2609</dd>
+                <dt>Preparado</dt><dd>02/09/2026</dd>
+                <dt>Validade</dt><dd>02/12/2026</dd>
+                <dt>Volume</dt><dd>100 ml</dd>
+              </dl>
+              <p style="font-size:11.5px;color:var(--ink-2);border-top:1px solid var(--line-2);padding-top:8px;margin-top:4px">Aplicar na raiz 3x por semana, massajar 5 minutos. Manter ao abrigo da luz. Uso exclusivo da cliente indicada.</p>
+            </div>
+            <div class="panel">
+              <header><h4>Stock de matéria-prima</h4><span>3 de 12 em alerta</span></header>
+              <div class="body">
+                <div class="stock">
+                  <div class="s"><span>Óleo de jojoba</span><span class="pill clay">Baixo</span><span class="q">180 ml</span></div>
+                  <div class="s"><span>Extrato de jaborandi</span><span class="pill sage">Ok</span><span class="q">640 ml</span></div>
+                  <div class="s"><span>OE de alecrim</span><span class="pill gold">A meio</span><span class="q">95 ml</span></div>
+                  <div class="s"><span>OE de hortelã-pimenta</span><span class="pill sage">Ok</span><span class="q">210 ml</span></div>
+                  <div class="s"><span>Pantenol</span><span class="pill clay">Baixo</span><span class="q">60 ml</span></div>
+                  <div class="s"><span>Frascos âmbar 100 ml</span><span class="pill sage">Ok</span><span class="q">42 un</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <header><h4>Quem está a usar esta fórmula</h4><span>14 clientes</span></header>
+          <div class="body">
+            <div class="tablescroll">
+              <table class="admin">
+                <thead><tr><th>Cliente</th><th>Fase</th><th>Início</th><th>Lote</th><th class="num">Frascos</th><th>Estado</th></tr></thead>
+                <tbody>
+                  <tr><td>Carla Nogueira</td><td>M4 de 6</td><td>12/05/2026</td><td class="num">B-2609</td><td class="num">3</td><td><span class="pill sage">Em uso</span></td></tr>
+                  <tr><td>Sofia Almeida</td><td>M3 de 3</td><td>02/06/2026</td><td class="num">B-2609</td><td class="num">2</td><td><span class="pill gold">Reavaliar</span></td></tr>
+                  <tr><td>Rita Campos</td><td>M2 de 3</td><td>04/07/2026</td><td class="num">B-2608</td><td class="num">2</td><td><span class="pill sage">Em uso</span></td></tr>
+                  <tr><td>Inês Rocha</td><td>M9 de 9</td><td>10/12/2025</td><td class="num">B-2605</td><td class="num">8</td><td><span class="pill mute">A terminar</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ COMUNICAÇÃO ============ -->
+      <div class="screen" id="sc-comunicacao" role="tabpanel" aria-labelledby="tab-comunicacao" hidden>
+        <div class="screen-head">
+          <div>
+            <h3>Comunicação automática</h3>
+            <p>Régua de lembretes por SMS e WhatsApp (Twilio) e sequência de e-mails ligada ao protocolo</p>
+          </div>
+          <button class="btn" type="button">Nova automação</button>
+        </div>
+
+        <div class="comms">
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="panel">
+              <header><h4>Lembretes</h4><span>ligue e desligue cada regra</span></header>
+              <div class="body">
+                <div class="rule-list">
+                  <div class="rulecard">
+                    <span class="when">−48 h</span>
+                    <span class="what"><strong>Confirmação da sessão</strong><span>SMS com resposta SIM ou NÃO — a resposta atualiza a agenda sozinha</span></span>
+                    <label class="switch"><input type="checkbox" id="rl1" checked aria-label="Confirmação da sessão"><span class="track2"></span></label>
+                  </div>
+                  <div class="rulecard">
+                    <span class="when">−24 h</span>
+                    <span class="what"><strong>Preparação</strong><span>WhatsApp com as indicações da véspera e a morada do estúdio</span></span>
+                    <label class="switch"><input type="checkbox" id="rl2" checked aria-label="Preparação"><span class="track2"></span></label>
+                  </div>
+                  <div class="rulecard">
+                    <span class="when">Dia 1</span>
+                    <span class="what"><strong>Foto do mês</strong><span>Link direto para a cliente enviar as fotos do telemóvel</span></span>
+                    <label class="switch"><input type="checkbox" id="rl3" checked aria-label="Foto do mês"><span class="track2"></span></label>
+                  </div>
+                  <div class="rulecard">
+                    <span class="when">Dia 24</span>
+                    <span class="what"><strong>Blend a acabar</strong><span>Aviso calculado a partir da posologia e do volume do frasco</span></span>
+                    <label class="switch"><input type="checkbox" id="rl4" checked aria-label="Blend a acabar"><span class="track2"></span></label>
+                  </div>
+                  <div class="rulecard">
+                    <span class="when">−30 d</span>
+                    <span class="what"><strong>Fim de fase</strong><span>Convite para a reavaliação de M3, M6 ou M9 e decisão de renovação</span></span>
+                    <label class="switch"><input type="checkbox" id="rl5" checked aria-label="Fim de fase"><span class="track2"></span></label>
+                  </div>
+                  <div class="rulecard">
+                    <span class="when">+60 d</span>
+                    <span class="what"><strong>Reativação</strong><span>Mensagem a clientes sem sessão há dois meses</span></span>
+                    <label class="switch"><input type="checkbox" id="rl6" aria-label="Reativação"><span class="track2"></span></label>
+                  </div>
+                </div>
+                <p style="font-size:12.5px;color:var(--ink-3)">Cada envio fica registado na ficha da cliente, com data, canal e estado de entrega.</p>
+              </div>
+            </div>
+
+            <div class="panel">
+              <header><h4>Sequência de e-mails</h4><span>4 modelos ativos</span></header>
+              <div class="body">
+                <div class="mailcard">
+                  <p class="subject"><b>Assunto:</b> Carla, o seu mês 3 em duas fotografias</p>
+                  <div class="prev">
+                    <p class="hdr">Três meses depois</p>
+                    <p>Olá Carla. Ao fim de três meses de acompanhamento, a densidade na zona do topo passou de 118 para 134 fios/cm² e o teste de tração baixou de 4 para 2 fios. Em anexo ficam as fotografias lado a lado.</p>
+                    <p>Na próxima sessão ajustamos o blend para a fase de fortalecimento.</p>
+                    <p style="font-size:12px;color:var(--ink-3)">Enviado automaticamente no fim de cada fase, com os dados reais da ficha.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="phone" aria-hidden="true">
+            <div class="bar"><span>09:41</span><span>Mensagens</span></div>
+            <div class="sms">
+              <p class="from">Jaqueline Mendonça</p>
+              Olá Carla 🌿 A sua sessão é quinta-feira, dia 11, às 09:00. Responda SIM para confirmar ou NÃO para remarcar.
+            </div>
+            <div class="sms out">SIM</div>
+            <div class="sms">
+              <p class="from">Jaqueline Mendonça</p>
+              Confirmado. Até quinta! Lembre-se de vir com o cabelo lavado na véspera, sem produto na raiz.
+            </div>
+            <div class="sms">
+              <p class="from">Jaqueline Mendonça</p>
+              Chegou o dia da foto do mês 4. Envie as suas fotos aqui: jm.pt/f/9c2a — demora menos de um minuto.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ GESTÃO ============ -->
+      <div class="screen" id="sc-gestao" role="tabpanel" aria-labelledby="tab-gestao" hidden>
+        <div class="screen-head">
+          <div>
+            <h3>Gestão do negócio</h3>
+            <p>Abril a setembro de 2026 · valores de exemplo</p>
+          </div>
+          <button class="btn ghost" type="button">Exportar para contabilidade</button>
+        </div>
+
+        <div class="kpis">
+          <div class="kpi"><p class="k">Receita do mês</p><p class="v">4 820 €</p><p class="d"><span class="up">+11%</span> face a agosto</p></div>
+          <div class="kpi"><p class="k">Ticket médio</p><p class="v">127 €</p><p class="d">por sessão realizada</p></div>
+          <div class="kpi"><p class="k">Valor por protocolo</p><p class="v">690 €</p><p class="d">média dos pacotes fechados</p></div>
+          <div class="kpi"><p class="k">Renovação</p><p class="v">58%</p><p class="d">de 3 para 6 meses</p></div>
+        </div>
+
+        <div class="cols">
+          <div class="panel">
+            <header><h4>Receita por mês</h4><span>sessões avulso vs. pacotes</span></header>
+            <div class="body">
+              <div class="chart-wrap">
+                <svg viewBox="0 0 640 260" width="100%" height="230" role="img" aria-label="Gráfico de barras da receita mensal de abril a setembro de 2026, a crescer de 3100 para 4820 euros">
+                  <g stroke="var(--line)" stroke-width="1">
+                    <line x1="52" y1="30" x2="628" y2="30"/><line x1="52" y1="82" x2="628" y2="82"/>
+                    <line x1="52" y1="134" x2="628" y2="134"/><line x1="52" y1="186" x2="628" y2="186"/>
+                    <line x1="52" y1="216" x2="628" y2="216"/>
+                  </g>
+                  <g fill="var(--ink-3)" font-size="11" font-family="IBM Plex Mono, monospace" text-anchor="end">
+                    <text x="44" y="34">6 000</text><text x="44" y="86">4 500</text>
+                    <text x="44" y="138">3 000</text><text x="44" y="190">1 500</text><text x="44" y="220">0</text>
+                  </g>
+                  <g>
+                    <rect x="70" y="141" width="46" height="75" fill="var(--brown)"/><rect x="70" y="123" width="46" height="18" fill="var(--gold-2)"/>
+                    <rect x="164" y="134" width="46" height="82" fill="var(--brown)"/><rect x="164" y="110" width="46" height="24" fill="var(--gold-2)"/>
+                    <rect x="258" y="130" width="46" height="86" fill="var(--brown)"/><rect x="258" y="99" width="46" height="31" fill="var(--gold-2)"/>
+                    <rect x="352" y="126" width="46" height="90" fill="var(--brown)"/><rect x="352" y="92" width="46" height="34" fill="var(--gold-2)"/>
+                    <rect x="446" y="121" width="46" height="95" fill="var(--brown)"/><rect x="446" y="86" width="46" height="35" fill="var(--gold-2)"/>
+                    <rect x="540" y="112" width="46" height="104" fill="var(--brown)"/><rect x="540" y="49" width="46" height="63" fill="var(--gold-2)"/>
+                  </g>
+                  <g fill="var(--ink-2)" font-size="12" font-family="Karla, sans-serif" text-anchor="middle">
+                    <text x="93" y="236">abr</text><text x="187" y="236">mai</text><text x="281" y="236">jun</text>
+                    <text x="375" y="236">jul</text><text x="469" y="236">ago</text><text x="563" y="236">set</text>
+                  </g>
+                  <g fill="var(--ink)" font-size="11" font-family="IBM Plex Mono, monospace" text-anchor="middle">
+                    <text x="93" y="115">3 100</text><text x="187" y="102">3 380</text><text x="281" y="91">3 620</text>
+                    <text x="375" y="84">3 800</text><text x="469" y="78">4 340</text><text x="563" y="41">4 820</text>
+                  </g>
+                </svg>
+              </div>
+              <div class="legend">
+                <span><i style="background:var(--brown)"></i>Sessões avulso</span>
+                <span><i style="background:var(--gold-2)"></i>Pacotes de protocolo</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <header><h4>Pacotes em curso</h4><span>pagamento faseado</span></header>
+            <div class="body">
+              <div class="tablescroll">
+                <table class="admin">
+                  <thead><tr><th>Cliente</th><th>Pacote</th><th class="num">Pago</th><th>Estado</th></tr></thead>
+                  <tbody>
+                    <tr><td>Carla Nogueira</td><td>6 meses</td><td class="num">460 / 690 €</td><td><span class="pill sage">Em dia</span></td></tr>
+                    <tr><td>Inês Rocha</td><td>9 meses</td><td class="num">960 / 960 €</td><td><span class="pill sage">Liquidado</span></td></tr>
+                    <tr><td>Sofia Almeida</td><td>3 meses</td><td class="num">240 / 390 €</td><td><span class="pill clay">Em atraso</span></td></tr>
+                    <tr><td>Rita Campos</td><td>3 meses</td><td class="num">390 / 390 €</td><td><span class="pill sage">Liquidado</span></td></tr>
+                    <tr><td>Helena Duarte</td><td>Manutenção</td><td class="num">45 / 45 €</td><td><span class="pill sage">Liquidado</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p style="font-size:12.5px;color:var(--ink-3)">Os atrasos geram um aviso discreto no painel do dia, nunca uma mensagem automática à cliente.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<section id="arquitectura">
+  <div class="sec-head">
+    <p class="eyebrow">Como se constrói</p>
+    <h2>Arquitetura e integrações</h2>
+    <p>A base proposta é a mesma que já usamos noutro sistema em produção — é conhecida, estável e não obriga a servidor próprio.</p>
+  </div>
+  <div class="stack-grid">
+    <div class="layer">
+      <h4>Aplicação <em>o que a Jaqueline vê</em></h4>
+      <p>Aplicação web em React, desenhada primeiro para telemóvel e tablet, já que a maior parte do trabalho acontece de pé, ao lado da cliente.</p>
+      <div class="kv"><span><b>Acesso:</b> por e-mail e palavra-passe, com perfis separados para a Jaqueline e para uma eventual assistente.</span><span><b>Instalável:</b> fica no ecrã inicial do telemóvel como uma aplicação normal.</span></div>
+    </div>
+    <div class="layer">
+      <h4>Dados e fotografias <em>onde fica guardado</em></h4>
+      <p>Base de dados Supabase (PostgreSQL) com arquivo de ficheiros privado para as fotografias, acessível apenas através de links temporários.</p>
+      <div class="kv"><span><b>Cópias de segurança:</b> automáticas, com possibilidade de exportar tudo.</span><span><b>Isolamento:</b> cada ficha só é legível por quem tem sessão iniciada no estúdio.</span></div>
+    </div>
+    <div class="layer">
+      <h4>Mensagens <em>Twilio</em></h4>
+      <p>SMS e WhatsApp enviados pela Twilio a partir da régua de lembretes, com registo de entrega e resposta.</p>
+      <div class="kv"><span><b>A confirmar:</b> o WhatsApp através da Twilio exige, tanto quanto sei, um remetente aprovado pela Meta e modelos de mensagem previamente autorizados — convém confirmarmos isso antes de prometer o canal.</span><span><b>Alternativa imediata:</b> começar por SMS, que não tem esse processo de aprovação.</span></div>
+    </div>
+    <div class="layer">
+      <h4>E-mail <em>envio automático</em></h4>
+      <p>Serviço de envio transacional para as sequências de e-mail, com domínio próprio no remetente para as mensagens não caírem em spam.</p>
+      <div class="kv"><span><b>Necessário:</b> um domínio da Jaqueline e a configuração dos registos de autenticação de e-mail.</span></div>
+    </div>
+  </div>
+
+  <div class="note" style="margin-top:20px">
+    <p><b>Proteção de dados — a assinalar desde já.</b> Fichas clínicas e fotografias do couro cabeludo são dados sensíveis. O sistema prevê consentimento explícito e separado para o acompanhamento e para a divulgação, arquivo privado, e apagamento a pedido da cliente.</p>
+    <p>Não sou a pessoa indicada para validar o cumprimento do RGPD: o texto dos consentimentos e o prazo de conservação devem ser revistos por quem trate da proteção de dados do negócio.</p>
+    <p><b>Custos mensais.</b> A Twilio cobra por mensagem enviada e o alojamento tem escalões gratuitos e pagos. Não indico valores aqui porque os preços mudam com frequência e variam com o país de destino — faço o levantamento atualizado assim que fecharmos o âmbito, para não avançar com números que depois não se confirmam.</p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<section id="fases">
+  <div class="sec-head">
+    <p class="eyebrow">Caminho até estar a funcionar</p>
+    <h2>Implementação por fases</h2>
+    <p>Cada fase entrega qualquer coisa que já se usa no dia seguinte. As durações são estimativas de trabalho, ainda por confirmar depois de fecharmos o detalhe de cada módulo.</p>
+  </div>
+  <div class="roadmap">
+    <div class="step">
+      <span class="n">1</span>
+      <div><h4>Núcleo clínico</h4><p>Clientes, agenda e ficha de anamnese digital com assinatura e consentimentos. A partir daqui o papel deixa de ser preciso.</p></div>
+      <p class="est"><b>2–3 semanas</b>estimativa</p>
+    </div>
+    <div class="step">
+      <span class="n">2</span>
+      <div><h4>Evolução fotográfica e protocolos</h4><p>Registo mensal nos cinco ângulos, comparador, e os percursos de 3, 6 e 9 meses com as sessões geradas automaticamente.</p></div>
+      <p class="est"><b>2–3 semanas</b>estimativa</p>
+    </div>
+    <div class="step">
+      <span class="n">3</span>
+      <div><h4>Blends</h4><p>Biblioteca de ativos, formulações com percentagens, lotes, rótulos e stock de matéria-prima.</p></div>
+      <p class="est"><b>2 semanas</b>estimativa</p>
+    </div>
+    <div class="step">
+      <span class="n">4</span>
+      <div><h4>Comunicação</h4><p>Régua de lembretes por SMS (e WhatsApp, se o canal for aprovado) e a sequência de e-mails ligada às fases.</p></div>
+      <p class="est"><b>1–2 semanas</b>estimativa</p>
+    </div>
+    <div class="step">
+      <span class="n">5</span>
+      <div><h4>Gestão</h4><p>Pacotes, pagamentos faseados, receita, ticket médio, renovação e exportação para a contabilidade.</p></div>
+      <p class="est"><b>2 semanas</b>estimativa</p>
+    </div>
+    <div class="step">
+      <span class="n">6</span>
+      <div><h4>Portal da cliente <span class="pill mute" style="margin-left:6px">opcional</span></h4><p>Área onde cada cliente vê o seu percurso, envia as fotos do mês e consulta as instruções do blend.</p></div>
+      <p class="est"><b>2 semanas</b>estimativa</p>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<section id="decisoes">
+  <div class="sec-head">
+    <p class="eyebrow">Antes de avançar</p>
+    <h2>O que preciso de saber consigo</h2>
+    <p>São estas as respostas que mudam o desenho do sistema. Nenhuma é urgente hoje — mas todas são anteriores à primeira linha de código.</p>
+  </div>
+  <div class="questions">
+    <div class="q"><h4>Quem usa o sistema?</h4><p>Só a Jaqueline, ou também uma assistente ou recepção? Isso define os perfis de acesso e o que cada pessoa pode ver da ficha clínica.</p></div>
+    <div class="q"><h4>SMS, WhatsApp ou os dois?</h4><p>O SMS arranca de imediato; o WhatsApp tem um processo de aprovação pelo meio. Podemos começar por um e acrescentar o outro.</p></div>
+    <div class="q"><h4>O que entra na anamnese?</h4><p>O protótipo mostra uma estrutura possível. O questionário final deve ser o seu, campo a campo — é isso que torna a ficha útil.</p></div>
+    <div class="q"><h4>Como são cobrados os protocolos?</h4><p>Pacote fechado, mensalidade ou sessão a sessão? A resposta define como se desenham os pagamentos e a renovação.</p></div>
+    <div class="q"><h4>As clientes enviam fotos?</h4><p>Se sim, vale a pena o portal da cliente já na fase 2, em vez de ficar para o fim.</p></div>
+    <div class="q"><h4>Que nome damos ao sistema?</h4><p>O protótipo usa apenas o nome da Jaqueline. Se houver uma marca para o método, é ela que deve aparecer no ecrã e nos rótulos.</p></div>
+  </div>
+</section>
+
+<footer>
+  <span>Proposta e protótipo · Jaqueline Mendonça — Terapia Capilar</span>
+  <span>Todos os nomes de clientes, valores e formulações nesta página são exemplos inventados.</span>
+</footer>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---- navegação entre ecrãs ---- */
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('.navbtn[data-screen]'));
+  function show(name){
+    tabs.forEach(function(t){
+      var on = t.dataset.screen === name;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      var panel = document.getElementById('sc-' + t.dataset.screen);
+      if (panel) panel.hidden = !on;
+    });
+  }
+  tabs.forEach(function(t){
+    t.addEventListener('click', function(){ show(t.dataset.screen); });
+    t.addEventListener('keydown', function(e){
+      var i = tabs.indexOf(t), n = null;
+      if (e.key === 'ArrowDown' || e.key === 'ArrowRight') n = tabs[(i + 1) % tabs.length];
+      if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') n = tabs[(i - 1 + tabs.length) % tabs.length];
+      if (n){ e.preventDefault(); n.focus(); show(n.dataset.screen); }
+    });
+  });
+
+  /* ---- mapas de densidade simulados (substituem as fotografias na demonstração) ---- */
+  function rng(seed){
+    return function(){
+      seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+      var t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+  function drawScalp(canvas, density, seed){
+    var ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    var w = canvas.width, h = canvas.height, r = rng(seed);
+    var skin = ctx.createLinearGradient(0, 0, w, h);
+    skin.addColorStop(0, '#EBD6BC');
+    skin.addColorStop(0.55, '#DCBE9C');
+    skin.addColorStop(1, '#C9A177');
+    ctx.fillStyle = skin;
+    ctx.fillRect(0, 0, w, h);
+
+    var strands = Math.round((density - 92) * (w * h) / 3400);
+    var partX = w * 0.5;
+    for (var i = 0; i < strands; i++){
+      var x = r() * w;
+      var y = r() * h;
+      var d = Math.abs(x - partX) / (w * 0.5);
+      if (r() > 0.18 + d * 0.95) continue;          /* risca central mais despida */
+      var len = 9 + r() * (h * 0.12);
+      var ang = (x < partX ? -1 : 1) * (0.6 + r() * 0.7);
+      var shade = 26 + Math.floor(r() * 34);
+      ctx.strokeStyle = 'rgba(' + (shade + 24) + ',' + (shade + 8) + ',' + shade + ',' + (0.55 + r() * 0.4) + ')';
+      ctx.lineWidth = 0.7 + r() * 1.1;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.quadraticCurveTo(x + ang * len * 0.5, y + len * 0.55, x + ang * len, y + len);
+      ctx.stroke();
+    }
+    var vig = ctx.createRadialGradient(w / 2, h / 2, w * 0.25, w / 2, h / 2, w * 0.75);
+    vig.addColorStop(0, 'rgba(0,0,0,0)');
+    vig.addColorStop(1, 'rgba(60,38,20,0.28)');
+    ctx.fillStyle = vig;
+    ctx.fillRect(0, 0, w, h);
+  }
+
+  document.querySelectorAll('canvas[data-density]').forEach(function(c, i){
+    drawScalp(c, parseInt(c.dataset.density, 10), 1000 + i * 37);
+  });
+
+  var before = document.getElementById('cmp-before');
+  var after = document.getElementById('cmp-after');
+  if (before && after){
+    drawScalp(before, 118, 7);
+    drawScalp(after, 134, 7);
+  }
+
+  /* ---- comparador com barra deslizante ---- */
+  var range = document.getElementById('cmp-range');
+  var handle = document.getElementById('cmp-handle');
+  if (range && before && handle){
+    var sync = function(){
+      var v = Number(range.value);
+      before.style.clipPath = 'inset(0 ' + (100 - v) + '% 0 0)';
+      handle.style.left = v + '%';
+    };
+    range.addEventListener('input', sync);
+    sync();
+  }
+})();
+</script>
