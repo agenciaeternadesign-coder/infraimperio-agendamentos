@@ -37,6 +37,9 @@
   --on-brown:#1B140E; --shadow:rgba(0,0,0,.45);
 }
 *{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+
 body{
   margin:0; background:var(--paper); color:var(--ink);
   font-family:"Karla","Helvetica Neue",Arial,sans-serif;
@@ -55,14 +58,14 @@ a{color:var(--brown)}
 
 /* ---------- capa ---------- */
 .hero{padding-block:64px 40px; position:relative; overflow:hidden}
-.hero-grid{display:grid; grid-template-columns:1.25fr .75fr; gap:48px; align-items:end}
+.hero-grid{display:grid; grid-template-columns:1.15fr .85fr; gap:clamp(28px,4vw,52px); align-items:start}
 .crest{
-  width:60px;height:60px;border-radius:50%;border:1px solid var(--line-2);
+  width:54px;height:54px;border-radius:50%;border:1px solid var(--line-2);
   display:grid;place-items:center;margin-bottom:26px;
   background:radial-gradient(circle at 35% 30%, var(--gold-wash), transparent 70%);
 }
 .crest span{font-family:"Fraunces",serif;font-size:22px;color:var(--gold);letter-spacing:.02em}
-.hero h1{font-size:clamp(40px,6.4vw,72px); line-height:1.02; margin-bottom:18px}
+.hero h1{font-size:clamp(38px,5.6vw,66px); line-height:1.03; margin-bottom:18px}
 .hero h1 em{font-style:italic; color:var(--brown)}
 .lede{font-size:clamp(17px,2vw,20px); color:var(--ink-2); max-width:56ch}
 .meta{display:flex; flex-direction:column; gap:14px; border-left:1px solid var(--line); padding-left:20px}
@@ -395,11 +398,166 @@ footer{padding-block:48px 60px; border-top:1px solid var(--line); margin-top:40p
   .rulecard{grid-template-columns:1fr auto; gap:8px}
   .rulecard .when{grid-column:1/-1; justify-self:start}
 }
+/* ---------- barra fixa ---------- */
+.topbar{
+  position:sticky; top:0; z-index:30; background:var(--paper); background:color-mix(in srgb, var(--paper) 88%, transparent);
+  backdrop-filter:blur(10px); border-bottom:1px solid transparent; transition:border-color .25s, box-shadow .25s;
+}
+.topbar.is-stuck{border-bottom-color:var(--line); box-shadow:0 8px 24px -22px var(--shadow)}
+.tb-inner{max-width:1120px; margin:0 auto; padding:10px 20px; display:flex; align-items:center; gap:20px}
+.tb-brand{display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--ink); font-weight:600; font-size:14.5px}
+.tb-crest{
+  width:30px;height:30px;border-radius:50%;border:1px solid var(--line-2); display:grid; place-items:center;
+  font-family:"Fraunces",serif; font-size:13px; color:var(--gold); background:var(--gold-wash);
+}
+.tb-nav{display:flex; gap:4px; margin-left:auto}
+.tb-nav a{
+  position:relative; text-decoration:none; color:var(--ink-2); font-size:14px; padding:7px 11px; border-radius:7px;
+  transition:color .2s, background .2s;
+}
+.tb-nav a::after{
+  content:""; position:absolute; left:11px; right:11px; bottom:3px; height:1.5px; background:var(--gold);
+  transform:scaleX(0); transform-origin:left; transition:transform .25s ease;
+}
+.tb-nav a:hover{color:var(--ink)}
+.tb-nav a:hover::after,.tb-nav a.is-active::after{transform:scaleX(1)}
+.tb-nav a.is-active{color:var(--brown); font-weight:600}
+.tb-cta{text-decoration:none; white-space:nowrap; transition:transform .2s, box-shadow .2s}
+.tb-cta:hover{transform:translateY(-1px); box-shadow:0 8px 18px -12px var(--shadow)}
+@media (max-width:820px){.tb-nav{display:none} .tb-cta{margin-left:auto}}
+section{scroll-margin-top:74px}
+
+/* ---------- herói com simulação ---------- */
+.hero{padding-block:52px 40px}
+.hero-side{display:flex; flex-direction:column; gap:22px}
+.sim{
+  margin:0; border:1px solid var(--line-2); border-radius:14px; overflow:hidden; background:var(--paper-2);
+  box-shadow:0 20px 40px -34px var(--shadow);
+}
+.sim .frame{position:relative; aspect-ratio:4/3; background:var(--card-2)}
+.sim canvas{position:absolute; inset:0; width:100%; height:100%; display:block}
+.sim .stamp{
+  position:absolute; top:12px; left:12px; background:var(--card); background:color-mix(in srgb, var(--card) 86%, transparent);
+  border:1px solid var(--line-2); border-radius:999px; padding:4px 11px;
+  font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--brown);
+}
+.sim .ctrl{display:flex; align-items:center; gap:12px; padding:11px 14px; border-top:1px solid var(--line); background:var(--card)}
+.sim .ctrl label{font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3); font-weight:700; white-space:nowrap}
+.sim input[type=range]{flex:1; accent-color:var(--gold); min-width:80px}
+.sim .val{font-family:"IBM Plex Mono",monospace; font-size:13px; color:var(--ink); white-space:nowrap}
+.sim figcaption{padding:9px 14px 12px; font-size:12px; color:var(--ink-3); border-top:1px dashed var(--line); background:var(--card)}
+.chip{transition:transform .2s, border-color .2s, background .2s}
+.chip:hover{transform:translateY(-2px); border-color:var(--gold-2)}
+
+/* ---------- filtros dos módulos ---------- */
+.filters{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px}
+.filter{
+  font:inherit; font-size:13px; cursor:pointer; border-radius:999px; padding:7px 15px;
+  border:1px solid var(--line-2); background:var(--card); color:var(--ink-2); transition:all .2s;
+}
+.filter:hover{border-color:var(--gold-2); color:var(--ink)}
+.filter[aria-pressed="true"]{background:var(--brown); border-color:var(--brown); color:var(--on-brown); font-weight:600}
+.mod{transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease, opacity .25s ease}
+.mod:hover{transform:translateY(-4px); border-color:var(--gold-2); box-shadow:0 20px 32px -26px var(--shadow)}
+.mod.is-out{display:none}
+.mods{align-items:start}
+
+/* ---------- jornada interativa ---------- */
+.rail{position:relative; display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:26px}
+.rail::before{
+  content:""; position:absolute; left:6%; right:6%; top:11px; height:2px;
+  background:linear-gradient(90deg, var(--gold-2), var(--line-2));
+}
+.stop{
+  position:relative; background:none; border:0; cursor:pointer; font:inherit; padding:0; text-align:center;
+  display:flex; flex-direction:column; align-items:center; gap:9px; color:var(--ink-2);
+}
+.stop .dot{
+  width:22px;height:22px;border-radius:50%; border:2px solid var(--line-2); background:var(--paper);
+  display:grid; place-items:center; transition:all .25s ease;
+}
+.stop .dot i{width:7px;height:7px;border-radius:50%;background:var(--line-2); transition:all .25s ease}
+.stop .lb{font-family:"IBM Plex Mono",monospace; font-size:12.5px; letter-spacing:.04em; transition:color .2s}
+.stop .nm{font-size:13px; color:var(--ink-3); transition:color .2s}
+.stop:hover .dot{border-color:var(--gold-2); transform:scale(1.08)}
+.stop[aria-selected="true"] .dot{border-color:var(--gold); background:var(--gold-wash); transform:scale(1.12)}
+.stop[aria-selected="true"] .dot i{background:var(--gold); width:9px; height:9px}
+.stop[aria-selected="true"] .lb{color:var(--brown); font-weight:500}
+.stop[aria-selected="true"] .nm{color:var(--ink)}
+.stage{
+  border:1px solid var(--line); border-radius:var(--radius); background:var(--card);
+  padding:26px 28px; display:grid; grid-template-columns:1fr 1fr; gap:28px; min-height:220px;
+}
+.stage[hidden]{display:none !important}
+.stage h3{font-size:clamp(22px,2.6vw,28px); margin-bottom:8px}
+.stage .lead{color:var(--ink-2); font-size:15px}
+.stage ul{margin:14px 0 0; padding-left:17px; display:flex; flex-direction:column; gap:7px; color:var(--ink-2); font-size:14.5px}
+.stage ul li::marker{color:var(--gold-2)}
+.auto{border-left:2px solid var(--gold-2); padding-left:16px; display:flex; flex-direction:column; gap:10px}
+.auto p.t{font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--gold); font-weight:700}
+.auto .line{display:flex; gap:11px; align-items:flex-start; font-size:14px; color:var(--ink-2)}
+.auto .line b{font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--brown); background:var(--card-2); border:1px solid var(--line-2); border-radius:5px; padding:2px 7px; white-space:nowrap; flex:none}
+@keyframes rise{from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:none}}
+.stage:not([hidden]){animation:rise .3s ease both}
+@media (prefers-reduced-motion: reduce){.stage:not([hidden]){animation:none}}
+
+/* ---------- convite final ---------- */
+.invite{
+  border:1px solid var(--gold-2); border-radius:14px; background:
+    radial-gradient(120% 140% at 12% 0%, var(--gold-wash), transparent 62%), var(--card);
+  padding:38px clamp(22px,4vw,44px); display:grid; grid-template-columns:1.1fr .9fr; gap:34px; align-items:center;
+}
+.invite h2{font-size:clamp(26px,3.6vw,38px); margin-bottom:12px}
+.invite p{color:var(--ink-2)}
+.invite .acts{display:flex; gap:10px; flex-wrap:wrap; margin-top:20px}
+.invite .acts a{text-decoration:none; transition:transform .2s}
+.invite .acts a:hover{transform:translateY(-2px)}
+.nextsteps{display:flex; flex-direction:column; gap:12px}
+.nextstep{display:grid; grid-template-columns:30px 1fr; gap:13px; align-items:start}
+.nextstep b{
+  width:28px;height:28px;border-radius:50%;background:var(--brown); color:var(--on-brown);
+  display:grid; place-items:center; font-size:13px; font-family:"IBM Plex Mono",monospace;
+}
+.nextstep span{font-size:14px; color:var(--ink-2)}
+.nextstep span strong{color:var(--ink); display:block; font-weight:600; font-size:14.5px}
+@media (max-width:860px){.invite{grid-template-columns:1fr; gap:26px} .stage{grid-template-columns:1fr; gap:20px} .rail{grid-template-columns:repeat(2,1fr); gap:18px} .rail::before{display:none}}
+
+/* ---------- polimento de interação ---------- */
+.row{transition:background .2s}
+.panel .body .row:hover{background:color-mix(in srgb, var(--gold-wash) 45%, transparent)}
+.step{transition:background .2s}
+.step:hover{background:var(--gold-wash)}
+.q{transition:border-color .2s, padding-left .2s}
+.q:hover{border-left-color:var(--gold); padding-left:19px}
+.layer{transition:transform .2s, border-color .2s}
+.layer:hover{transform:translateY(-3px); border-color:var(--gold-2)}
+.shot{transition:transform .2s, box-shadow .2s}
+.shot:hover{transform:translateY(-3px); box-shadow:0 16px 28px -24px var(--shadow)}
+.btn{transition:transform .18s, box-shadow .18s, background .2s}
+.btn:hover{transform:translateY(-1px); box-shadow:0 10px 20px -14px var(--shadow)}
+.kpi{transition:border-color .2s}
+.kpi:hover{border-color:var(--gold-2)}
+.track i{transition:width .9s cubic-bezier(.22,.9,.3,1)}
+
 </style>
+
+<header class="topbar" id="topbar">
+  <div class="tb-inner">
+    <a class="tb-brand" href="#topo"><span class="tb-crest">JM</span> Jaqueline Mendonça</a>
+    <nav class="tb-nav" aria-label="Secções">
+      <a href="#porque">Porquê</a>
+      <a href="#modulos">Módulos</a>
+      <a href="#jornada">Jornada</a>
+      <a href="#prototipo">Protótipo</a>
+      <a href="#fases">Fases</a>
+    </nav>
+    <a class="btn tb-cta" href="#prototipo">Ver o protótipo</a>
+  </div>
+</header>
 
 <div class="wrap">
 
-<header class="hero">
+<header class="hero" id="topo">
   <div class="hero-grid">
     <div>
       <div class="crest"><span>JM</span></div>
@@ -407,12 +565,26 @@ footer{padding-block:48px 60px; border-top:1px solid var(--line); margin-top:40p
       <h1>O método já existe.<br>Falta-lhe uma <em>casa</em>.</h1>
       <p class="lede">Um sistema único para a terapia capilar da Jaqueline Mendonça: anamnese digital, registo fotográfico mês a mês, as formulações dos blends, os lembretes automáticos às clientes e a gestão do negócio — tudo ligado ao protocolo de 3, 6 e 9 meses.</p>
     </div>
+    <div class="hero-side">
+      <figure class="sim">
+        <div class="frame">
+          <canvas id="hero-canvas" width="560" height="388" aria-label="Simulação da densidade capilar a aumentar do mês 0 ao mês 6"></canvas>
+          <span class="stamp" id="hero-stamp">M0 · 112 fios/cm²</span>
+        </div>
+        <div class="ctrl">
+          <label for="hero-range">Mês</label>
+          <input type="range" id="hero-range" min="0" max="6" step="1" value="0" aria-label="Escolher o mês do acompanhamento">
+          <span class="val" id="hero-val">M0</span>
+        </div>
+        <figcaption>Arraste para percorrer os meses. Simulação ilustrativa da densidade — no sistema, cada mês é uma fotografia real da cliente.</figcaption>
+      </figure>
     <dl class="meta">
       <div><dt>Cliente</dt><dd>Jaqueline Mendonça — Terapia Capilar</dd></div>
       <div><dt>Fase</dt><dd>Apresentação da ideia e protótipo navegável</dd></div>
       <div><dt>Âmbito</dt><dd>Aplicação web (telemóvel, tablet e computador)</dd></div>
       <div><dt>Data</dt><dd>Setembro de 2026</dd></div>
     </dl>
+    </div>
   </div>
   <div class="hero-note">
     <span class="chip"><b>7</b> módulos</span>
@@ -463,8 +635,15 @@ footer{padding-block:48px 60px; border-top:1px solid var(--line); margin-top:40p
     <h2>Os sete módulos</h2>
     <p>Cada módulo funciona sozinho, mas todos escrevem na mesma ficha da cliente. É isso que permite, no mês 6, ver numa só página a anamnese inicial, as fotos, os blends usados e o que foi pago.</p>
   </div>
-  <div class="mods">
-    <article class="mod">
+  <div class="filters" role="group" aria-label="Filtrar módulos">
+    <button class="filter" type="button" data-cat="todos" aria-pressed="true">Todos os módulos</button>
+    <button class="filter" type="button" data-cat="Clínico" aria-pressed="false">Clínico</button>
+    <button class="filter" type="button" data-cat="Acompanhamento" aria-pressed="false">Acompanhamento</button>
+    <button class="filter" type="button" data-cat="Comunicação" aria-pressed="false">Comunicação</button>
+    <button class="filter" type="button" data-cat="Negócio" aria-pressed="false">Negócio</button>
+  </div>
+  <div class="mods" id="mods">
+    <article class="mod" data-cat="Clínico">
       <p class="tag">Clínico</p>
       <h3>Ficha de anamnese</h3>
       <p>O questionário capilar completo, em secções, preenchido no tablet ou enviado à cliente antes da primeira sessão.</p>
@@ -476,7 +655,7 @@ footer{padding-block:48px 60px; border-top:1px solid var(--line); margin-top:40p
         <li>Consentimento informado e autorização de imagem, assinados no ecrã</li>
       </ul>
     </article>
-    <article class="mod">
+    <article class="mod" data-cat="Clínico">
       <p class="tag">Clínico</p>
       <h3>Evolução fotográfica</h3>
       <p>Um registo por mês, sempre nos mesmos cinco ângulos, com guia de enquadramento sobreposto para as fotos ficarem comparáveis.</p>
@@ -487,7 +666,7 @@ footer{padding-block:48px 60px; border-top:1px solid var(--line); margin-top:40p
         <li>Armazenamento privado, com apagamento a pedido</li>
       </ul>
     </article>
-    <article class="mod">
+    <article class="mod" data-cat="Clínico">
       <p class="tag">Clínico</p>
       <h3>Blends e formulações</h3>
       <p>A parte que torna o método único, escrita e versionada: o que entra em cada frasco, para quem, e porquê.</p>
@@ -499,7 +678,7 @@ footer{padding-block:48px 60px; border-top:1px solid var(--line); margin-top:40p
         <li>Stock de matéria-prima com aviso de rutura</li>
       </ul>
     </article>
-    <article class="mod">
+    <article class="mod" data-cat="Acompanhamento">
       <p class="tag">Acompanhamento</p>
       <h3>Protocolos 3 / 6 / 9 meses</h3>
       <p>O método transformado em percurso: cada protocolo tem fases, sessões previstas, blends por fase e avaliação mensal.</p>
@@ -510,7 +689,7 @@ footer{padding-block:48px 60px; border-top:1px solid var(--line); margin-top:40p
         <li>Estado visível: em dia, atrasada, concluída</li>
       </ul>
     </article>
-    <article class="mod">
+    <article class="mod" data-cat="Comunicação">
       <p class="tag">Comunicação</p>
       <h3>E-mails automáticos</h3>
       <p>As mensagens que se repetem em todas as clientes, escritas uma vez e enviadas sozinhas no momento certo.</p>
@@ -522,7 +701,7 @@ footer{padding-block:48px 60px; border-top:1px solid var(--line); margin-top:40p
         <li>Reativação de clientes paradas há 60 dias</li>
       </ul>
     </article>
-    <article class="mod">
+    <article class="mod" data-cat="Comunicação">
       <p class="tag">Comunicação</p>
       <h3>Lembretes por SMS e WhatsApp</h3>
       <p>Régua de lembretes ligada à agenda e ao protocolo, através da Twilio, com registo de tudo o que foi enviado.</p>
@@ -534,7 +713,7 @@ footer{padding-block:48px 60px; border-top:1px solid var(--line); margin-top:40p
         <li>Histórico por cliente, sem mensagens repetidas</li>
       </ul>
     </article>
-    <article class="mod">
+    <article class="mod" data-cat="Negócio">
       <p class="tag">Negócio</p>
       <h3>Gestão do negócio</h3>
       <p>A administração que costuma ficar para o fim do mês, atualizada à medida que as sessões acontecem.</p>
@@ -555,32 +734,96 @@ footer{padding-block:48px 60px; border-top:1px solid var(--line); margin-top:40p
   <div class="sec-head">
     <p class="eyebrow">Como o sistema acompanha o método</p>
     <h2>A jornada de 9 meses</h2>
-    <p>Os marcos abaixo seguem a lógica de 3, 6 e 9 meses. Os conteúdos de cada fase são definidos pela Jaqueline — o sistema limita-se a garantir que nada é esquecido no caminho.</p>
+    <p>Toque num marco para ver o que acontece nessa fase. Os marcos seguem a lógica de 3, 6 e 9 meses. Os conteúdos de cada fase são definidos pela Jaqueline — o sistema limita-se a garantir que nada é esquecido no caminho.</p>
   </div>
-  <div class="journey">
-    <div class="phase is-key">
-      <span class="mark">M0</span>
-      <h4>Avaliação inicial</h4>
-      <p>A sessão que fixa o ponto de partida.</p>
-      <ul><li>Anamnese completa</li><li>Fotos nos cinco ângulos</li><li>Consentimentos assinados</li><li>Protocolo escolhido e blend inicial</li></ul>
+  <div class="rail" role="tablist" aria-label="Fases do acompanhamento">
+    <button class="stop" role="tab" id="st-0" aria-controls="stg-0" aria-selected="true" data-stage="0">
+      <span class="dot"><i></i></span><span class="lb">M0</span><span class="nm">Avaliação inicial</span>
+    </button>
+    <button class="stop" role="tab" id="st-1" aria-controls="stg-1" aria-selected="false" data-stage="1">
+      <span class="dot"><i></i></span><span class="lb">M1 — M3</span><span class="nm">Reequilíbrio</span>
+    </button>
+    <button class="stop" role="tab" id="st-2" aria-controls="stg-2" aria-selected="false" data-stage="2">
+      <span class="dot"><i></i></span><span class="lb">M4 — M6</span><span class="nm">Fortalecimento</span>
+    </button>
+    <button class="stop" role="tab" id="st-3" aria-controls="stg-3" aria-selected="false" data-stage="3">
+      <span class="dot"><i></i></span><span class="lb">M7 — M9</span><span class="nm">Manutenção</span>
+    </button>
+  </div>
+
+  <div class="stage" id="stg-0" role="tabpanel" aria-labelledby="st-0">
+    <div>
+      <h3>A sessão que fixa o ponto de partida</h3>
+      <p class="lead">Tudo o que vier a seguir vai ser comparado com este dia — por isso é o dia em que o sistema mais trabalha.</p>
+      <ul>
+        <li>Anamnese completa preenchida no tablet, ao lado da cliente</li>
+        <li>Primeiras fotografias nos cinco ângulos, com guia de enquadramento</li>
+        <li>Consentimento de acompanhamento e autorização de imagem, assinados no ecrã</li>
+        <li>Escolha do protocolo e do blend inicial, já com as contraindicações verificadas</li>
+      </ul>
     </div>
-    <div class="phase is-key">
-      <span class="mark">M1 — M3</span>
-      <h4>Fase de reequilíbrio</h4>
-      <p>Primeiro marco de reavaliação.</p>
-      <ul><li>Foto mensal pedida automaticamente</li><li>Ajuste do blend ao fim do mês 3</li><li>Relatório de evolução por e-mail</li><li>Decisão: manter ou avançar para 6 meses</li></ul>
+    <div class="auto">
+      <p class="t">O que acontece sozinho</p>
+      <p class="line"><b>na hora</b> E-mail de boas-vindas com o resumo da avaliação e as instruções do blend.</p>
+      <p class="line"><b>+1 dia</b> Sessões do protocolo criadas na agenda, nas datas certas.</p>
+      <p class="line"><b>dia 1</b> Primeiro pedido de foto mensal agendado.</p>
     </div>
-    <div class="phase is-key">
-      <span class="mark">M4 — M6</span>
-      <h4>Fase de fortalecimento</h4>
-      <p>Onde a comparação fotográfica começa a falar.</p>
-      <ul><li>Comparação M0 vs M6 lado a lado</li><li>Segunda formulação do blend</li><li>Renovação do pacote assinalada a 30 dias</li></ul>
+  </div>
+
+  <div class="stage" id="stg-1" role="tabpanel" aria-labelledby="st-1" hidden>
+    <div>
+      <h3>Os três meses em que a rotina se instala</h3>
+      <p class="lead">A fase que costuma perder clientes por falta de contacto. É aqui que os lembretes valem mais do que qualquer relatório.</p>
+      <ul>
+        <li>Foto mensal pedida automaticamente, com link para o telemóvel</li>
+        <li>Aviso quando o frasco do blend está a acabar, calculado pela posologia</li>
+        <li>Reavaliação de M3 com comparação das fotos lado a lado</li>
+        <li>Decisão registada na ficha: manter, ajustar ou avançar para os 6 meses</li>
+      </ul>
     </div>
-    <div class="phase is-key">
-      <span class="mark">M7 — M9</span>
-      <h4>Fase de manutenção</h4>
-      <p>Fecho do ciclo e continuidade.</p>
-      <ul><li>Relatório final com todo o percurso</li><li>Plano de manutenção e blend caseiro</li><li>Pedido de testemunho e autorização de uso</li></ul>
+    <div class="auto">
+      <p class="t">O que acontece sozinho</p>
+      <p class="line"><b>−48 h</b> SMS de confirmação de cada sessão, com resposta SIM ou NÃO.</p>
+      <p class="line"><b>dia 1</b> Pedido da foto do mês; quem não enviar aparece no painel ao fim de cinco dias.</p>
+      <p class="line"><b>fim de M3</b> E-mail com a evolução do trimestre e convite para a reavaliação.</p>
+    </div>
+  </div>
+
+  <div class="stage" id="stg-2" role="tabpanel" aria-labelledby="st-2" hidden>
+    <div>
+      <h3>Quando a comparação começa a falar</h3>
+      <p class="lead">Ao sexto mês há material suficiente para mostrar o percurso à cliente — e é isso que sustenta a renovação.</p>
+      <ul>
+        <li>Comparador M0 contra M6 nos mesmos ângulos</li>
+        <li>Segunda formulação do blend, versionada e com lote novo</li>
+        <li>Medições atualizadas: densidade, teste de tração, oleosidade</li>
+        <li>Renovação do pacote assinalada com 30 dias de antecedência</li>
+      </ul>
+    </div>
+    <div class="auto">
+      <p class="t">O que acontece sozinho</p>
+      <p class="line"><b>−30 d</b> Aviso interno de fim de fase, antes de a cliente perguntar.</p>
+      <p class="line"><b>fim de M6</b> Relatório com as fotos dos seis meses e os valores medidos.</p>
+      <p class="line"><b>rótulo</b> Nova etiqueta do blend impressa com lote, validade e posologia.</p>
+    </div>
+  </div>
+
+  <div class="stage" id="stg-3" role="tabpanel" aria-labelledby="st-3" hidden>
+    <div>
+      <h3>Fechar o ciclo sem perder a cliente</h3>
+      <p class="lead">O fim do protocolo é o princípio da manutenção — e o momento certo para pedir o testemunho.</p>
+      <ul>
+        <li>Relatório final com todo o percurso, dos nove meses</li>
+        <li>Plano de manutenção com blend caseiro e frequência reduzida</li>
+        <li>Pedido de testemunho e autorização de uso das imagens, em separado</li>
+        <li>Cliente passa a seguimento trimestral, sem sair do sistema</li>
+      </ul>
+    </div>
+    <div class="auto">
+      <p class="t">O que acontece sozinho</p>
+      <p class="line"><b>fim de M9</b> Relatório final em PDF e e-mail de encerramento do protocolo.</p>
+      <p class="line"><b>+60 d</b> Mensagem de reativação a quem não voltar a marcar.</p>
+      <p class="line"><b>trimestral</b> Lembrete de sessão de manutenção, se a cliente aceitar.</p>
     </div>
   </div>
 </section>
@@ -1282,6 +1525,25 @@ footer{padding-block:48px 60px; border-top:1px solid var(--line); margin-top:40p
   </div>
 </section>
 
+<section id="convite" style="padding-bottom:24px">
+  <div class="invite">
+    <div>
+      <p class="eyebrow">Próximo passo</p>
+      <h2>Começamos pela ficha.</h2>
+      <p>O protótipo já mostra a forma. Falta o conteúdo que só a Jaqueline tem: as perguntas da anamnese, as fases do método e o que entra em cada blend. Com isso em mãos, a primeira fase entra em funcionamento antes de o sistema estar completo — e o papel deixa de ser preciso logo aí.</p>
+      <div class="acts">
+        <a class="btn" href="#prototipo">Rever o protótipo</a>
+        <a class="btn ghost" href="#decisoes">Ver o que falta decidir</a>
+      </div>
+    </div>
+    <div class="nextsteps">
+      <div class="nextstep"><b>1</b><span><strong>Uma sessão de trabalho, uma hora</strong>Percorrer o protótipo ecrã a ecrã e apontar o que sobra e o que falta.</span></div>
+      <div class="nextstep"><b>2</b><span><strong>A anamnese, campo a campo</strong>Passar o questionário em papel para a estrutura digital, sem perder nada.</span></div>
+      <div class="nextstep"><b>3</b><span><strong>Arranque da fase 1</strong>Clientes, agenda e ficha digital a funcionar no estúdio, com as fichas antigas importadas.</span></div>
+    </div>
+  </div>
+</section>
+
 <footer>
   <span>Proposta e protótipo · Jaqueline Mendonça — Terapia Capilar</span>
   <span>Todos os nomes de clientes, valores e formulações nesta página são exemplos inventados.</span>
@@ -1379,6 +1641,150 @@ footer{padding-block:48px 60px; border-top:1px solid var(--line); margin-top:40p
     };
     range.addEventListener('input', sync);
     sync();
+  }
+
+  /* ---- barra fixa: sombra e secção ativa ---- */
+  var topbar = document.getElementById('topbar');
+  var links = Array.prototype.slice.call(document.querySelectorAll('.tb-nav a'));
+  var marks = links.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var ticking = false;
+  function onScroll(){
+    if (topbar) topbar.classList.toggle('is-stuck', window.scrollY > 30);
+    var active = -1;
+    marks.forEach(function(el, i){
+      if (el && el.getBoundingClientRect().top <= 140) active = i;
+    });
+    links.forEach(function(a, i){ a.classList.toggle('is-active', i === active); });
+    ticking = false;
+  }
+  window.addEventListener('scroll', function(){
+    if (!ticking){ ticking = true; window.requestAnimationFrame(onScroll); }
+  }, { passive: true });
+  onScroll();
+
+  /* ---- filtros dos módulos ---- */
+  var filters = Array.prototype.slice.call(document.querySelectorAll('.filter'));
+  var cards = Array.prototype.slice.call(document.querySelectorAll('.mod[data-cat]'));
+  filters.forEach(function(f){
+    f.addEventListener('click', function(){
+      filters.forEach(function(o){ o.setAttribute('aria-pressed', o === f ? 'true' : 'false'); });
+      var cat = f.dataset.cat;
+      cards.forEach(function(c){ c.classList.toggle('is-out', cat !== 'todos' && c.dataset.cat !== cat); });
+    });
+  });
+
+  /* ---- jornada clicável ---- */
+  var stops = Array.prototype.slice.call(document.querySelectorAll('.stop[data-stage]'));
+  function stage(n){
+    stops.forEach(function(t){
+      var on = t.dataset.stage === n;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      var panel = document.getElementById('stg-' + t.dataset.stage);
+      if (panel) panel.hidden = !on;
+    });
+  }
+  stops.forEach(function(t){
+    t.addEventListener('click', function(){ stage(t.dataset.stage); });
+    t.addEventListener('keydown', function(e){
+      var i = stops.indexOf(t), n = null;
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') n = stops[(i + 1) % stops.length];
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') n = stops[(i - 1 + stops.length) % stops.length];
+      if (n){ e.preventDefault(); n.focus(); stage(n.dataset.stage); }
+    });
+  });
+
+  /* ---- simulação do herói: densidade de M0 a M6 ---- */
+  var calm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var hero = document.getElementById('hero-canvas');
+  var hrange = document.getElementById('hero-range');
+  var hstamp = document.getElementById('hero-stamp');
+  var hval = document.getElementById('hero-val');
+  if (hero && hero.getContext){
+    var hctx = hero.getContext('2d');
+    var frames = [];
+    for (var m = 0; m <= 6; m++){
+      var off = document.createElement('canvas');
+      off.width = hero.width; off.height = hero.height;
+      drawScalp(off, 112 + m * 5, 21);        /* mesma semente: os fios novos somam-se aos antigos */
+      frames.push(off);
+    }
+    var paint = function(t){
+      var lo = Math.max(0, Math.min(6, Math.floor(t)));
+      var hi = Math.min(6, lo + 1);
+      var f = t - lo;
+      hctx.globalAlpha = 1;
+      hctx.drawImage(frames[lo], 0, 0);
+      if (f > 0.01){ hctx.globalAlpha = f; hctx.drawImage(frames[hi], 0, 0); hctx.globalAlpha = 1; }
+      var mm = Math.round(t);
+      if (hstamp) hstamp.textContent = 'M' + mm + ' · ' + (112 + mm * 5) + ' fios/cm²';
+      if (hval) hval.textContent = 'M' + mm;
+    };
+    paint(0);
+    if (hrange){
+      hrange.addEventListener('input', function(){ intro = null; paint(Number(hrange.value)); });
+    }
+    var intro = { t0: 0, dur: 2400 };
+    if (calm){
+      intro = null;
+      if (hrange) hrange.value = 6;
+      paint(6);
+    } else {
+      var tick = function(now){
+        if (!intro) return;
+        if (!intro.t0) intro.t0 = now;
+        var k = Math.min(1, (now - intro.t0) / intro.dur);
+        var eased = 1 - Math.pow(1 - k, 3);
+        paint(eased * 6);
+        if (hrange) hrange.value = String(Math.round(eased * 6));
+        if (k < 1) window.requestAnimationFrame(tick); else intro = null;
+      };
+      window.setTimeout(function(){ if (intro) window.requestAnimationFrame(tick); }, 420);
+    }
+  }
+
+  /* ---- números e barras que sobem ao entrar no ecrã ---- */
+  function countUp(el){
+    var raw = el.textContent;
+    var match = raw.match(/[\d\s]+/);
+    if (!match) return;
+    var target = parseInt(match[0].replace(/\s/g, ''), 10);
+    if (!target || calm) return;
+    var pre = raw.slice(0, match.index), post = raw.slice(match.index + match[0].length);
+    var t0 = 0;
+    var step = function(now){
+      if (!t0) t0 = now;
+      var k = Math.min(1, (now - t0) / 800);
+      var v = Math.round(target * (1 - Math.pow(1 - k, 3)));
+      el.textContent = pre + v.toLocaleString('pt-PT').replace(/\u00A0/g, ' ') + post;
+      if (k < 1) window.requestAnimationFrame(step);
+      else el.textContent = raw;
+    };
+    window.requestAnimationFrame(step);
+  }
+  if ('IntersectionObserver' in window){
+    var seen = new WeakSet();
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if (!e.isIntersecting || seen.has(e.target)) return;
+        seen.add(e.target);
+        if (e.target.classList.contains('kpis')){
+          e.target.querySelectorAll('.v').forEach(countUp);
+        } else if (e.target.classList.contains('bars') && !calm){
+          e.target.querySelectorAll('.track i').forEach(function(bar){
+            var w = bar.style.width;
+            bar.style.width = '0%';
+            window.requestAnimationFrame(function(){
+              window.requestAnimationFrame(function(){ bar.style.width = w; });
+            });
+          });
+        }
+      });
+    }, { threshold: 0.35 });
+    var painel = document.getElementById('sc-painel');
+    if (painel){
+      var k = painel.querySelector('.kpis'); if (k) io.observe(k);
+      var b = painel.querySelector('.bars'); if (b) io.observe(b);
+    }
   }
 })();
 </script>
